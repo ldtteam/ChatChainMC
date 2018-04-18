@@ -7,19 +7,19 @@ import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 public class MainConfig extends BaseConfig
 {
 
-    @Setting(value = "server-name", comment = "The display name for this server, try to keep it unique.")
+    @Setting(value = "server-name", comment = "\nThe display name for this server, try to keep it unique.")
     public String serverName = "This Servers Name";
 
-    @Setting(value = "api-url", comment = "URL for connecting to DiscordianNetwork")
+    @Setting(value = "api-url", comment = "\nURL for connecting to DiscordianNetwork")
     public String apiUrl = "http://localhost:5000";
 
-    @Setting(value = "api-hub", comment = "DO NOT TOUCH UNLESS YOU KNOW WHAT YOU'RE DOING \n "
+    @Setting(value = "api-hub", comment = "\nDO NOT TOUCH UNLESS YOU KNOW WHAT YOU'RE DOING \n "
                                             + "API hub url. please leave proceeding \"/\"")
     public String apiHub = "/hubs/discordian";
 
-    @Setting(value = "main-channel", comment = "Put the discord channel ID of where you want the main chat output to go.")
+    @Setting(value = "main-channel", comment = "\nPut the discord channel ID of where you want the main chat output to go.")
     public String mainChannel = "channel id here";
 
-    @Setting(value = "api-token", comment = "Put your DiscordianServer token in here.")
+    @Setting(value = "api-token", comment = "\nPut your DiscordianServer token in here.")
     public String apiToken = "api token here";
 }

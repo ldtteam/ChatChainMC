@@ -18,6 +18,15 @@ public class TemplateMessages
                  .replace(PLAYER_MESSAGE, message);
     }
 
+    public static String getDiscordMessage(final String channelID, final String userName, final String message)
+    {
+        return DiscordianMC.instance.getTemplatesConfig().discordMessage
+                 .replace(CHANNEL_ID, channelID)
+                 .replace(PLAYER_NAME, userName)
+                 .replace(PLAYER_MESSAGE, message);
+    }
+
+
     public static String getPlayerJoin(final String playerName)
     {
         return DiscordianMC.instance.getTemplatesConfig().playerJoin
