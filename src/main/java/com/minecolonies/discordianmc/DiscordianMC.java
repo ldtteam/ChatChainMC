@@ -188,6 +188,17 @@ public class DiscordianMC
     }
 
     /**
+     * Used to set our API Auth token. This is retrieved from the config.
+     *
+     * @param builder the Authentication builder used.
+     */
+    private void setAuthenticationToken(IDiscordianConnectAuthenticationBuilder builder)
+    {
+
+        builder.withBearerToken(mainConfig.apiToken);
+    }
+
+    /**
      * How we handle Exceptions from the API client.
      * Honestly, we just log them and move on for now.
      *

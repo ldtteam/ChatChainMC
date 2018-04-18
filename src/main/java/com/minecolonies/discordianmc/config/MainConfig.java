@@ -19,4 +19,7 @@ public class MainConfig extends BaseConfig
 
     @Setting(value = "main-channel", comment = "Put the discord channel ID of where you want the main chat output to go.")
     public String mainChannel = "channel id here";
+
+    @Setting(value = "api-token", comment = "Put your DiscordianServer token in here.")
+    public String apiToken = "api token here";
 }
