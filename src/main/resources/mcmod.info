@@ -1,0 +1,20 @@
+[
+  {
+    "modid": "DiscordianMC",
+    "name": "DiscordianMC",
+    "description": "Minecraft side of the Discordian framework",
+    "version": "${version}",
+    "mcversion": "${mcversion}",
+    "url": "https://minecolonies.com",
+    "updateUrl": "",
+    "authorList": [
+      "MineColoniesTeam"
+    ],
+    "credits": "",
+    "logoFile": "",
+    "screenshots": [],
+    "dependencies": [
+      ""
+    ]
+  }
+]

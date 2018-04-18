@@ -1,14 +1,35 @@
-.gradle
+# project files
+
+# music files
+*.mp3
+*.aac
+*.m4a
+*.wav
+*.flac
+*.ogg
+
+# gradle
 /build/
+/.gradle/
+/out/
 
-# Ignore Gradle GUI config
-gradle-app.setting
+# eclipse files
+.classpath
+.project
+.settings/
+/bin/
 
-# Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
-!gradle-wrapper.jar
+# intellij files
+/.idea/
+*.iml
+*.ipr
+*.iws
 
-# Cache of project
-.gradletasknamecache
+# netbeans files
+/.nb-gradle/
+*.nb-gradle-properties
 
-# # Work around https://youtrack.jetbrains.com/issue/IDEA-116898
-# gradle/wrapper/gradle-wrapper.properties
+.DS_Store
+/config/
+
+run/
