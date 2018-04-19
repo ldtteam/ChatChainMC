@@ -10,15 +10,9 @@ import static com.minecolonies.discordianmc.config.TemplatesConfigReplacements.*
 public class TemplateMessages
 {
 
-    public static String getChatMessage(final String playerName, final String message)
-    {
-        return DiscordianMC.instance.getTemplatesConfig().chatMessage
-                 .replace(SERVER_NAME, DiscordianMC.instance.getMainConfig().serverName)
-                 .replace(PLAYER_NAME, playerName)
-                 .replace(PLAYER_MESSAGE, message);
-    }
+    private TemplateMessages() {/* Private constructor to hide implicit */}
 
-    public static String getDiscordMessage(final String channelID, final String userName, final String message)
+    public static String getGenericAnyDiscordChatMessage(final String channelID, final String userName, final String message)
     {
         return DiscordianMC.instance.getTemplatesConfig().discordMessage
                  .replace(CHANNEL_ID, channelID)
@@ -26,30 +20,71 @@ public class TemplateMessages
                  .replace(PLAYER_MESSAGE, message);
     }
 
-
-    public static String getPlayerJoin(final String playerName)
+    public static String getAnyChatMessage(final String serverName, final String playerName, final String message)
     {
-        return DiscordianMC.instance.getTemplatesConfig().playerJoin
+        return DiscordianMC.instance.getTemplatesConfig().anyChatMessage
+                 .replace(SERVER_NAME, serverName)
+                 .replace(PLAYER_NAME, playerName)
+                 .replace(PLAYER_MESSAGE, message);
+    }
+
+    public static String getAnyPlayerJoin(final String serverName, final String playerName)
+    {
+        return DiscordianMC.instance.getTemplatesConfig().anyPlayerJoin
+                 .replace(SERVER_NAME, serverName)
+                 .replace(PLAYER_NAME, playerName);
+    }
+
+    public static String getAnyPlayerLeave(final String serverName, final String playerName)
+    {
+        return DiscordianMC.instance.getTemplatesConfig().anyPlayerLeave
+                 .replace(SERVER_NAME, serverName)
+                 .replace(PLAYER_NAME, playerName);
+    }
+
+    public static String getAnyServerStart(final String serverName)
+    {
+        return DiscordianMC.instance.getTemplatesConfig().anyServerStart
+                 .replace(SERVER_NAME, serverName);
+    }
+
+    public static String getAnyServerStop(final String serverName)
+    {
+        return DiscordianMC.instance.getTemplatesConfig().anyServerStop
+                 .replace(SERVER_NAME, serverName);
+    }
+
+    public static String getDiscordChatMessage(final String playerName, final String message)
+    {
+        return DiscordianMC.instance.getTemplatesConfig().discordChatMessage
+                 .replace(SERVER_NAME, DiscordianMC.instance.getMainConfig().serverName)
+                 .replace(PLAYER_NAME, playerName)
+                 .replace(PLAYER_MESSAGE, message);
+    }
+
+    public static String getDiscordPlayerJoin(final String playerName)
+    {
+        return DiscordianMC.instance.getTemplatesConfig().discordPlayerJoin
                  .replace(SERVER_NAME, DiscordianMC.instance.getMainConfig().serverName)
                  .replace(PLAYER_NAME, playerName);
     }
 
-    public static String getPlayerLeave(final String playerName)
+    public static String getDiscordPlayerLeave(final String playerName)
     {
-        return DiscordianMC.instance.getTemplatesConfig().playerLeave
+        return DiscordianMC.instance.getTemplatesConfig().discordPlayerLeave
                  .replace(SERVER_NAME, DiscordianMC.instance.getMainConfig().serverName)
                  .replace(PLAYER_NAME, playerName);
     }
 
-    public static String getServerStart()
+    public static String getDiscordServerStart()
     {
-        return DiscordianMC.instance.getTemplatesConfig().serverStart
+        return DiscordianMC.instance.getTemplatesConfig().discordServerStart
                  .replace(SERVER_NAME, DiscordianMC.instance.getMainConfig().serverName);
     }
 
-    public static String getServerStop()
+    public static String getDiscordServerStop()
     {
-        return DiscordianMC.instance.getTemplatesConfig().serverStop
+        return DiscordianMC.instance.getTemplatesConfig().discordServerStop
                  .replace(SERVER_NAME, DiscordianMC.instance.getMainConfig().serverName);
     }
 }

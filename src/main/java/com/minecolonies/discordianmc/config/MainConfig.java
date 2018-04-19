@@ -3,6 +3,9 @@ package com.minecolonies.discordianmc.config;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @ConfigSerializable
 public class MainConfig extends BaseConfig
 {
@@ -22,4 +25,7 @@ public class MainConfig extends BaseConfig
 
     @Setting(value = "api-token", comment = "\nPut your DiscordianServer token in here.")
     public String apiToken = "api token here";
+
+    @Setting(value = "servers-to-display", comment = "Put all the Minecraft server-names (config value) to display messages from here.")
+    public List<String> displayServers = new ArrayList<>();
 }

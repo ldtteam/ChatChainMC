@@ -8,8 +8,8 @@ import com.minecolonies.discordianconnect.api.connection.auth.IDiscordianConnect
 import com.minecolonies.discordianmc.config.BaseConfig;
 import com.minecolonies.discordianmc.config.MainConfig;
 import com.minecolonies.discordianmc.config.TemplatesConfig;
-import com.minecolonies.discordianmc.handlers.api.ChatHandlers;
-import com.minecolonies.discordianmc.util.TemplateMessages;
+import com.minecolonies.discordianmc.handlers.api.Handlers;
+import com.minecolonies.discordianmc.util.APIMesssages;
 import lombok.Getter;
 import lombok.NonNull;
 import net.minecraft.server.MinecraftServer;
@@ -154,7 +154,14 @@ public class DiscordianMC
 
                 builder.usingAuthentication(IDiscordianConnectAuthenticationBuilder::withNoAuthentication);
 
-                builder.withEventHandler(eventBuilder -> eventBuilder.registerMessageHandler("DiscordChatMessage", ChatHandlers::discordMessage));
+                builder.withEventHandler(eventBuilder -> {
+                    eventBuilder.registerMessageHandler("GenericAnyDiscordChatMessage", Handlers::discordMessage);
+                    eventBuilder.registerMessageHandler("AnyMinecraftChatMessage", Handlers::anyMinecraftChatMessage);
+                    eventBuilder.registerMessageHandler("AnyMinecraftPlayerJoin", Handlers::anyMinecraftPlayerJoin);
+                    eventBuilder.registerMessageHandler("AnyMinecraftPlayerLeave", Handlers::anyMinecraftPlayerLeave);
+                    eventBuilder.registerMessageHandler("AnyMinecraftServerStart", Handlers::anyMinecraftServerStart);
+                    eventBuilder.registerMessageHandler("AnyMinecraftServerStop", Handlers::anyMinecraftServerStop);
+                });
 
                 builder.withErrorHandler(errorBuilder -> errorBuilder.registerHandler(this::errorHandler));
             });
@@ -179,10 +186,7 @@ public class DiscordianMC
             }
         }
 
-        if (connection.getConnectionState().equals(ConnectionState.OPEN))
-        {
-            connection.send("MinecraftGenericMessage", getMainConfig().mainChannel, getMainConfig().serverName, TemplateMessages.getServerStart());
-        }
+        APIMesssages.serverStart();
 
         logger.info("Successfully connected to API!");
     }
@@ -216,10 +220,7 @@ public class DiscordianMC
     public void serverStop(FMLServerStoppingEvent event)
     {
         logger.info("Disconnecting from API");
-        if (connection.getConnectionState().equals(ConnectionState.OPEN))
-        {
-            getConnection().send("MinecraftGenericMessage", getMainConfig().mainChannel, getMainConfig().serverName, TemplateMessages.getServerStop());
-        }
+        APIMesssages.serverStop();
         logger.info("Successfully Disconnected from API!");
     }
 }

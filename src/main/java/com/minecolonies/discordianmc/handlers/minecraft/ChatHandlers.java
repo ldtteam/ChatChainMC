@@ -3,7 +3,7 @@ package com.minecolonies.discordianmc.handlers.minecraft;
 import com.minecolonies.discordianconnect.api.connection.ConnectionState;
 import com.minecolonies.discordianmc.DiscordianMC;
 import com.minecolonies.discordianmc.config.MainConfig;
-import com.minecolonies.discordianmc.util.TemplateMessages;
+import com.minecolonies.discordianmc.util.APIMesssages;
 import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -22,11 +22,7 @@ public class ChatHandlers
               && DiscordianMC.instance.getConnection().getConnectionState().equals(ConnectionState.OPEN)
               && config != null)
         {
-            DiscordianMC.instance.getConnection()
-              .send("MinecraftGenericMessage",
-                config.mainChannel,
-                config.serverName,
-                TemplateMessages.getChatMessage(event.getUsername(), event.getMessage()));
+            APIMesssages.chatMessage(event.getPlayer().getName(), event.getMessage());
         }
     }
 }
