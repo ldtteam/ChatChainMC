@@ -2,7 +2,7 @@
   {
     "modid": "DiscordianMC",
     "name": "DiscordianMC",
-    "description": "Minecraft side of the Discordian framework",
+    "description": "Minecraft side of the ChatChain framework",
     "version": "${version}",
     "mcversion": "${mcversion}",
     "url": "https://minecolonies.com",
@@ -13,8 +13,6 @@
     "credits": "",
     "logoFile": "",
     "screenshots": [],
-    "dependencies": [
-      ""
-    ]
+    "dependencies": []
   }
 ]

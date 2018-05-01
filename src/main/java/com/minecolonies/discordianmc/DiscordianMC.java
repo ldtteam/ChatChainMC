@@ -5,14 +5,14 @@ import com.minecolonies.discordianconnect.DiscordianConnectAPI;
 import com.minecolonies.discordianconnect.api.connection.ConnectionState;
 import com.minecolonies.discordianconnect.api.connection.IDiscordianConnectConnection;
 import com.minecolonies.discordianconnect.api.connection.auth.IDiscordianConnectAuthenticationBuilder;
-import com.minecolonies.discordianmc.config.BaseConfig;
-import com.minecolonies.discordianmc.config.MainConfig;
-import com.minecolonies.discordianmc.config.TemplatesConfig;
-import com.minecolonies.discordianmc.handlers.api.Handlers;
+import com.minecolonies.discordianmc.commands.CommandEntryPoint;
+import com.minecolonies.discordianmc.config.*;
+import com.minecolonies.discordianmc.handlers.api.GenericHandlers;
 import com.minecolonies.discordianmc.util.APIMesssages;
 import lombok.Getter;
 import lombok.NonNull;
 import net.minecraft.server.MinecraftServer;
+import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
@@ -42,6 +42,7 @@ public class DiscordianMC
     public static final String MOD_ID   = "discordianmc";
     public static final String MOD_NAME = "DiscordianMC";
     public static final String VERSION  = "1.0-SNAPSHOT";
+    public static final String CLIENT_TYPE = "ChatChainMC";
 
     /**
      * This is the instance of your mod as created by Forge. It will never be null.
@@ -66,6 +67,9 @@ public class DiscordianMC
     @Getter
     private TemplatesConfig templatesConfig = null;
 
+    @Getter
+    private ClientConfigs clientConfigs = null;
+
     /**
      * This is the first initialization event. Register tile entities here.
      * The registry events below will have fired prior to entry to this method.
@@ -89,12 +93,16 @@ public class DiscordianMC
 
         final Path mainConfigPath = configDir.toPath().resolve("main.conf");
         final Path templateConfigPath = configDir.toPath().resolve("templates.conf");
+        final Path clientConfigsPath = configDir.toPath().resolve("clients.conf");
 
         mainConfig = getConfig(mainConfigPath, MainConfig.class,
           HoconConfigurationLoader.builder().setPath(mainConfigPath).build());
 
         templatesConfig = getConfig(templateConfigPath, TemplatesConfig.class,
           HoconConfigurationLoader.builder().setPath(templateConfigPath).build());
+
+        clientConfigs = getConfig(clientConfigsPath, ClientConfigs.class,
+          HoconConfigurationLoader.builder().setPath(clientConfigsPath).build());
     }
 
     @SuppressWarnings("unchecked")
@@ -131,6 +139,8 @@ public class DiscordianMC
     {
         server = event.getServer();
 
+        //event.registerServerCommand(new CommandEntryPoint());
+
         logger.info("Connecting to API");
 
         URL apiURL = null;
@@ -155,12 +165,13 @@ public class DiscordianMC
                 builder.usingAuthentication(IDiscordianConnectAuthenticationBuilder::withNoAuthentication);
 
                 builder.withEventHandler(eventBuilder -> {
-                    eventBuilder.registerMessageHandler("GenericAnyDiscordChatMessage", Handlers::discordMessage);
-                    eventBuilder.registerMessageHandler("AnyMinecraftChatMessage", Handlers::anyMinecraftChatMessage);
-                    eventBuilder.registerMessageHandler("AnyMinecraftPlayerJoin", Handlers::anyMinecraftPlayerJoin);
-                    eventBuilder.registerMessageHandler("AnyMinecraftPlayerLeave", Handlers::anyMinecraftPlayerLeave);
-                    eventBuilder.registerMessageHandler("AnyMinecraftServerStart", Handlers::anyMinecraftServerStart);
-                    eventBuilder.registerMessageHandler("AnyMinecraftServerStop", Handlers::anyMinecraftServerStop);
+                    eventBuilder.registerMessageHandler("GenericConnectionEvent", GenericHandlers::genericConnectionEvent);
+                    eventBuilder.registerMessageHandler("GenericDisconnectionEvent", GenericHandlers::genericDisconnectionEvent);
+                    eventBuilder.registerMessageHandler("GenericMessageEvent", GenericHandlers::genericMessageEvent);
+                    eventBuilder.registerMessageHandler("GenericJoinEvent", GenericHandlers::genericJoinEvent);
+                    eventBuilder.registerMessageHandler("GenericLeaveEvent", GenericHandlers::genericLeaveEvent);
+                    eventBuilder.registerMessageHandler("RequestJoined", GenericHandlers::requestJoined);
+                    eventBuilder.registerMessageHandler("RespondJoined", GenericHandlers::respondJoined);
                 });
 
                 builder.withErrorHandler(errorBuilder -> errorBuilder.registerHandler(this::errorHandler));
@@ -186,7 +197,7 @@ public class DiscordianMC
             }
         }
 
-        APIMesssages.serverStart();
+        APIMesssages.serverStart(APIChannels.MAIN);
 
         logger.info("Successfully connected to API!");
     }
@@ -220,7 +231,8 @@ public class DiscordianMC
     public void serverStop(FMLServerStoppingEvent event)
     {
         logger.info("Disconnecting from API");
-        APIMesssages.serverStop();
+        APIMesssages.serverStop(APIChannels.MAIN);
+        connection.disconnect();
         logger.info("Successfully Disconnected from API!");
     }
 }

@@ -1,5 +1,6 @@
 package com.minecolonies.discordianmc.handlers.minecraft;
 
+import com.minecolonies.discordianmc.APIChannels;
 import com.minecolonies.discordianmc.util.APIMesssages;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -20,7 +21,7 @@ public class PlayerHandlers
         if (event.player != null
               && !event.player.world.isRemote)
         {
-            APIMesssages.playerJoin(event.player.getName());
+            APIMesssages.playerJoin(APIChannels.MAIN, event.player.getName());
         }
     }
 
@@ -30,7 +31,7 @@ public class PlayerHandlers
         if (event.player != null
               && !event.player.world.isRemote)
         {
-            APIMesssages.playerLeave(event.player.getName());
+            APIMesssages.playerLeave(APIChannels.MAIN, event.player.getName());
         }
     }
 }
