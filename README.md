@@ -1,2 +1,2 @@
-# DiscordianMC
-DiscordianNetwork connector for the MinecraftForge Minecraft Modding platform.
+# ChatChainMC
+ChatChainNetwork connector for the MinecraftForge Minecraft Modding platform.
