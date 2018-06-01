@@ -2,7 +2,6 @@ package com.minecolonies.discordianmc;
 
 import com.google.common.reflect.TypeToken;
 import com.minecolonies.discordianconnect.DiscordianConnectAPI;
-import com.minecolonies.discordianconnect.api.connection.ConnectionState;
 import com.minecolonies.discordianconnect.api.connection.IDiscordianConnectConnection;
 import com.minecolonies.discordianconnect.api.connection.auth.IDiscordianConnectAuthenticationBuilder;
 import com.minecolonies.discordianmc.commands.CommandEntryPoint;
@@ -11,8 +10,8 @@ import com.minecolonies.discordianmc.handlers.api.GenericHandlers;
 import com.minecolonies.discordianmc.util.APIMesssages;
 import lombok.Getter;
 import lombok.NonNull;
+import net.minecraft.item.Item;
 import net.minecraft.server.MinecraftServer;
-import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
@@ -34,14 +33,16 @@ import java.nio.file.Path;
 @Mod(
   modid = DiscordianMC.MOD_ID,
   name = DiscordianMC.MOD_NAME,
-  version = DiscordianMC.VERSION
+  version = DiscordianMC.VERSION,
+  acceptableRemoteVersions = "*"
 )
 public class DiscordianMC
 {
 
-    public static final String MOD_ID   = "discordianmc";
-    public static final String MOD_NAME = "DiscordianMC";
+    public static final String MOD_ID   = "chatchainmc";
+    public static final String MOD_NAME = "ChatChainMC";
     public static final String VERSION  = "1.0-SNAPSHOT";
+    @SuppressWarnings("squid:S1192")
     public static final String CLIENT_TYPE = "ChatChainMC";
 
     /**
@@ -70,6 +71,8 @@ public class DiscordianMC
     @Getter
     private ClientConfigs clientConfigs = null;
 
+    private File configDir = null;
+
     /**
      * This is the first initialization event. Register tile entities here.
      * The registry events below will have fired prior to entry to this method.
@@ -79,7 +82,7 @@ public class DiscordianMC
     {
         logger = event.getModLog();
 
-        final File configDir = event.getSuggestedConfigurationFile().getParentFile().toPath().resolve(MOD_NAME).toFile();
+        configDir = event.getSuggestedConfigurationFile().getParentFile().toPath().resolve(MOD_NAME).toFile();
 
         if (!configDir.exists())
         {
@@ -91,6 +94,22 @@ public class DiscordianMC
             }
         }
 
+        final Path mainConfigPath = configDir.toPath().resolve("main.conf");
+        final Path templateConfigPath = configDir.toPath().resolve("templates.conf");
+        final Path clientConfigsPath = configDir.toPath().resolve("clients.conf");
+
+        mainConfig = getConfig(mainConfigPath, MainConfig.class,
+          HoconConfigurationLoader.builder().setPath(mainConfigPath).build());
+
+        templatesConfig = getConfig(templateConfigPath, TemplatesConfig.class,
+          HoconConfigurationLoader.builder().setPath(templateConfigPath).build());
+
+        clientConfigs = getConfig(clientConfigsPath, ClientConfigs.class,
+          HoconConfigurationLoader.builder().setPath(clientConfigsPath).build());
+    }
+
+    public void reloadConfigs()
+    {
         final Path mainConfigPath = configDir.toPath().resolve("main.conf");
         final Path templateConfigPath = configDir.toPath().resolve("templates.conf");
         final Path clientConfigsPath = configDir.toPath().resolve("clients.conf");
@@ -130,18 +149,17 @@ public class DiscordianMC
     }
 
     /**
-     * This is where we connect to the api and send
-     * the various messages needed when the server starts!
+     * (Re)conect to the ChatChainServer API.
      */
-    @Mod.EventHandler
-    @SuppressWarnings("squid:S2589")
-    public synchronized void serverStart(FMLServerStartingEvent event)
+    public synchronized void connectToAPI()
     {
-        server = event.getServer();
-
-        //event.registerServerCommand(new CommandEntryPoint());
-
         logger.info("Connecting to API");
+
+        if (connection != null)
+        {
+            APIMesssages.serverStop(APIChannels.MAIN);
+            connection.disconnect();
+        }
 
         URL apiURL = null;
 
@@ -177,29 +195,25 @@ public class DiscordianMC
                 builder.withErrorHandler(errorBuilder -> errorBuilder.registerHandler(this::errorHandler));
             });
 
-            connection.connect();
+            connection.connect(() -> APIMesssages.serverStart(APIChannels.MAIN));
         }
-
-        while (connection.getConnectionState() != ConnectionState.OPEN)
-        {
-            if (connection.getConnectionState().equals(ConnectionState.CLOSED))
-            {
-                break;
-            }
-
-            try
-            {
-                wait(1);
-            }
-            catch (Exception e)
-            {
-                logger.info("wait failed", e);
-            }
-        }
-
-        APIMesssages.serverStart(APIChannels.MAIN);
 
         logger.info("Successfully connected to API!");
+    }
+
+    /**
+     * This is where we connect to the api and send
+     * the various messages needed when the server starts!
+     */
+    @Mod.EventHandler
+    @SuppressWarnings("squid:S2589")
+    public synchronized void serverStart(FMLServerStartingEvent event)
+    {
+        server = event.getServer();
+
+        event.registerServerCommand(new CommandEntryPoint());
+
+        connectToAPI();
     }
 
     /**

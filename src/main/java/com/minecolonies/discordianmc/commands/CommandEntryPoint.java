@@ -85,8 +85,8 @@ public class CommandEntryPoint extends CommandBase
      */
     public CommandEntryPoint()
     {
-        //super();
-        root = buildMenu(NavigationMenuType.MINECOLONIES);
+        super();
+        root = buildMenu(NavigationMenuType.CHATCHAIN);
     }
 
     /**
@@ -100,7 +100,7 @@ public class CommandEntryPoint extends CommandBase
     @Override
     public List<String> getAliases()
     {
-        return Arrays.asList("mc", "col", "mcol", "mcolonies", "minecol", "minecolonies");
+        return Arrays.asList("cc", "ccmc", "chatchain", "chatchainmc");
     }
 
     private TreeNode<IMenu> buildMenu(@NotNull final IMenuType menuType)
@@ -414,7 +414,15 @@ public class CommandEntryPoint extends CommandBase
         if (treeNode.getData().getMenuType().isNavigationMenu())
         {
             final Map<String, TreeNode<IMenu>> childs = getNavigationCommands(treeNode);
-            final String lowerCaseArg0 = args[0].toLowerCase(Locale.ROOT);
+            String lowerCaseArg0;
+            if (args.length != 0)
+            {
+                lowerCaseArg0 = args[0].toLowerCase(Locale.ROOT);
+            }
+            else
+            {
+                lowerCaseArg0 = root.toString();
+            }
             if (args.length <= 1
                   || !childs.containsKey(lowerCaseArg0))
             {

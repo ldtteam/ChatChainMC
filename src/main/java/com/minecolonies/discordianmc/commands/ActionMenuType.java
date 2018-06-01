@@ -1,5 +1,7 @@
 package com.minecolonies.discordianmc.commands;
 
+import com.minecolonies.discordianmc.commands.general.ReconnectCommand;
+import com.minecolonies.discordianmc.commands.general.ReloadCommand;
 import com.minecolonies.discordianmc.commands.general.TestCommand;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,7 +24,19 @@ public enum ActionMenuType implements IMenuType
             ForgePermissionNodes.TEST,
             TestCommand.class,
             new ActionArgument("player", ActionArgumentType.ONLINE_PLAYER, ActionArgumentType.Is.OPTIONAL)
-            ))
+            )),
+    RELOAD(new ActionMenu(
+      "Reload Command",
+      "reload",
+      ForgePermissionNodes.RELOAD,
+      ReloadCommand.class
+    )),
+    RECONNECT(new ActionMenu(
+      "Reconnect Command",
+      "reconnect",
+        ForgePermissionNodes.RECONNECT,
+      ReconnectCommand.class
+    ))
     ;
 
     @NotNull

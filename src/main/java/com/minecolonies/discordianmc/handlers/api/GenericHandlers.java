@@ -27,6 +27,7 @@ public class GenericHandlers
             return;
         }
 
+        DiscordianMC.instance.getClientConfigs().load();
         if (DiscordianMC.instance.getClientConfigs().clientConfigs.containsKey(clientName)
               && DiscordianMC.instance.getServer() != null
               && DiscordianMC.instance.getClientConfigs().clientTypesConfig.containsKey(clientType)
@@ -39,6 +40,7 @@ public class GenericHandlers
                 {
                     if (clientConfig.channels.get(channel).contains(channelName.toLowerCase()))
                     {
+                        DiscordianMC.instance.getServer().sendMessage(message);
                         DiscordianMC.instance.getServer().getPlayerList().getPlayers().forEach(player -> player.sendMessage(message));
                     }
                 }
@@ -53,12 +55,14 @@ public class GenericHandlers
             clientConfig.display = false;
 
             DiscordianMC.instance.getClientConfigs().clientConfigs.put(clientName, clientConfig);
+            DiscordianMC.instance.getClientConfigs().save();
         }
 
         if (!DiscordianMC.instance.getClientConfigs().clientTypesConfig.containsKey(clientType))
         {
             DiscordianMC.instance.getLogger().info("Adding New ClientType: {}", clientType);
             DiscordianMC.instance.getClientConfigs().clientTypesConfig.put(clientType, true);
+            DiscordianMC.instance.getClientConfigs().save();
         }
     }
 

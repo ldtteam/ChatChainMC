@@ -12,7 +12,9 @@ import org.jetbrains.annotations.NotNull;
  */
 public enum ForgePermissionNodes
 {
-    TEST("com.discordianmc.test", DefaultPermissionLevel.OP, "Can test....")
+    TEST("com.discordianmc.test", DefaultPermissionLevel.OP, "Can test...."),
+    RELOAD("com.discordianmc.reload", DefaultPermissionLevel.OP, "Reloads Configs...."),
+    RECONNECT("com.discordianmc.reconnect", DefaultPermissionLevel.OP, "Reconnect to API....")
     ;
 
     @NotNull

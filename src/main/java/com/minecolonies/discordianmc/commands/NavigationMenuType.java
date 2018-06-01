@@ -8,9 +8,11 @@ public enum NavigationMenuType implements IMenuType
             ActionMenuType.TEST2
     )),
 
-    MINECOLONIES(new NavigationMenu("discordianMC",
+    CHATCHAIN(new NavigationMenu("chatchain",
             NavigationMenuType.TEST_COMMANDS,
-            ActionMenuType.TEST
+            ActionMenuType.TEST,
+            ActionMenuType.RELOAD,
+            ActionMenuType.RECONNECT
     ))
 
     ;

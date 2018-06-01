@@ -99,6 +99,13 @@ processResources {
 }
 
 shadowJar {
+    mainSpec.sourcePaths.clear()
+    dependsOn reobfJar
+    exclude 'dummyThing'
+
+    afterEvaluate {
+        from zipTree(reobfJar.jar)
+    }
     exclude 'META-INF'
     relocate('com.typesafe.config', 'configurate.typesafe.config')
 }
