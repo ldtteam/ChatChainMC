@@ -4,7 +4,7 @@ import com.google.common.reflect.TypeToken;
 import com.minecolonies.chatchainconnect.ChatChainConnectAPI;
 import com.minecolonies.chatchainconnect.api.connection.IChatChainConnectConnection;
 import com.minecolonies.chatchainconnect.api.connection.auth.IChatChainConnectAuthenticationBuilder;
-import com.minecolonies.chatchainmc.api.events.connection.ConnectionSetEventHandler;
+import com.minecolonies.chatchainmc.api.events.connection.ConnectionOpenEvent;
 import com.minecolonies.chatchainmc.core.commands.CommandEntryPoint;
 import com.minecolonies.chatchainmc.core.config.BaseConfig;
 import com.minecolonies.chatchainmc.core.config.ClientConfigs;
@@ -40,6 +40,7 @@ import java.nio.file.Path;
   version = ChatChainMC.VERSION,
   acceptableRemoteVersions = "*"
 )
+@Mod.EventBusSubscriber
 public class ChatChainMC
 {
 
@@ -187,22 +188,21 @@ public class ChatChainMC
                 builder.usingAuthentication(IChatChainConnectAuthenticationBuilder::withNoAuthentication);
 
                 builder.withEventHandler(eventBuilder -> {
-                    MinecraftForge.EVENT_BUS.post(new ConnectionSetEventHandler(eventBuilder));
                     eventBuilder.registerMessageHandler("GenericConnectionEvent", GenericHandlers::genericConnectionEvent);
                     eventBuilder.registerMessageHandler("GenericDisconnectionEvent", GenericHandlers::genericDisconnectionEvent);
-                    eventBuilder.registerMessageHandler("GenericMessageEvent", GenericHandlers::genericMessageEvent);
                     eventBuilder.registerMessageHandler("GenericJoinEvent", GenericHandlers::genericJoinEvent);
                     eventBuilder.registerMessageHandler("GenericLeaveEvent", GenericHandlers::genericLeaveEvent);
                     eventBuilder.registerMessageHandler("RequestJoined", GenericHandlers::requestJoined);
                     eventBuilder.registerMessageHandler("RespondJoined", GenericHandlers::respondJoined);
+                    eventBuilder.registerMessageHandler("GenericMessageEvent", GenericHandlers::genericMessageEvent);
                 });
 
                 builder.withErrorHandler(errorBuilder -> errorBuilder.registerHandler(this::errorHandler));
+
+                MinecraftForge.EVENT_BUS.post(new ConnectionOpenEvent(builder));
             });
 
             connection.connect(() -> APIMesssages.serverStart(APIChannels.MAIN));
-
-            //MinecraftForge.EVENT_BUS.post(new ConnectionOpenEvent());
         }
 
         logger.info("Successfully connected to API!");
