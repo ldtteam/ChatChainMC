@@ -1,7 +1,7 @@
 [
   {
-    "modid": "DiscordianMC",
-    "name": "DiscordianMC",
+    "modid": "ChatChainMC",
+    "name": "ChatChainMC",
     "description": "Minecraft side of the ChatChain framework",
     "version": "${version}",
     "mcversion": "${mcversion}",
