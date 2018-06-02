@@ -25,9 +25,28 @@ version = modVersion
 group = modGroup
 archivesBaseName = modBaseName
 
+sourceSets {
+    api {
+        java {
+            srcDir 'src/api/java'
+        }
+    }
+    main {
+        java {
+            srcDir 'src/main/java'
+        }
+        resources {
+            srcDir 'src/main/resources'
+        }
+        compileClasspath += sourceSets.api.output
+    }
+}
+
 minecraft {
     version = project.forgeVersion
     runDir = "run"
+
+    //srgExtra "PK: com/typesafe/config configurate/typesafe/config"
 
     // the mappings can be changed at any time, and must be in the following format.
     // snapshot_YYYYMMDD   snapshot are built nightly.
@@ -99,13 +118,16 @@ processResources {
 }
 
 shadowJar {
-    mainSpec.sourcePaths.clear()
-    dependsOn reobfJar
+    from sourceSets.api.output
+    from sourceSets.main.output
+
     exclude 'dummyThing'
 
-    afterEvaluate {
-        from zipTree(reobfJar.jar)
-    }
     exclude 'META-INF'
     relocate('com.typesafe.config', 'configurate.typesafe.config')
+}
+
+task apiJar(type: Jar) {
+    from sourceSets.api.output
+    classifier = 'api'
 }
