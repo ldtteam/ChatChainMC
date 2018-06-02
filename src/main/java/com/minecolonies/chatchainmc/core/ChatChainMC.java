@@ -218,7 +218,7 @@ public class ChatChainMC
     {
         server = event.getServer();
 
-        //event.registerServerCommand(new CommandEntryPoint());
+        event.registerServerCommand(new CommandEntryPoint());
 
         connectToAPI();
     }

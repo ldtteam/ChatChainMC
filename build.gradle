@@ -127,6 +127,10 @@ shadowJar {
     relocate('com.typesafe.config', 'configurate.typesafe.config')
 }
 
+reobf {
+    shadowJar {}
+}
+
 task apiJar(type: Jar) {
     from sourceSets.api.output
     classifier = 'api'
