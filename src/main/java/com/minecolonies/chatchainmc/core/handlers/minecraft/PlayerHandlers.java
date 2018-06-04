@@ -1,5 +1,6 @@
 package com.minecolonies.chatchainmc.core.handlers.minecraft;
 
+import com.minecolonies.chatchainconnect.api.objects.User;
 import com.minecolonies.chatchainmc.core.APIChannels;
 import com.minecolonies.chatchainmc.core.util.APIMesssages;
 import net.minecraft.entity.player.EntityPlayer;
@@ -23,7 +24,11 @@ public class PlayerHandlers
         if (event.player != null
               && !event.player.world.isRemote)
         {
-            APIMesssages.playerJoin(APIChannels.MAIN, event.player.getName());
+            final User user = new User();
+            user.setName(event.player.getName());
+            user.setAvatarURL("https://crafatar.com/avatars/" + event.player.getUniqueID().toString());
+
+            APIMesssages.playerJoin(APIChannels.MAIN, user);
         }
     }
 
@@ -33,7 +38,11 @@ public class PlayerHandlers
         if (event.player != null
               && !event.player.world.isRemote)
         {
-            APIMesssages.playerLeave(APIChannels.MAIN, event.player.getName());
+            final User user = new User();
+            user.setName(event.player.getName());
+            user.setAvatarURL("https://crafatar.com/avatars/" + event.player.getUniqueID().toString());
+
+            APIMesssages.playerLeave(APIChannels.MAIN, user);
         }
     }
 

@@ -86,13 +86,13 @@ dependencies {
     //compile('uk.co.drnaylor:quickstart-moduleloader:0.8.2')
     //compile('io.github.lukehutch:fast-classpath-scanner')
 
-    compile('org:ChatChainConnect_Release:' + chatChainConnectVersion) {
+    compile('org:ChatChain_ChatChainConnect_Branches:' + chatChainConnectVersion) {
         artifact {
-            name = 'chatchainconnect-0.0.1.' + chatChainConnectVersion + '-all'
+            name = 'chatchainconnect-' + chatChainConnectVersion + '-all'
             type = 'jar'
         }
         artifact {
-            name = 'chatchainconnect-0.0.1.' + chatChainConnectVersion + '-sources'
+            name = 'chatchainconnect-' + chatChainConnectVersion + '-sources'
             type = 'jar'
         }
     }

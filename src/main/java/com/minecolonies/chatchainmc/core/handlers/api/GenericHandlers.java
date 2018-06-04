@@ -1,5 +1,7 @@
 package com.minecolonies.chatchainmc.core.handlers.api;
 
+import com.google.gson.Gson;
+import com.minecolonies.chatchainconnect.api.objects.User;
 import com.minecolonies.chatchainmc.core.ChatChainMC;
 import com.minecolonies.chatchainconnect.api.connection.ConnectionState;
 import com.minecolonies.chatchainconnect.api.message.IChatChainConnectMessage;
@@ -10,6 +12,7 @@ import com.minecolonies.chatchainmc.core.util.TemplateMessages;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 
+import javax.jws.soap.SOAPBinding;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -97,13 +100,13 @@ public class GenericHandlers
         final String clientType = message.getArguments()[0].getAsString();
         final String clientName = message.getArguments()[1].getAsString();
         final String channelName = message.getArguments()[2].getAsString();
-        final String user = message.getArguments()[3].getAsString();
+        final User user = new Gson().fromJson(message.getArguments()[3], User.class);
         final String sentMessage = message.getArguments()[4].getAsString();
 
         final ITextComponent discordMessage = new TextComponentString((TemplateMessages.genericMessage(clientType,
           clientName,
           channelName,
-          user,
+          user.getName(),
           sentMessage)));
 
         sendMessage(clientType, clientName, channelName, discordMessage);
@@ -114,12 +117,12 @@ public class GenericHandlers
         final String clientType = message.getArguments()[0].getAsString();
         final String clientName = message.getArguments()[1].getAsString();
         final String channelName = message.getArguments()[2].getAsString();
-        final String user = message.getArguments()[3].getAsString();
+        final User user = new Gson().fromJson(message.getArguments()[3], User.class);
 
         final ITextComponent discordMessage = new TextComponentString(TemplateMessages.genericJoin(clientType,
           clientName,
           channelName,
-          user));
+          user.getName()));
 
         sendMessage(clientType, clientName, channelName, discordMessage);
     }
@@ -129,12 +132,12 @@ public class GenericHandlers
         final String clientType = message.getArguments()[0].getAsString();
         final String clientName = message.getArguments()[1].getAsString();
         final String channelName = message.getArguments()[2].getAsString();
-        final String user = message.getArguments()[3].getAsString();
+        final User user = new Gson().fromJson(message.getArguments()[3], User.class);
 
         final ITextComponent discordMessage = new TextComponentString(TemplateMessages.genericLeave(clientType,
           clientName,
           channelName,
-          user));
+          user.getName()));
 
         sendMessage(clientType, clientName, channelName, discordMessage);
     }
