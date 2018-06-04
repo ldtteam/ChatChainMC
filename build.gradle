@@ -21,9 +21,9 @@ apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: "net.minecraftforge.gradle.forge"
 
-version = modVersion
 group = modGroup
 archivesBaseName = modBaseName
+version = System.getenv()['BUILD_NUMBER'] != null ? System.getenv()['BUILD_NUMBER'] : System.getenv()['TRAVIS_BUILD_NUMBER']
 
 sourceSets {
     api {
