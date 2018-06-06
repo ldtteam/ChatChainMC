@@ -22,7 +22,7 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.ConfigurationOptions;
-import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
+import ninja.leaping.configurate.gson.GsonConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import org.apache.logging.log4j.Logger;
@@ -99,34 +99,34 @@ public class ChatChainMC
             }
         }
 
-        final Path mainConfigPath = configDir.toPath().resolve("main.conf");
-        final Path templateConfigPath = configDir.toPath().resolve("templates.conf");
-        final Path clientConfigsPath = configDir.toPath().resolve("clients.conf");
+        final Path mainConfigPath = configDir.toPath().resolve("main.json");
+        final Path templateConfigPath = configDir.toPath().resolve("templates.json");
+        final Path clientConfigsPath = configDir.toPath().resolve("clients.json");
 
         mainConfig = getConfig(mainConfigPath, MainConfig.class,
-          HoconConfigurationLoader.builder().setPath(mainConfigPath).build());
+          GsonConfigurationLoader.builder().setPath(mainConfigPath).build());
 
         templatesConfig = getConfig(templateConfigPath, TemplatesConfig.class,
-          HoconConfigurationLoader.builder().setPath(templateConfigPath).build());
+          GsonConfigurationLoader.builder().setPath(templateConfigPath).build());
 
         clientConfigs = getConfig(clientConfigsPath, ClientConfigs.class,
-          HoconConfigurationLoader.builder().setPath(clientConfigsPath).build());
+          GsonConfigurationLoader.builder().setPath(clientConfigsPath).build());
     }
 
     public void reloadConfigs()
     {
-        final Path mainConfigPath = configDir.toPath().resolve("main.conf");
-        final Path templateConfigPath = configDir.toPath().resolve("templates.conf");
-        final Path clientConfigsPath = configDir.toPath().resolve("clients.conf");
+        final Path mainConfigPath = configDir.toPath().resolve("main.json");
+        final Path templateConfigPath = configDir.toPath().resolve("templates.json");
+        final Path clientConfigsPath = configDir.toPath().resolve("clients.json");
 
         mainConfig = getConfig(mainConfigPath, MainConfig.class,
-          HoconConfigurationLoader.builder().setPath(mainConfigPath).build());
+          GsonConfigurationLoader.builder().setPath(mainConfigPath).build());
 
         templatesConfig = getConfig(templateConfigPath, TemplatesConfig.class,
-          HoconConfigurationLoader.builder().setPath(templateConfigPath).build());
+          GsonConfigurationLoader.builder().setPath(templateConfigPath).build());
 
         clientConfigs = getConfig(clientConfigsPath, ClientConfigs.class,
-          HoconConfigurationLoader.builder().setPath(clientConfigsPath).build());
+          GsonConfigurationLoader.builder().setPath(clientConfigsPath).build());
     }
 
     @SuppressWarnings("unchecked")

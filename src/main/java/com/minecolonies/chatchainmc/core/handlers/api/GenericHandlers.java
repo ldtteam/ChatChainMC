@@ -1,18 +1,16 @@
 package com.minecolonies.chatchainmc.core.handlers.api;
 
-import com.google.gson.Gson;
-import com.minecolonies.chatchainconnect.api.objects.User;
-import com.minecolonies.chatchainmc.core.ChatChainMC;
 import com.minecolonies.chatchainconnect.api.connection.ConnectionState;
 import com.minecolonies.chatchainconnect.api.message.IChatChainConnectMessage;
+import com.minecolonies.chatchainconnect.api.objects.User;
 import com.minecolonies.chatchainmc.core.APIChannels;
+import com.minecolonies.chatchainmc.core.ChatChainMC;
 import com.minecolonies.chatchainmc.core.config.ClientConfigs;
 import com.minecolonies.chatchainmc.core.util.SerializeUtils;
 import com.minecolonies.chatchainmc.core.util.TemplateMessages;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 
-import javax.jws.soap.SOAPBinding;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -37,15 +35,14 @@ public class GenericHandlers
               && ChatChainMC.instance.getClientConfigs().clientTypesConfig.get(clientType))
         {
             ClientConfigs.ClientConfig clientConfig = ChatChainMC.instance.getClientConfigs().clientConfigs.get(clientName);
-            if (clientConfig.display)
+            if (clientConfig.display
+                  && clientConfig.channels.containsKey(channelName))
             {
-                for (final String channel : clientConfig.channels.keySet())
+                for (final String channel : clientConfig.channels.get(channelName))
                 {
-                    if (clientConfig.channels.get(channel).contains(channelName.toLowerCase()))
-                    {
-                        ChatChainMC.instance.getServer().sendMessage(message);
-                        ChatChainMC.instance.getServer().getPlayerList().getPlayers().forEach(player -> player.sendMessage(message));
-                    }
+                    //We'll send it in the "Channel" later..
+                    ChatChainMC.instance.getServer().sendMessage(message);
+                    ChatChainMC.instance.getServer().getPlayerList().getPlayers().forEach(player -> player.sendMessage(message));
                 }
             }
         }
@@ -100,7 +97,7 @@ public class GenericHandlers
         final String clientType = message.getArguments()[0].getAsString();
         final String clientName = message.getArguments()[1].getAsString();
         final String channelName = message.getArguments()[2].getAsString();
-        final User user = new Gson().fromJson(message.getArguments()[3], User.class);
+        final User user = User.fromJson(message.getArguments()[3]);
         final String sentMessage = message.getArguments()[4].getAsString();
 
         final ITextComponent discordMessage = new TextComponentString((TemplateMessages.genericMessage(clientType,
@@ -117,7 +114,7 @@ public class GenericHandlers
         final String clientType = message.getArguments()[0].getAsString();
         final String clientName = message.getArguments()[1].getAsString();
         final String channelName = message.getArguments()[2].getAsString();
-        final User user = new Gson().fromJson(message.getArguments()[3], User.class);
+        final User user = User.fromJson(message.getArguments()[3]);
 
         final ITextComponent discordMessage = new TextComponentString(TemplateMessages.genericJoin(clientType,
           clientName,
@@ -132,7 +129,7 @@ public class GenericHandlers
         final String clientType = message.getArguments()[0].getAsString();
         final String clientName = message.getArguments()[1].getAsString();
         final String channelName = message.getArguments()[2].getAsString();
-        final User user = new Gson().fromJson(message.getArguments()[3], User.class);
+        final User user = User.fromJson(message.getArguments()[3]);
 
         final ITextComponent discordMessage = new TextComponentString(TemplateMessages.genericLeave(clientType,
           clientName,

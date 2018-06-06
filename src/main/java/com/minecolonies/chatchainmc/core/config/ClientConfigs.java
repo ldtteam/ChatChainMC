@@ -11,10 +11,10 @@ import java.util.Map;
 public class ClientConfigs extends BaseConfig
 {
 
-    @Setting(comment = "Put overriding ignore on clientTypes. E.G. ChatChainMC=false will ignore all other MC messages")
+    @Setting(value = "client-types", comment = "Put overriding ignore on clientTypes. E.G. ChatChainMC=false will ignore all other MC messages")
     public Map<String, Boolean> clientTypesConfig = new HashMap<>();
 
-    @Setting
+    @Setting(value = "clients")
     public Map<String, ClientConfig> clientConfigs = new HashMap<>();
 
     @ConfigSerializable
