@@ -43,7 +43,6 @@ public class ChatHandlers
             user.setAvatarURL("https://cdn.discordapp.com/channel-icons/354208766285185027/6fd2f2d04ef1c4a79a970ae96af42e75");
 
             final String message = Joiner.on(" ").join(event.getParameters());
-            ChatChainMC.instance.getLogger().info("Command Event, Name: {}, Parameters: {}", event.getSender().getName(), message);
             APIMesssages.chatMessage(APIChannels.MAIN, user, message);
         }
     }
