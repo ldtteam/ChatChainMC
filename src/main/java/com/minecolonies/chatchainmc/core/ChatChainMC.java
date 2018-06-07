@@ -172,9 +172,10 @@ public class ChatChainMC
         {
             apiURL = new URL(mainConfig.apiUrl + mainConfig.apiHub);
         }
-        catch (MalformedURLException e)
+        catch (Exception e)
         {
-            getLogger().error("Unable to create url: ", e);
+            logger.error("MainConfig: " + mainConfig);
+            logger.error("Unable to create url: ", e);
         }
 
         if (apiURL != null)
@@ -203,9 +204,12 @@ public class ChatChainMC
             });
 
             connection.connect(() -> APIMesssages.serverStart(APIChannels.MAIN));
+            logger.info("Successfully connected to API!");
         }
-
-        logger.info("Successfully connected to API!");
+        else
+        {
+            logger.warn("ChatChain could not connect to the API!!");
+        }
     }
 
     /**
