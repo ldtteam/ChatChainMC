@@ -2,6 +2,7 @@ package com.minecolonies.chatchainmc.core;
 
 import com.google.common.reflect.TypeToken;
 import com.minecolonies.chatchainconnect.ChatChainConnectAPI;
+import com.minecolonies.chatchainconnect.api.connection.ConnectionState;
 import com.minecolonies.chatchainconnect.api.connection.IChatChainConnectConnection;
 import com.minecolonies.chatchainconnect.api.connection.auth.IChatChainConnectAuthenticationBuilder;
 import com.minecolonies.chatchainmc.api.events.connection.ConnectionOpenEvent;
@@ -29,7 +30,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -44,9 +44,9 @@ import java.nio.file.Path;
 public class ChatChainMC
 {
 
-    public static final String MOD_ID   = "chatchainmc";
-    public static final String MOD_NAME = "ChatChainMC";
-    public static final String VERSION  = "1.0-SNAPSHOT";
+    public static final String MOD_ID      = "chatchainmc";
+    public static final String MOD_NAME    = "ChatChainMC";
+    public static final String VERSION     = "1.0-SNAPSHOT";
     @SuppressWarnings("squid:S1192")
     public static final String CLIENT_TYPE = "ChatChainMC";
 
@@ -203,8 +203,27 @@ public class ChatChainMC
                 MinecraftForge.EVENT_BUS.post(new ConnectionOpenEvent(builder));
             });
 
-            connection.connect(() -> APIMesssages.serverStart(APIChannels.MAIN));
+            connection.connect();
             logger.info("Successfully connected to API!");
+
+            while (!connection.getConnectionState().equals(ConnectionState.OPEN)
+                     || connection.getConnectionState().equals(ConnectionState.CLOSED)
+                     || (connection.getConnectionState().equals(ConnectionState.CLOSING)))
+            {
+                try
+                {
+                    wait(1);
+                }
+                catch (Exception e)
+                {
+                    logger.error("Couldn't wait for connection to open", e);
+                }
+            }
+
+            if (connection.getConnectionState().equals(ConnectionState.OPEN))
+            {
+                APIMesssages.serverStart(APIChannels.MAIN);
+            }
         }
         else
         {
@@ -223,6 +242,7 @@ public class ChatChainMC
         server = event.getServer();
 
         event.registerServerCommand(new CommandEntryPoint());
+        //event.registerServerCommand(new StaffCommand());
 
         connectToAPI();
     }

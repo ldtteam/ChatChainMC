@@ -19,12 +19,12 @@ public class ActionMenu extends AbstractMenu
     private final Class<? extends IActionCommand> actionCommandClass;
 
     public ActionMenu(
-            @NotNull final String description,
-            @NotNull final String menuItemName,
-            @NotNull final ForgePermissionNodes forgePermissionNode,
-            @NotNull final Class<? extends IActionCommand> actionCommandClass,
-            @Nullable final ActionArgument ... actionArguments
-            )
+      @NotNull final String description,
+      @NotNull final String menuItemName,
+      @NotNull final ForgePermissionNodes forgePermissionNode,
+      @NotNull final Class<? extends IActionCommand> actionCommandClass,
+      @Nullable final ActionArgument... actionArguments
+    )
     {
         super(menuItemName);
         this.description = description;

@@ -27,18 +27,21 @@ public class CommandEntryPoint extends CommandBase
     private static class ParsingResult
     {
         @NotNull
-        private final           List<String>         tabCompletions;
+        private final List<String>         tabCompletions;
         @NotNull
-        private final           TreeNode<IMenu>      executionTreeNode;
+        private final TreeNode<IMenu>      executionTreeNode;
         @NotNull
-        private final           List<ActionArgument> executionActionArgumentList;
-        @Nullable private final ActionMenuState      actionMenuState;
-        @Nullable private final String               badArgument;
+        private final List<ActionArgument> executionActionArgumentList;
+        @Nullable
+        private final ActionMenuState      actionMenuState;
+        @Nullable
+        private final String               badArgument;
 
-        ParsingResult(@NotNull final List<String> tabCompletions, @NotNull final TreeNode<IMenu> executionTreeNode,
-                @NotNull final List<ActionArgument> executionActionArgumentList,
-                @Nullable final ActionMenuState actionMenuState,
-                @Nullable final String badArgument)
+        ParsingResult(
+          @NotNull final List<String> tabCompletions, @NotNull final TreeNode<IMenu> executionTreeNode,
+          @NotNull final List<ActionArgument> executionActionArgumentList,
+          @Nullable final ActionMenuState actionMenuState,
+          @Nullable final String badArgument)
         {
             super();
             this.tabCompletions = new ArrayList<>(tabCompletions);
@@ -268,16 +271,18 @@ public class CommandEntryPoint extends CommandBase
         }
     }
 
-    protected void createInstanceAndExecute(@NotNull final MinecraftServer server, @NotNull final ICommandSender sender, @NotNull final ActionMenuState actionMenuState,
-            @NotNull final Class<? extends IActionCommand> clazz) throws InstantiationException, IllegalAccessException, CommandException
+    protected void createInstanceAndExecute(
+      @NotNull final MinecraftServer server, @NotNull final ICommandSender sender, @NotNull final ActionMenuState actionMenuState,
+      @NotNull final Class<? extends IActionCommand> clazz) throws InstantiationException, IllegalAccessException, CommandException
     {
         final IActionCommand actionCommand = clazz.newInstance();
         actionCommand.execute(server, sender, actionMenuState);
     }
 
-    private static void throwCommandUsageExceptionIfRequiredArgumentsAreNotProvided(@NotNull final TreeNode<IMenu> executionTreeNode, @NotNull final ActionMenu actionMenu,
-            @NotNull final List<ActionArgument> executionActionArgumentList, @NotNull final ActionMenuState actionMenuState, final String badArgument,
-            @NotNull final ICommandSender sender) throws CommandException
+    private static void throwCommandUsageExceptionIfRequiredArgumentsAreNotProvided(
+      @NotNull final TreeNode<IMenu> executionTreeNode, @NotNull final ActionMenu actionMenu,
+      @NotNull final List<ActionArgument> executionActionArgumentList, @NotNull final ActionMenuState actionMenuState, final String badArgument,
+      @NotNull final ICommandSender sender) throws CommandException
     {
         final List<ActionArgument> actionArgumentListForActionMenu = actionMenu.getActionArgumentList();
         for (final ActionArgument actionArgument : actionArgumentListForActionMenu)
@@ -294,14 +299,14 @@ public class CommandEntryPoint extends CommandBase
                             if (null == badArgument)
                             {
                                 throw new CommandException(
-                                        getCommandUsage(sender, executionTreeNode)
-                                            + ": no value specified for required argument " + actionArgument.getName());
+                                  getCommandUsage(sender, executionTreeNode)
+                                    + ": no value specified for required argument " + actionArgument.getName());
                             }
                             else
                             {
                                 throw new CommandException(
-                                        getCommandUsage(sender, executionTreeNode)
-                                            + ": invalid value '" + badArgument + "' for required argument " + actionArgument.getName());
+                                  getCommandUsage(sender, executionTreeNode)
+                                    + ": invalid value '" + badArgument + "' for required argument " + actionArgument.getName());
                             }
                         }
                         else
@@ -313,7 +318,7 @@ public class CommandEntryPoint extends CommandBase
                 if (!foundArgument)
                 {
                     throw new CommandException(getCommandUsage(sender, executionTreeNode)
-                            + ": missing required parameter " + actionArgument.getName());
+                                                 + ": missing required parameter " + actionArgument.getName());
                 }
             }
         }
@@ -325,8 +330,8 @@ public class CommandEntryPoint extends CommandBase
                 if ((null != executionActionArgument) && !actionMenuState.isValueSet(executionActionArgument))
                 {
                     throw new CommandException(
-                            getCommandUsage(sender, executionTreeNode)
-                                + ": invalid value '" + badArgument + "' for required argument " + executionActionArgument.getName());
+                      getCommandUsage(sender, executionTreeNode)
+                        + ": invalid value '" + badArgument + "' for required argument " + executionActionArgument.getName());
                 }
             }
         }
@@ -394,10 +399,10 @@ public class CommandEntryPoint extends CommandBase
     @NotNull
     @Override
     public List<String> getTabCompletions(
-                                           @NotNull final MinecraftServer server,
-                                           @NotNull final ICommandSender sender,
-                                           @NotNull final String[] args,
-                                           @Nullable final BlockPos pos)
+      @NotNull final MinecraftServer server,
+      @NotNull final ICommandSender sender,
+      @NotNull final String[] args,
+      @Nullable final BlockPos pos)
     {
         final ParsingResult parsingResult = getTabCompletionsAndParsingHolders(root, server, sender, args, pos);
         return parsingResult.getTabCompletions();
@@ -405,11 +410,11 @@ public class CommandEntryPoint extends CommandBase
 
     @NotNull
     private ParsingResult getTabCompletionsAndParsingHolders(
-                                           @NotNull final TreeNode<IMenu> treeNode,
-                                           @NotNull final MinecraftServer server,
-                                           @NotNull final ICommandSender sender,
-                                           @NotNull final String[] args,
-                                           @Nullable final BlockPos pos)
+      @NotNull final TreeNode<IMenu> treeNode,
+      @NotNull final MinecraftServer server,
+      @NotNull final ICommandSender sender,
+      @NotNull final String[] args,
+      @Nullable final BlockPos pos)
     {
         if (treeNode.getData().getMenuType().isNavigationMenu())
         {
@@ -466,22 +471,22 @@ public class CommandEntryPoint extends CommandBase
             final ActionMenu actionMenu = (ActionMenu) treeNode.getData();
             @NotNull final ActionMenuState actionMenuState = new ActionMenuState(actionMenu);
             return getTabCompletionsAndParsingHoldersForActionMenuTreeNode(treeNode, actionMenuState, parsedHolders, parsedActionArgumentList, possibleActionCommands, server,
-                    sender, args, pos);
+              sender, args, pos);
         }
     }
 
     @NotNull
     private ParsingResult getTabCompletionsAndParsingHoldersForActionMenuTreeNode(
-                                           @NotNull final TreeNode<IMenu> actionMenuTreeNode,
-           // TODO: can parsedHolders, parsedActionArgumentList, and possibleActionCommands be merged into actionMenuState?
-                                           @NotNull final ActionMenuState actionMenuState,
-                                           @NotNull final List<ActionMenuHolder> parsedHolders,
-                                           @NotNull final List<ActionArgument> parsedActionArgumentList,
-                                           @NotNull final Map<String, ActionMenuHolder> possibleActionCommands,
-                                           @NotNull final MinecraftServer server,
-                                           @NotNull final ICommandSender sender,
-                                           @NotNull final String[] args,
-                                           @Nullable final BlockPos pos)
+      @NotNull final TreeNode<IMenu> actionMenuTreeNode,
+      // TODO: can parsedHolders, parsedActionArgumentList, and possibleActionCommands be merged into actionMenuState?
+      @NotNull final ActionMenuState actionMenuState,
+      @NotNull final List<ActionMenuHolder> parsedHolders,
+      @NotNull final List<ActionArgument> parsedActionArgumentList,
+      @NotNull final Map<String, ActionMenuHolder> possibleActionCommands,
+      @NotNull final MinecraftServer server,
+      @NotNull final ICommandSender sender,
+      @NotNull final String[] args,
+      @Nullable final BlockPos pos)
     {
         final String lowerCaseArg0 = args[0].toLowerCase(Locale.ROOT);
         if (args.length <= 1 || !possibleActionCommands.containsKey(lowerCaseArg0))
@@ -566,6 +571,6 @@ public class CommandEntryPoint extends CommandBase
         final String[] newArgs = new String[args.length - newArgsStartPos];
         System.arraycopy(args, newArgsStartPos, newArgs, 0, newArgs.length);
         return getTabCompletionsAndParsingHoldersForActionMenuTreeNode(actionMenuTreeNode, actionMenuState, parsedHolders, parsedActionArgumentList, possibleActionCommands, server,
-                sender, newArgs, pos);
+          sender, newArgs, pos);
     }
 }

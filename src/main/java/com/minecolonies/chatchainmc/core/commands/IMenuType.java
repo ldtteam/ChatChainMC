@@ -4,6 +4,6 @@ public interface IMenuType
 {
 
     boolean isNavigationMenu();
-    IMenu getMenu();
 
+    IMenu getMenu();
 }

@@ -5,17 +5,15 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Available forge Permission nodes that can be checked for access.
- *
+ * <p>
  * See this url until real documentation becomes available.
  * https://github.com/MinecraftForge/MinecraftForge/pull/3155
- *
  */
 public enum ForgePermissionNodes
 {
     TEST("com.chatchainmc.test", DefaultPermissionLevel.OP, "Can test...."),
     RELOAD("com.chatchainmc.reload", DefaultPermissionLevel.OP, "Reloads Configs...."),
-    RECONNECT("com.chatchainmc.reconnect", DefaultPermissionLevel.OP, "Reconnect to API....")
-    ;
+    RECONNECT("com.chatchainmc.reconnect", DefaultPermissionLevel.OP, "Reconnect to API....");
 
     @NotNull
     private final String                 nodeName;

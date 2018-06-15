@@ -19,7 +19,8 @@ public class ActionMenuState
     private static class ArgumentState
     {
         private boolean valueIsSet = false;
-        @Nullable private Object value = null;
+        @Nullable
+        private Object  value      = null;
     }
 
     public ActionMenuState(@NotNull final ActionMenu actionMenu)

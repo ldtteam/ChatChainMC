@@ -16,18 +16,22 @@ public final class ActionMenuHolder
         this.treeNode = treeNode;
         this.actionArgument = actionArgument;
     }
+
     public TreeNode<IMenu> getTreeNode()
     {
         return treeNode;
     }
+
     public ActionArgument getActionArgument()
     {
         return actionArgument;
     }
+
     public Object getValue()
     {
         return value;
     }
+
     public void setValue(final Object value)
     {
         this.value = value;

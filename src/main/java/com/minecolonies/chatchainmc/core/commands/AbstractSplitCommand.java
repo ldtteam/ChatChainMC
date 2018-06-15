@@ -77,10 +77,10 @@ public abstract class AbstractSplitCommand implements ISubCommand
     @NotNull
     @Override
     public List<String> getTabCompletionOptions(
-                                                 @NotNull final MinecraftServer server,
-                                                 @NotNull final ICommandSender sender,
-                                                 @NotNull final String[] args,
-                                                 @Nullable final BlockPos pos)
+      @NotNull final MinecraftServer server,
+      @NotNull final ICommandSender sender,
+      @NotNull final String[] args,
+      @Nullable final BlockPos pos)
     {
 
         final Map<String, ISubCommand> childs = getSubCommands();
@@ -94,7 +94,6 @@ public abstract class AbstractSplitCommand implements ISubCommand
         System.arraycopy(args, 1, newArgs, 0, newArgs.length);
         return child.getTabCompletionOptions(server, sender, newArgs, pos);
     }
-
 
     @Override
     public boolean isUsernameIndex(@NotNull final String[] args, final int index)

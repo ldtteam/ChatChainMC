@@ -1,24 +1,26 @@
 package com.minecolonies.chatchainmc.core.commands;
 
+import com.minecolonies.chatchainmc.core.commands.ActionArgumentType.Is;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import com.minecolonies.chatchainmc.core.commands.ActionArgumentType.Is;
 
 public class ActionArgument
 {
     @NotNull
-    private final           String               name;
+    private final String               name;
     @NotNull
-    private final           ActionArgumentType   type;
-    private final           boolean              required;
-    @Nullable private final List<ActionArgument> actionArgumentList;
+    private final ActionArgumentType   type;
+    private final boolean              required;
+    @Nullable
+    private final List<ActionArgument> actionArgumentList;
 
-    public ActionArgument(@NotNull final String name, @NotNull final ActionArgumentType type, final Is optionalOrRequired, @Nullable final ActionArgument ... actionArguments
-)
+    public ActionArgument(
+      @NotNull final String name, @NotNull final ActionArgumentType type, final Is optionalOrRequired, @Nullable final ActionArgument... actionArguments
+    )
     {
         super();
         this.name = name;

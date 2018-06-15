@@ -1,12 +1,11 @@
 package com.minecolonies.chatchainmc.core.util;
 
 import com.google.gson.Gson;
-import com.minecolonies.chatchainconnect.ChatChainConnectAPI;
-import com.minecolonies.chatchainconnect.api.objects.User;
-import com.minecolonies.chatchainmc.core.ChatChainMC;
 import com.minecolonies.chatchainconnect.api.connection.ConnectionState;
 import com.minecolonies.chatchainconnect.api.connection.IChatChainConnectConnection;
+import com.minecolonies.chatchainconnect.api.objects.User;
 import com.minecolonies.chatchainmc.core.APIChannels;
+import com.minecolonies.chatchainmc.core.ChatChainMC;
 
 public class APIMesssages
 {

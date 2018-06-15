@@ -24,8 +24,7 @@ public enum ActionArgumentType
     COORDINATE_Z("z-coordinate", 0),
     BOOLEAN("boolean", 0),
     INTEGER("integer", 0),
-    STRING("string", 0)
-    ;
+    STRING("string", 0);
 
     private static final String ABANDONED_FAKE_PLAYER_NAME = "[abandoned]";
 
@@ -35,8 +34,9 @@ public enum ActionArgumentType
         OPTIONAL
     }
 
-    @Nonnull private final String usageValue;
-    private final int allowedSpaceCount;
+    @Nonnull
+    private final String usageValue;
+    private final int    allowedSpaceCount;
 
     ActionArgumentType(@Nonnull final String usageValue, final int allowedSpaceCount)
     {
@@ -79,9 +79,10 @@ public enum ActionArgumentType
     }
 
     @NotNull
-    public List<String> getTabCompletions(@NotNull final MinecraftServer server,
-            @Nullable final BlockPos pos,
-            @NotNull final ActionMenuState actionMenuState, final String potentialArgumentValue)
+    public List<String> getTabCompletions(
+      @NotNull final MinecraftServer server,
+      @Nullable final BlockPos pos,
+      @NotNull final ActionMenuState actionMenuState, final String potentialArgumentValue)
     {
         switch (this)
         {
@@ -132,9 +133,10 @@ public enum ActionArgumentType
     }
 
     @Nullable
-    public Object parse(@NotNull final MinecraftServer server, @NotNull final ICommandSender sender, @Nullable final BlockPos pos,
-            @NotNull final List<ActionMenuHolder> parsedHolders,
-            final String potentialArgumentValue)
+    public Object parse(
+      @NotNull final MinecraftServer server, @NotNull final ICommandSender sender, @Nullable final BlockPos pos,
+      @NotNull final List<ActionMenuHolder> parsedHolders,
+      final String potentialArgumentValue)
     {
         // TODO: selector support, such as used by CommandKill to find player
         // Entity entity = <net.minecraft.command.CommandBase>.getEntity(server, sender, args[0]);
@@ -169,43 +171,43 @@ public enum ActionArgumentType
     @Nullable
     private static Boolean parseBoolean(final String potentialArgumentValue)
     {
-        if ("true".equalsIgnoreCase(potentialArgumentValue))
+        if ("true" .equalsIgnoreCase(potentialArgumentValue))
         {
             return Boolean.TRUE;
         }
-        if ("t".equalsIgnoreCase(potentialArgumentValue))
+        if ("t" .equalsIgnoreCase(potentialArgumentValue))
         {
             return Boolean.TRUE;
         }
-        if ("yes".equalsIgnoreCase(potentialArgumentValue))
+        if ("yes" .equalsIgnoreCase(potentialArgumentValue))
         {
             return Boolean.TRUE;
         }
-        if ("y".equalsIgnoreCase(potentialArgumentValue))
+        if ("y" .equalsIgnoreCase(potentialArgumentValue))
         {
             return Boolean.TRUE;
         }
-        if ("1".equalsIgnoreCase(potentialArgumentValue))
+        if ("1" .equalsIgnoreCase(potentialArgumentValue))
         {
             return Boolean.TRUE;
         }
-        if ("false".equalsIgnoreCase(potentialArgumentValue))
+        if ("false" .equalsIgnoreCase(potentialArgumentValue))
         {
             return Boolean.FALSE;
         }
-        if ("f".equalsIgnoreCase(potentialArgumentValue))
+        if ("f" .equalsIgnoreCase(potentialArgumentValue))
         {
             return Boolean.FALSE;
         }
-        if ("no".equalsIgnoreCase(potentialArgumentValue))
+        if ("no" .equalsIgnoreCase(potentialArgumentValue))
         {
             return Boolean.FALSE;
         }
-        if ("n".equalsIgnoreCase(potentialArgumentValue))
+        if ("n" .equalsIgnoreCase(potentialArgumentValue))
         {
             return Boolean.FALSE;
         }
-        if ("0".equalsIgnoreCase(potentialArgumentValue))
+        if ("0" .equalsIgnoreCase(potentialArgumentValue))
         {
             return Boolean.FALSE;
         }

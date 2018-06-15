@@ -49,7 +49,7 @@ public class PlayerHandlers
     public static void onPlayerDeath(LivingDeathEvent event)
     {
         if (event.getEntity() instanceof EntityPlayer
-          && !event.getEntity().world.isRemote)
+              && !event.getEntity().world.isRemote)
         {
         }
     }

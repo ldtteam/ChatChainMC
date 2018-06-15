@@ -31,5 +31,4 @@ public class ReconnectCommand implements IActionCommand
     {
         ChatChainMC.instance.connectToAPI();
     }
-
 }

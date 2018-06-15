@@ -6,8 +6,7 @@ public enum APIChannels
 {
 
     MAIN("main"),
-    STAFF("staff")
-    ;
+    STAFF("staff");
 
     @Getter
     private final String name;

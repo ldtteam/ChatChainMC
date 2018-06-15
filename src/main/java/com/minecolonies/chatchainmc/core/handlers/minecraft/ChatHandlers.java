@@ -1,10 +1,10 @@
 package com.minecolonies.chatchainmc.core.handlers.minecraft;
 
 import com.google.common.base.Joiner;
-import com.minecolonies.chatchainconnect.api.objects.User;
-import com.minecolonies.chatchainmc.core.ChatChainMC;
 import com.minecolonies.chatchainconnect.api.connection.ConnectionState;
+import com.minecolonies.chatchainconnect.api.objects.User;
 import com.minecolonies.chatchainmc.core.APIChannels;
+import com.minecolonies.chatchainmc.core.ChatChainMC;
 import com.minecolonies.chatchainmc.core.util.APIMesssages;
 import net.minecraftforge.event.CommandEvent;
 import net.minecraftforge.event.ServerChatEvent;

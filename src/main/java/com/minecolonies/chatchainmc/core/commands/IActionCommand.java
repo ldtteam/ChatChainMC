@@ -13,8 +13,8 @@ public interface IActionCommand
     /**
      * Callback for when the command is executed.
      *
-     * @param server the server this is executed on.
-     * @param sender the entity that executed this command.
+     * @param server          the server this is executed on.
+     * @param sender          the entity that executed this command.
      * @param actionMenuState contains argument values
      * @throws CommandException if something goes wrong (like wrong syntax).
      */

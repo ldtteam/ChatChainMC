@@ -4,7 +4,8 @@ public interface IMenu
 {
 
     String getMenuItemName();
-    IMenuType getMenuType();
-    void setMenuType(IMenuType menuType);
 
+    IMenuType getMenuType();
+
+    void setMenuType(IMenuType menuType);
 }

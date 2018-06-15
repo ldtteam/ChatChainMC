@@ -10,7 +10,7 @@ public class NavigationMenu extends AbstractMenu
     @NotNull
     private final List<IMenuType> childrenMenuList;
 
-    public NavigationMenu(@NotNull final String menuItemName, @NotNull final IMenuType ... childMenuTypes)
+    public NavigationMenu(@NotNull final String menuItemName, @NotNull final IMenuType... childMenuTypes)
     {
         super(menuItemName);
         this.childrenMenuList = Arrays.asList(childMenuTypes);
@@ -21,7 +21,6 @@ public class NavigationMenu extends AbstractMenu
     {
         return (NavigationMenuType) menuType;
     }
-
 
     public List<IMenuType> getChildrenMenuList()
     {
