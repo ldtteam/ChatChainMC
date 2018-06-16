@@ -4,13 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 public enum NavigationMenuType implements IMenuType
 {
-    TEST_COMMANDS(new NavigationMenu("tests",
-      ActionMenuType.TEST2
-    )),
-
     CHATCHAIN(new NavigationMenu("chatchain",
-      NavigationMenuType.TEST_COMMANDS,
-      ActionMenuType.TEST,
       ActionMenuType.RELOAD,
       ActionMenuType.RECONNECT
     ));

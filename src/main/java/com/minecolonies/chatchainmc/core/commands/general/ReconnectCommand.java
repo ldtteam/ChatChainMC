@@ -6,6 +6,7 @@ import com.minecolonies.chatchainmc.core.commands.IActionCommand;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.text.TextComponentString;
 import org.jetbrains.annotations.NotNull;
 
 public class ReconnectCommand implements IActionCommand
@@ -29,6 +30,7 @@ public class ReconnectCommand implements IActionCommand
 
     private void executeShared(@NotNull final MinecraftServer server, @NotNull final ICommandSender sender) throws CommandException
     {
-        ChatChainMC.instance.connectToAPI();
+        new Thread(() -> ChatChainMC.instance.connectToAPI()).start();
+        sender.sendMessage(new TextComponentString("Reconnection has begun. Check server log for more information."));
     }
 }

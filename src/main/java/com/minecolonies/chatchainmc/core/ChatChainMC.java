@@ -193,8 +193,6 @@ public class ChatChainMC
                     eventBuilder.registerMessageHandler("GenericDisconnectionEvent", GenericHandlers::genericDisconnectionEvent);
                     eventBuilder.registerMessageHandler("GenericJoinEvent", GenericHandlers::genericJoinEvent);
                     eventBuilder.registerMessageHandler("GenericLeaveEvent", GenericHandlers::genericLeaveEvent);
-                    eventBuilder.registerMessageHandler("RequestJoined", GenericHandlers::requestJoined);
-                    eventBuilder.registerMessageHandler("RespondJoined", GenericHandlers::respondJoined);
                     eventBuilder.registerMessageHandler("GenericMessageEvent", GenericHandlers::genericMessageEvent);
                 });
 
@@ -244,7 +242,7 @@ public class ChatChainMC
         event.registerServerCommand(new CommandEntryPoint());
         //event.registerServerCommand(new StaffCommand());
 
-        connectToAPI();
+        new Thread(() -> ChatChainMC.instance.connectToAPI()).start();
     }
 
     /**
