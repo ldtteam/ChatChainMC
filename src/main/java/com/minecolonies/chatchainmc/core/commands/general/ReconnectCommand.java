@@ -30,7 +30,7 @@ public class ReconnectCommand implements IActionCommand
 
     private void executeShared(@NotNull final MinecraftServer server, @NotNull final ICommandSender sender) throws CommandException
     {
-        new Thread(() -> ChatChainMC.instance.connectToAPI()).start();
+        ChatChainMC.instance.connectToAPI();
         sender.sendMessage(new TextComponentString("Reconnection has begun. Check server log for more information."));
     }
 }

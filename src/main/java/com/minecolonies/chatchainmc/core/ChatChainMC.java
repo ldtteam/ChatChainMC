@@ -27,6 +27,7 @@ import ninja.leaping.configurate.gson.GsonConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -91,6 +92,7 @@ public class ChatChainMC
 
         if (!configDir.exists())
         {
+            //noinspection ResultOfMethodCallIgnored
             configDir.mkdirs();
 
             if (!configDir.getParentFile().exists())
@@ -154,7 +156,7 @@ public class ChatChainMC
     }
 
     /**
-     * (Re)conect to the ChatChainServer API.
+     * (Re)connect to the ChatChainServer API.
      */
     public synchronized void connectToAPI()
     {
@@ -162,7 +164,7 @@ public class ChatChainMC
 
         if (connection != null)
         {
-            APIMesssages.serverStop(APIChannels.MAIN);
+            APIMesssages.disconnect(APIChannels.MAIN);
             connection.disconnect();
         }
 
@@ -201,31 +203,37 @@ public class ChatChainMC
                 MinecraftForge.EVENT_BUS.post(new ConnectionOpenEvent(builder));
             });
 
-            connection.connect();
-            logger.info("Successfully connected to API!");
-
-            while (!connection.getConnectionState().equals(ConnectionState.OPEN)
-                     || connection.getConnectionState().equals(ConnectionState.CLOSED)
-                     || (connection.getConnectionState().equals(ConnectionState.CLOSING)))
-            {
-                try
-                {
-                    wait(1);
-                }
-                catch (Exception e)
-                {
-                    logger.error("Couldn't wait for connection to open", e);
-                }
-            }
-
-            if (connection.getConnectionState().equals(ConnectionState.OPEN))
-            {
-                APIMesssages.serverStart(APIChannels.MAIN);
-            }
+            new Thread(this::connect).start();
+            //Minecraft.getMinecraft().addScheduledTask() <- Run something on Minecraft main thread!
         }
         else
         {
             logger.warn("ChatChain could not connect to the API!!");
+        }
+    }
+
+    private synchronized void connect()
+    {
+        connection.connect();
+        logger.info("Successfully connected to API!");
+
+        while (!connection.getConnectionState().equals(ConnectionState.OPEN)
+                 || connection.getConnectionState().equals(ConnectionState.CLOSED)
+                 || (connection.getConnectionState().equals(ConnectionState.CLOSING)))
+        {
+            try
+            {
+                wait(500);
+            }
+            catch (Exception e)
+            {
+                logger.error("Couldn't wait for connection to open", e);
+            }
+        }
+
+        if (connection.getConnectionState().equals(ConnectionState.OPEN))
+        {
+            APIMesssages.connect(APIChannels.MAIN);
         }
     }
 
@@ -240,9 +248,8 @@ public class ChatChainMC
         server = event.getServer();
 
         event.registerServerCommand(new CommandEntryPoint());
-        //event.registerServerCommand(new StaffCommand());
 
-        new Thread(() -> ChatChainMC.instance.connectToAPI()).start();
+        ChatChainMC.instance.connectToAPI();
     }
 
     /**
@@ -250,9 +257,8 @@ public class ChatChainMC
      *
      * @param builder the Authentication builder used.
      */
-    private void setAuthenticationToken(IChatChainConnectAuthenticationBuilder builder)
+    private void setAuthenticationToken(@NotNull IChatChainConnectAuthenticationBuilder builder)
     {
-
         builder.withBearerToken(mainConfig.apiToken);
     }
 
@@ -274,7 +280,7 @@ public class ChatChainMC
     public void serverStop(FMLServerStoppingEvent event)
     {
         logger.info("Disconnecting from API");
-        APIMesssages.serverStop(APIChannels.MAIN);
+        APIMesssages.disconnect(APIChannels.MAIN);
         connection.disconnect();
         logger.info("Successfully Disconnected from API!");
     }

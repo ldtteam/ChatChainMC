@@ -1,20 +1,15 @@
 package com.minecolonies.chatchainmc.core.handlers.api;
 
-import com.minecolonies.chatchainconnect.api.connection.ConnectionState;
 import com.minecolonies.chatchainconnect.api.message.IChatChainConnectMessage;
 import com.minecolonies.chatchainconnect.api.objects.User;
-import com.minecolonies.chatchainmc.core.APIChannels;
 import com.minecolonies.chatchainmc.core.ChatChainMC;
 import com.minecolonies.chatchainmc.core.config.ClientConfigs;
-import com.minecolonies.chatchainmc.core.util.SerializeUtils;
 import com.minecolonies.chatchainmc.core.util.TemplateMessages;
+import net.minecraft.client.Minecraft;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 
 public class GenericHandlers
 {
@@ -41,8 +36,10 @@ public class GenericHandlers
                 for (final String channel : clientConfig.channels.get(channelName))
                 {
                     //We'll send it in the "Channel" later..
-                    ChatChainMC.instance.getServer().sendMessage(message);
-                    ChatChainMC.instance.getServer().getPlayerList().getPlayers().forEach(player -> player.sendMessage(message));
+                    Minecraft.getMinecraft().addScheduledTask(() -> ChatChainMC.instance.getServer().sendMessage(message));
+                    Minecraft.getMinecraft().addScheduledTask(() -> ChatChainMC.instance.getServer().getPlayerList().getPlayers().forEach(player -> player.sendMessage(message)));
+                    //ChatChainMC.instance.getServer().sendMessage(message);
+                    //ChatChainMC.instance.getServer().getPlayerList().getPlayers().forEach(player -> player.sendMessage(message));
                 }
             }
         }
@@ -68,74 +65,84 @@ public class GenericHandlers
 
     public static void genericConnectionEvent(final IChatChainConnectMessage message)
     {
-        final String clientType = message.getArguments()[0].getAsString();
-        final String clientName = message.getArguments()[1].getAsString();
-        final String channelName = message.getArguments()[2].getAsString();
+        new Thread(() -> {
+            final String clientType = message.getArguments()[0].getAsString();
+            final String clientName = message.getArguments()[1].getAsString();
+            final String channelName = message.getArguments()[2].getAsString();
 
-        final ITextComponent discordMessage = new TextComponentString(TemplateMessages.genericConnection(clientType,
-          clientName,
-          channelName));
+            final ITextComponent apiMessage = new TextComponentString(TemplateMessages.genericConnection(clientType,
+              clientName,
+              channelName));
 
-        sendMessage(clientType, clientName, channelName, discordMessage);
+            sendMessage(clientType, clientName, channelName, apiMessage);
+        }).start();
     }
 
     public static void genericDisconnectionEvent(final IChatChainConnectMessage message)
     {
-        final String clientType = message.getArguments()[0].getAsString();
-        final String clientName = message.getArguments()[1].getAsString();
-        final String channelName = message.getArguments()[2].getAsString();
+        new Thread(() -> {
+            final String clientType = message.getArguments()[0].getAsString();
+            final String clientName = message.getArguments()[1].getAsString();
+            final String channelName = message.getArguments()[2].getAsString();
 
-        final ITextComponent discordMessage = new TextComponentString(TemplateMessages.genericDisconnection(clientType,
-          clientName,
-          channelName));
+            final ITextComponent apiMessage = new TextComponentString(TemplateMessages.genericDisconnection(clientType,
+              clientName,
+              channelName));
 
-        sendMessage(clientType, clientName, channelName, discordMessage);
+            sendMessage(clientType, clientName, channelName, apiMessage);
+        }).start();
     }
 
     public static void genericMessageEvent(final IChatChainConnectMessage message)
     {
-        final String clientType = message.getArguments()[0].getAsString();
-        final String clientName = message.getArguments()[1].getAsString();
-        final String channelName = message.getArguments()[2].getAsString();
-        final User user = User.fromJson(message.getArguments()[3]);
-        final String sentMessage = message.getArguments()[4].getAsString();
+        new Thread(() -> {
+            final String clientType = message.getArguments()[0].getAsString();
+            final String clientName = message.getArguments()[1].getAsString();
+            final String channelName = message.getArguments()[2].getAsString();
+            final User user = User.fromJson(message.getArguments()[3]);
+            final String sentMessage = message.getArguments()[4].getAsString();
 
-        final ITextComponent discordMessage = new TextComponentString((TemplateMessages.genericMessage(clientType,
-          clientName,
-          channelName,
-          user.getName(),
-          sentMessage)));
+            final ITextComponent apiMessage = new TextComponentString((TemplateMessages.genericMessage(clientType,
+              clientName,
+              channelName,
+              user.getName(),
+              sentMessage)));
 
-        sendMessage(clientType, clientName, channelName, discordMessage);
+            sendMessage(clientType, clientName, channelName, apiMessage);
+        }).start();
     }
 
     public static void genericJoinEvent(final IChatChainConnectMessage message)
     {
-        final String clientType = message.getArguments()[0].getAsString();
-        final String clientName = message.getArguments()[1].getAsString();
-        final String channelName = message.getArguments()[2].getAsString();
-        final User user = User.fromJson(message.getArguments()[3]);
+        new Thread(() -> {
+            final String clientType = message.getArguments()[0].getAsString();
+            final String clientName = message.getArguments()[1].getAsString();
+            final String channelName = message.getArguments()[2].getAsString();
+            final User user = User.fromJson(message.getArguments()[3]);
 
-        final ITextComponent discordMessage = new TextComponentString(TemplateMessages.genericJoin(clientType,
-          clientName,
-          channelName,
-          user.getName()));
+            final ITextComponent apiMessage = new TextComponentString(TemplateMessages.genericJoin(clientType,
+              clientName,
+              channelName,
+              user.getName()));
 
-        sendMessage(clientType, clientName, channelName, discordMessage);
+            sendMessage(clientType, clientName, channelName, apiMessage);
+        }).start();
     }
 
     public static void genericLeaveEvent(final IChatChainConnectMessage message)
     {
-        final String clientType = message.getArguments()[0].getAsString();
-        final String clientName = message.getArguments()[1].getAsString();
-        final String channelName = message.getArguments()[2].getAsString();
-        final User user = User.fromJson(message.getArguments()[3]);
+        new Thread(() -> {
+            final String clientType = message.getArguments()[0].getAsString();
+            final String clientName = message.getArguments()[1].getAsString();
+            final String channelName = message.getArguments()[2].getAsString();
+            final User user = User.fromJson(message.getArguments()[3]);
 
-        final ITextComponent discordMessage = new TextComponentString(TemplateMessages.genericLeave(clientType,
-          clientName,
-          channelName,
-          user.getName()));
+            final ITextComponent apiMessage = new TextComponentString(TemplateMessages.genericLeave(clientType,
+              clientName,
+              channelName,
+              user.getName()));
 
-        sendMessage(clientType, clientName, channelName, discordMessage);
+            sendMessage(clientType, clientName, channelName, apiMessage);
+        }).start();
     }
 }

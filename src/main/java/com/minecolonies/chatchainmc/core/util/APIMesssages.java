@@ -16,7 +16,8 @@ public class APIMesssages
     {
         IChatChainConnectConnection connection = ChatChainMC.instance.getConnection();
 
-        if (connection.getConnectionState().equals(ConnectionState.OPEN))
+        if (connection != null
+              && connection.getConnectionState().equals(ConnectionState.OPEN))
         {
             final String clientName = ChatChainMC.instance.getMainConfig().clientName;
             connection.send("GenericMessageEvent", ChatChainMC.CLIENT_TYPE, clientName, channel.getName(), new Gson().toJson(user), message);
@@ -27,7 +28,8 @@ public class APIMesssages
     {
         IChatChainConnectConnection connection = ChatChainMC.instance.getConnection();
 
-        if (connection.getConnectionState().equals(ConnectionState.OPEN))
+        if (connection != null
+              && connection.getConnectionState().equals(ConnectionState.OPEN))
         {
             final String clientName = ChatChainMC.instance.getMainConfig().clientName;
             connection.send("GenericJoinEvent", ChatChainMC.CLIENT_TYPE, clientName, channel.getName(), new Gson().toJson(user));
@@ -38,29 +40,32 @@ public class APIMesssages
     {
         IChatChainConnectConnection connection = ChatChainMC.instance.getConnection();
 
-        if (connection.getConnectionState().equals(ConnectionState.OPEN))
+        if (connection != null
+              && connection.getConnectionState().equals(ConnectionState.OPEN))
         {
             final String clientName = ChatChainMC.instance.getMainConfig().clientName;
             connection.send("GenericLeaveEvent", ChatChainMC.CLIENT_TYPE, clientName, channel.getName(), new Gson().toJson(user));
         }
     }
 
-    public static void serverStart(final APIChannels channel)
+    public static void connect(final APIChannels channel)
     {
         IChatChainConnectConnection connection = ChatChainMC.instance.getConnection();
 
-        if (connection.getConnectionState().equals(ConnectionState.OPEN))
+        if (connection != null
+            && connection.getConnectionState().equals(ConnectionState.OPEN))
         {
             final String clientName = ChatChainMC.instance.getMainConfig().clientName;
             connection.send("GenericConnectionEvent", ChatChainMC.CLIENT_TYPE, clientName, channel.getName());
         }
     }
 
-    public static void serverStop(final APIChannels channel)
+    public static void disconnect(final APIChannels channel)
     {
         IChatChainConnectConnection connection = ChatChainMC.instance.getConnection();
 
-        if (connection.getConnectionState().equals(ConnectionState.OPEN))
+        if (connection != null
+              && connection.getConnectionState().equals(ConnectionState.OPEN))
         {
             final String clientName = ChatChainMC.instance.getMainConfig().clientName;
             connection.send("GenericDisconnectionEvent", ChatChainMC.CLIENT_TYPE, clientName, channel.getName());
