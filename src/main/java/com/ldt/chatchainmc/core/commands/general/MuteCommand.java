@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MuteCommand extends AbstractSingleCommand
 {
@@ -31,19 +32,20 @@ public class MuteCommand extends AbstractSingleCommand
     {
         if (args.length >= 1 && sender instanceof EntityPlayer)
         {
-            final String channel = args[0];
-            final IChannelStorage channelStorage = ((EntityPlayer)sender).getCapability(ChannelProvider.CHANNEL_STORAGE_CAP, null);
+            final String channel = args[0].toLowerCase();
+            final IChannelStorage channelStorage = ((EntityPlayer) sender).getCapability(ChannelProvider.CHANNEL_STORAGE_CAP, null);
             if (channelStorage != null)
             {
-                if (channelStorage.getChannels().contains(channel) && (ChatChainMC.instance.getMainConfig().createdChannels.contains(channel) || (channel.equalsIgnoreCase(
-              StaticAPIChannels.MAIN) || channel.equalsIgnoreCase(StaticAPIChannels.STAFF))))
+                if (channelStorage.getTalkingChannel().equalsIgnoreCase(channel))
+                {
+                    sender.sendMessage(new TextComponentString("§4You cannot mute the channel you're currently in!"));
+                }
+                else if (channelStorage.getChannels().contains(channel)
+                           && (ChatChainMC.instance.getMainConfig().createdChannels.contains(channel) || (channel.equalsIgnoreCase(
+                  StaticAPIChannels.MAIN) || channel.equalsIgnoreCase(StaticAPIChannels.STAFF))))
                 {
                     channelStorage.removeLChannel(channel);
                     sender.sendMessage(new TextComponentString("§6Channel §e" + channel + "§6 is no longer being listened to"));
-                }
-                else if (channelStorage.getTalkingChannel().equalsIgnoreCase(channel))
-                {
-                    sender.sendMessage(new TextComponentString("§4You cannot mute the channel you're currently in!"));
                 }
                 else if (!ChatChainMC.instance.getMainConfig().createdChannels.contains(channel))
                 {
@@ -65,6 +67,21 @@ public class MuteCommand extends AbstractSingleCommand
     public @NotNull List<String> getTabCompletionOptions(
       final @NotNull MinecraftServer server, final @NotNull ICommandSender sender, @NotNull final String[] args, @Nullable final BlockPos pos)
     {
+        if (sender instanceof EntityPlayer)
+        {
+            final IChannelStorage channelStorage = ((EntityPlayer) sender).getCapability(ChannelProvider.CHANNEL_STORAGE_CAP, null);
+            if (channelStorage != null)
+            {
+                final List<String> muteableChannels = channelStorage.getListeningChannels();
+                muteableChannels.remove(channelStorage.getTalkingChannel());
+
+                if (args.length <= 1
+                      || !muteableChannels.contains(args[0]))
+                {
+                    return muteableChannels.stream().filter(k -> k.startsWith(args[0])).collect(Collectors.toList());
+                }
+            }
+        }
         return Collections.emptyList();
     }
 

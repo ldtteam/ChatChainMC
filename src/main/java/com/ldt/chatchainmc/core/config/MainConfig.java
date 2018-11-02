@@ -23,6 +23,9 @@ public class MainConfig extends BaseConfig
     @Setting(value = "api-token", comment = "Put your ChatChainServer token in here.")
     public String apiToken = "api token here";
 
+    @Setting(value = "bridge-console", comment = "Whether to bridge the console to the ChatChainServer or not.")
+    public Boolean bridgeConsole = false;
+
     @Setting(value = "only-op-create-channels", comment = "Whether Only ops can create new channels or not")
     public Boolean onlyOPCreateChannels = true;
 

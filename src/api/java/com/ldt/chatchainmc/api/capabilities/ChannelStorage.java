@@ -7,7 +7,7 @@ import java.util.List;
 
 public class ChannelStorage implements IChannelStorage
 {
-    private List<String> channels = new ArrayList<>();
+    private List<String> channels          = new ArrayList<>();
     private List<String> listeningChannels = new ArrayList<>();
 
     private String talkingChannel = StaticAPIChannels.MAIN;

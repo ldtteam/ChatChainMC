@@ -12,6 +12,7 @@ import com.ldt.chatchainmc.core.config.MainConfig;
 import com.ldt.chatchainmc.core.config.TemplatesConfig;
 import com.ldt.chatchainmc.core.handlers.api.GenericHandlers;
 import com.ldt.chatchainmc.core.util.APIMesssages;
+import com.ldt.chatchainmc.core.util.Log4JFilter;
 import com.minecolonies.chatchainconnect.ChatChainConnectAPI;
 import com.minecolonies.chatchainconnect.api.connection.ConnectionState;
 import com.minecolonies.chatchainconnect.api.connection.IChatChainConnectConnection;
@@ -35,7 +36,9 @@ import ninja.leaping.configurate.ConfigurationOptions;
 import ninja.leaping.configurate.gson.GsonConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.LoggerContext;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -256,6 +259,11 @@ public class ChatChainMC
     @SuppressWarnings("squid:S2589")
     public synchronized void serverStart(FMLServerStartingEvent event)
     {
+        if (mainConfig.bridgeConsole)
+        {
+            ((LoggerContext) LogManager.getContext(false)).getConfiguration().getRootLogger().addFilter(new Log4JFilter());
+        }
+
         server = event.getServer();
 
         //event.registerServerCommand(new CommandEntryPoint());

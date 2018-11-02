@@ -1,8 +1,8 @@
 package com.ldt.chatchainmc.core.commands.general;
 
 import com.ldt.chatchainmc.api.StaticAPIChannels;
-import com.ldt.chatchainmc.core.commands.AbstractSingleCommand;
 import com.ldt.chatchainmc.core.ChatChainMC;
+import com.ldt.chatchainmc.core.commands.AbstractSingleCommand;
 import com.ldt.chatchainmc.core.util.APIMesssages;
 import com.minecolonies.chatchainconnect.api.connection.ConnectionState;
 import com.minecolonies.chatchainconnect.api.objects.User;
@@ -23,7 +23,6 @@ public class StaffCommand extends AbstractSingleCommand
      * Command description.
      */
     public static final String DESC = "staff";
-
 
     public StaffCommand(@NotNull final String... parents)
     {

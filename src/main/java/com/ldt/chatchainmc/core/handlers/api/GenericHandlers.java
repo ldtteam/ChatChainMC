@@ -37,7 +37,8 @@ public class GenericHandlers
             {
                 for (final String channel : clientConfig.channels.get(channelName))
                 {
-                    ChatChainMC.instance.getServer().addScheduledTask(() -> ChatChainMC.instance.getServer().sendMessage(message));;
+                    ChatChainMC.instance.getServer().addScheduledTask(() -> ChatChainMC.instance.getServer().sendMessage(message));
+                    ;
                     for (final EntityPlayer player : ChatChainMC.instance.getServer().getPlayerList().getPlayers())
                     {
                         final IChannelStorage channelStorage = player.getCapability(ChannelProvider.CHANNEL_STORAGE_CAP, null);

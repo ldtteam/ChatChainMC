@@ -1,7 +1,7 @@
 package com.ldt.chatchainmc.core.commands.general;
 
-import com.ldt.chatchainmc.core.commands.AbstractSingleCommand;
 import com.ldt.chatchainmc.core.ChatChainMC;
+import com.ldt.chatchainmc.core.commands.AbstractSingleCommand;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
@@ -32,7 +32,7 @@ public class ReloadCommand extends AbstractSingleCommand
 
     @Override
     public @NotNull List<String> getTabCompletionOptions(
-      final @NotNull MinecraftServer server, final @NotNull ICommandSender sender, @NotNull final  String[] args, @Nullable final BlockPos pos)
+      final @NotNull MinecraftServer server, final @NotNull ICommandSender sender, @NotNull final String[] args, @Nullable final BlockPos pos)
     {
         return Collections.emptyList();
     }

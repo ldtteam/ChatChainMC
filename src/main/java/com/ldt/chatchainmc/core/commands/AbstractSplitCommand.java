@@ -92,7 +92,6 @@ public abstract class AbstractSplitCommand implements ISubCommand
         return child.getTabCompletionOptions(server, sender, newArgs, pos);
     }
 
-
     @Override
     public boolean isUsernameIndex(@NotNull final String[] args, final int index)
     {

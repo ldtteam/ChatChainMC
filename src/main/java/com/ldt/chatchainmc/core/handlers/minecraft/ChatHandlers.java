@@ -1,9 +1,9 @@
 package com.ldt.chatchainmc.core.handlers.minecraft;
 
 import com.google.common.base.Joiner;
+import com.ldt.chatchainmc.api.StaticAPIChannels;
 import com.ldt.chatchainmc.api.capabilities.ChannelProvider;
 import com.ldt.chatchainmc.api.capabilities.IChannelStorage;
-import com.ldt.chatchainmc.api.StaticAPIChannels;
 import com.ldt.chatchainmc.core.ChatChainMC;
 import com.ldt.chatchainmc.core.config.TemplatesConfig;
 import com.ldt.chatchainmc.core.util.APIMesssages;
@@ -52,9 +52,9 @@ public class ChatHandlers
                 if (config.localChannelOverrideMessages.containsKey(channelName))
                 {
                     message = new TextComponentString(config.localChannelOverrideMessages.get(channelName)
-                                .replace(CHANNEL_NAME, channelName)
-                                .replace(USER_NAME, event.getPlayer().getName())
-                                .replace(USER_MESSAGE, event.getMessage()));
+                                                        .replace(CHANNEL_NAME, channelName)
+                                                        .replace(USER_NAME, event.getPlayer().getName())
+                                                        .replace(USER_MESSAGE, event.getMessage()));
                 }
                 else
                 {

@@ -8,7 +8,6 @@ public class StaticAPIChannels
         //private to hide implicit public
     }
 
-    public static final String MAIN = "main";
+    public static final String MAIN  = "main";
     public static final String STAFF = "staff";
-
 }

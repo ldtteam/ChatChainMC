@@ -14,8 +14,10 @@ import net.minecraft.util.text.TextComponentString;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ListenCommand extends AbstractSingleCommand
 {
@@ -31,9 +33,9 @@ public class ListenCommand extends AbstractSingleCommand
     {
         if (args.length >= 1 && sender instanceof EntityPlayer)
         {
-            final String channel = args[0];
-            final IChannelStorage channelStorage = ((EntityPlayer)sender).getCapability(ChannelProvider.CHANNEL_STORAGE_CAP, null);
-            if (channelStorage != null )
+            final String channel = args[0].toLowerCase();
+            final IChannelStorage channelStorage = ((EntityPlayer) sender).getCapability(ChannelProvider.CHANNEL_STORAGE_CAP, null);
+            if (channelStorage != null)
             {
                 if (channelStorage.getChannels().contains(channel) && (ChatChainMC.instance.getMainConfig().createdChannels.contains(channel) || (channel.equalsIgnoreCase(
                   StaticAPIChannels.MAIN) || channel.equalsIgnoreCase(StaticAPIChannels.STAFF))))
@@ -61,6 +63,28 @@ public class ListenCommand extends AbstractSingleCommand
     public @NotNull List<String> getTabCompletionOptions(
       final @NotNull MinecraftServer server, final @NotNull ICommandSender sender, @NotNull final String[] args, @Nullable final BlockPos pos)
     {
+        if (sender instanceof EntityPlayer)
+        {
+            final IChannelStorage channelStorage = ((EntityPlayer) sender).getCapability(ChannelProvider.CHANNEL_STORAGE_CAP, null);
+            if (channelStorage != null)
+            {
+                final List<String> mutedChannels = new ArrayList<>();
+
+                for (final String channel : channelStorage.getChannels())
+                {
+                    if (!channelStorage.getListeningChannels().contains(channel))
+                    {
+                        mutedChannels.add(channel);
+                    }
+                }
+
+                if (args.length <= 1
+                      || !mutedChannels.contains(args[0]))
+                {
+                    return mutedChannels.stream().filter(k -> k.startsWith(args[0])).collect(Collectors.toList());
+                }
+            }
+        }
         return Collections.emptyList();
     }
 

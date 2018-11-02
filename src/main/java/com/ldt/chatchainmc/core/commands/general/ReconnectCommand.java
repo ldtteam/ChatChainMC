@@ -1,7 +1,7 @@
 package com.ldt.chatchainmc.core.commands.general;
 
-import com.ldt.chatchainmc.core.commands.AbstractSingleCommand;
 import com.ldt.chatchainmc.core.ChatChainMC;
+import com.ldt.chatchainmc.core.commands.AbstractSingleCommand;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
@@ -37,7 +37,7 @@ public class ReconnectCommand extends AbstractSingleCommand
     }
 
     @Override
-    public boolean isUsernameIndex(@NotNull final  String[] args, final int index)
+    public boolean isUsernameIndex(@NotNull final String[] args, final int index)
     {
         return false;
     }

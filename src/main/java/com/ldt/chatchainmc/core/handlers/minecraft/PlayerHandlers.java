@@ -1,8 +1,9 @@
 package com.ldt.chatchainmc.core.handlers.minecraft;
 
+import com.ldt.chatchainmc.api.StaticAPIChannels;
 import com.ldt.chatchainmc.api.capabilities.ChannelProvider;
 import com.ldt.chatchainmc.api.capabilities.IChannelStorage;
-import com.ldt.chatchainmc.api.StaticAPIChannels;
+import com.ldt.chatchainmc.core.ChatChainMC;
 import com.ldt.chatchainmc.core.util.APIMesssages;
 import com.minecolonies.chatchainconnect.api.objects.User;
 import net.minecraft.entity.player.EntityPlayer;
@@ -42,6 +43,15 @@ public class PlayerHandlers
                       .canSendCommands((event.player).getGameProfile()))
                 {
                     channelStorage.addChannel(StaticAPIChannels.STAFF);
+                }
+
+                for (final String channel : channelStorage.getChannels())
+                {
+                    if (!ChatChainMC.instance.getMainConfig().createdChannels.contains(channel) && !(channel.equalsIgnoreCase(StaticAPIChannels.MAIN) || channel.equalsIgnoreCase(
+                      StaticAPIChannels.STAFF)))
+                    {
+                        channelStorage.getChannels().remove(channel);
+                    }
                 }
             }
         }

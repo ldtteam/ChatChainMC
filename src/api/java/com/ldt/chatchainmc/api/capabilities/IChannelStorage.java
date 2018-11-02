@@ -15,17 +15,20 @@ import java.util.concurrent.Callable;
 public interface IChannelStorage
 {
     void addLChannel(final String channel);
+
     void removeLChannel(final String channel);
 
     void addChannel(final String channel);
+
     void removeChannel(final String channel);
 
     void setTalkingChannel(final String channel);
 
     List<String> getChannels();
-    List<String> getListeningChannels();
-    String getTalkingChannel();
 
+    List<String> getListeningChannels();
+
+    String getTalkingChannel();
 
     class Storage implements Capability.IStorage<IChannelStorage>
     {
@@ -76,5 +79,4 @@ public interface IChannelStorage
             return new ChannelStorage();
         }
     }
-
 }
