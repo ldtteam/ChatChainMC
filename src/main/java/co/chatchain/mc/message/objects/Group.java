@@ -7,7 +7,6 @@ import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,6 +16,9 @@ public class Group
     @Getter
     @Setting("group-name")
     private String groupName;
+
+    @Setting("command-name")
+    private String commandName = "";
 
     @Getter
     @Setting("group-ID")
@@ -38,10 +40,21 @@ public class Group
     @Setting("is-group-mutable")
     private boolean isGroupMutable = true;
 
-    public Group() {}
+    public Group()
+    {
+    }
 
     public Group(final String groupId)
     {
         this.groupId = groupId;
+    }
+
+    public String getCommandName()
+    {
+        if (commandName == null || commandName.isEmpty())
+        {
+            return groupName.replace(" ", "");
+        }
+        return commandName;
     }
 }

@@ -47,28 +47,27 @@ public class MuteGroupCommand extends CommandBase
         if (sender instanceof EntityPlayerMP)
         {
 
-            String groupId = null;
+            Group group = null;
 
             for (final String id : ChatChainMC.instance.getGroupsConfig().getGroupStorage().keySet())
             {
-                final Group group = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(id);
+                final Group fgroup = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(id);
 
-                if (group.getGroupName().replace(" ", "").equalsIgnoreCase(args[0]))
+                if (fgroup.getCommandName().equalsIgnoreCase(args[0]))
                 {
-                    groupId = id;
+                    group = fgroup;
                 }
             }
 
             final EntityPlayerMP player = (EntityPlayerMP) sender;
 
-            if (!ChatChainMC.instance.getGroupsConfig().getGroupStorage().containsKey(groupId) ||
-                    (!ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(groupId).getAllowedPlayers().contains(player.getUniqueID()) && !ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(groupId).isAllowAllPlayers()))
+            if (group == null || (!group.getAllowedPlayers().contains(player.getUniqueID()) && !group.isAllowAllPlayers()))
             {
                 sender.sendMessage(new TextComponentString("This group is invalid!"));
                 return;
             }
 
-            if (!ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(groupId).isGroupMutable())
+            if (!group.isGroupMutable())
             {
                 sender.sendMessage(new TextComponentString("This group is unmutable!"));
                 return;
@@ -78,14 +77,13 @@ public class MuteGroupCommand extends CommandBase
 
             if (groupSettings != null)
             {
-                if (groupSettings.getMutedGroups().contains(groupId))
+                if (groupSettings.getMutedGroups().contains(group))
                 {
-                    groupSettings.removeMutedGroup(groupId);
+                    groupSettings.removeMutedGroup(group);
                     sender.sendMessage(new TextComponentString("Group unmuted"));
-                }
-                else
+                } else
                 {
-                    groupSettings.addMutedGroup(groupId);
+                    groupSettings.addMutedGroup(group);
                     sender.sendMessage(new TextComponentString("Group muted"));
                 }
             }
@@ -110,7 +108,7 @@ public class MuteGroupCommand extends CommandBase
             final Group group = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(groupId);
             if (group.getAllowedPlayers().contains(player.getUniqueID()))
             {
-                groupNames.add(group.getGroupName().replace(" ", ""));
+                groupNames.add(group.getCommandName());
             }
         }
 

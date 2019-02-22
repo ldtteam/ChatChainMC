@@ -5,7 +5,6 @@ import co.chatchain.mc.capabilities.GroupProvider;
 import co.chatchain.mc.capabilities.IGroupSettings;
 import co.chatchain.mc.message.objects.Group;
 import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -37,7 +36,7 @@ public class TalkInGroupCommand extends CommandBase
     }
 
     @Override
-    public void execute(@NotNull MinecraftServer server, @NotNull ICommandSender sender, @NotNull String[] args) throws CommandException
+    public void execute(@NotNull MinecraftServer server, @NotNull ICommandSender sender, @NotNull String[] args)
     {
         if (args.length != 1)
         {
@@ -48,22 +47,22 @@ public class TalkInGroupCommand extends CommandBase
         if (sender instanceof EntityPlayerMP)
         {
 
-            String groupId = null;
+            Group group = null;
 
             for (final String id : ChatChainMC.instance.getGroupsConfig().getGroupStorage().keySet())
             {
-                final Group group = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(id);
+                final Group fgroup = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(id);
 
-                if (group.getGroupName().replace(" ", "").equalsIgnoreCase(args[0]))
+                if (fgroup.getCommandName().equalsIgnoreCase(args[0]))
                 {
-                    groupId = id;
+                    group = fgroup;
                 }
             }
 
             final EntityPlayerMP player = (EntityPlayerMP) sender;
 
-            if (!ChatChainMC.instance.getGroupsConfig().getGroupStorage().containsKey(groupId) ||
-                    (!ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(groupId).getAllowedPlayers().contains(player.getUniqueID()) && !ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(groupId).isAllowAllPlayers()))
+            if (group == null ||
+                    (!group.getAllowedPlayers().contains(player.getUniqueID()) && !group.isAllowAllPlayers()))
             {
                 sender.sendMessage(new TextComponentString("This group is invalid!"));
                 return;
@@ -73,7 +72,7 @@ public class TalkInGroupCommand extends CommandBase
 
             if (groupSettings != null)
             {
-                groupSettings.setTalkingGroup(groupId);
+                groupSettings.setTalkingGroup(group);
                 sender.sendMessage(new TextComponentString("Talking group set to: " + args[0]));
             }
         }
@@ -97,7 +96,7 @@ public class TalkInGroupCommand extends CommandBase
             final Group group = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(groupId);
             if (group.getAllowedPlayers().contains(player.getUniqueID()))
             {
-                groupNames.add(group.getGroupName().replace(" ", ""));
+                groupNames.add(group.getCommandName());
             }
         }
 

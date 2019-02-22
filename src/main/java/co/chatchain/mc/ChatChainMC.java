@@ -3,18 +3,12 @@ package co.chatchain.mc;
 import co.chatchain.mc.capabilities.GroupProvider;
 import co.chatchain.mc.capabilities.IGroupSettings;
 import co.chatchain.mc.commands.BaseCommand;
-import co.chatchain.mc.commands.MuteGroupCommand;
-import co.chatchain.mc.commands.ReloadCommand;
-import co.chatchain.mc.commands.TalkInGroupCommand;
 import co.chatchain.mc.configs.AbstractConfig;
 import co.chatchain.mc.configs.FormattingConfig;
 import co.chatchain.mc.configs.GroupsConfig;
 import co.chatchain.mc.configs.MainConfig;
 import co.chatchain.mc.message.handling.APIMessages;
-import co.chatchain.mc.message.objects.GenericMessage;
-import co.chatchain.mc.message.objects.GetGroupsResponseMessage;
-import co.chatchain.mc.message.objects.Group;
-import co.chatchain.mc.message.objects.User;
+import co.chatchain.mc.message.objects.*;
 import com.google.common.reflect.TypeToken;
 import com.microsoft.signalr.HubConnection;
 import com.microsoft.signalr.HubConnectionBuilder;
@@ -22,10 +16,12 @@ import com.microsoft.signalr.HubConnectionState;
 import io.reactivex.Single;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
@@ -33,6 +29,7 @@ import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.ConfigurationOptions;
@@ -49,13 +46,18 @@ import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.StringJoiner;
+
+import static co.chatchain.mc.Constants.*;
 
 @Mod(
-  modid = ChatChainMC.MOD_ID,
-  name = ChatChainMC.MOD_NAME,
-  version = ChatChainMC.VERSION,
-  acceptableRemoteVersions = "*"
+        modid = ChatChainMC.MOD_ID,
+        name = ChatChainMC.MOD_NAME,
+        version = ChatChainMC.VERSION,
+        acceptableRemoteVersions = "*"
 )
 @Mod.EventBusSubscriber
 public class ChatChainMC
@@ -94,6 +96,10 @@ public class ChatChainMC
 
     @Getter
     private MinecraftServer server;
+
+    @Getter
+    @Setter
+    private Client client;
 
     private File configDir;
 
@@ -146,13 +152,12 @@ public class ChatChainMC
         try
         {
             accessToken = getAccessToken();
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
             logger.error("Exception while attempting to get ChatChain Access Token from IdentityServer", e);
         }
 
-        connection = HubConnectionBuilder.create(mainConfig.getApiUrl() /*"https://api.chatchain.co/hubs/chatchain"*/ )
+        connection = HubConnectionBuilder.create(mainConfig.getApiUrl() /*"https://api.chatchain.co/hubs/chatchain"*/)
                 .withAccessTokenProvider(Single.defer(() -> Single.just(accessToken)))
                 .build();
         connection.start().blockingAwait();
@@ -161,11 +166,19 @@ public class ChatChainMC
 
         connection.on("ReceiveGenericMessage", APIMessages::ReceiveGenericMessage, GenericMessage.class);
         connection.on("GetGroupsResponse", APIMessages::GetGroupsResponse, GetGroupsResponseMessage.class);
+        connection.on("GetClientResponse", APIMessages::GetClientResponse, GetClientResponseMessage.class);
 
         connection.send("GetGroups");
+        connection.send("GetClient");
 
         event.registerServerCommand(new BaseCommand());
         //event.registerServerCommand(new ReloadCommand());
+    }
+
+    public synchronized void serverStop(FMLServerStoppingEvent event)
+    {
+        logger.info("FMLServerStoppingEvent");
+        connection.stop().blockingAwait();
     }
 
     @SubscribeEvent
@@ -177,7 +190,7 @@ public class ChatChainMC
         {
             final User user = new User(event.getUsername());
 
-            final GenericMessage message = new GenericMessage(new Group(groupSettings.getTalkingGroup()), user, event.getMessage());
+            final GenericMessage message = new GenericMessage(groupSettings.getTalkingGroup(), user, event.getMessage());
 
             if (groupSettings.getMutedGroups().contains(groupSettings.getTalkingGroup()))
             {
@@ -190,6 +203,30 @@ public class ChatChainMC
                 instance.logger.info("Message Sent");
                 ChatChainMC.instance.connection.send("SendGenericMessage", message);
             }
+
+            final ITextComponent messageToSend;
+
+            if (ChatChainMC.instance.getFormattingConfig().getGenericMessageFormats().containsKey(message.getGroup().getGroupId()))
+            {
+                messageToSend = new TextComponentString(ChatChainMC.instance.getFormattingConfig().getGenericMessageFormats().get(message.getGroup().getGroupId())
+                        .replace(GROUP_NAME, message.getGroup().getGroupName())
+                        .replace(GROUP_ID, message.getGroup().getGroupId())
+                        .replace(USER_NAME, message.getUser().getName())
+                        .replace(SENDING_CLIENT_NAME, ChatChainMC.instance.getClient().getClientName())
+                        .replace(SENDING_CLIENT_GUID, ChatChainMC.instance.getClient().getClientGuid())
+                        .replace(MESSAGE, message.getMessage()));
+            } else
+            {
+                messageToSend = new TextComponentString(ChatChainMC.instance.getFormattingConfig().getDefaultGenericMessageFormat()
+                        .replace(GROUP_NAME, message.getGroup().getGroupName())
+                        .replace(GROUP_ID, message.getGroup().getGroupId())
+                        .replace(USER_NAME, message.getUser().getName())
+                        .replace(SENDING_CLIENT_NAME, ChatChainMC.instance.getClient().getClientName())
+                        .replace(SENDING_CLIENT_GUID, ChatChainMC.instance.getClient().getClientGuid())
+                        .replace(MESSAGE, message.getMessage()));
+            }
+
+            event.setComponent(messageToSend);
         }
     }
 
@@ -197,7 +234,7 @@ public class ChatChainMC
     {
         System.out.println("Ran Here");
 
-        URL url = new URL(mainConfig.getIdentityUrl() /*"https://identity.chatchain.co/connect/token"*/ );
+        URL url = new URL(mainConfig.getIdentityUrl() /*"https://identity.chatchain.co/connect/token"*/);
 
         URLConnection con = url.openConnection();
         HttpURLConnection http = (HttpURLConnection) con;
@@ -210,22 +247,21 @@ public class ChatChainMC
         logger.info("clientId: " + clientId);
         logger.info("clientSecret: " + clientSecret);
 
-        //final String clientId = "6d02fe95-567a-4ca0-b6ee-0af90dff230b";
-        //final String clientSecret = "test123!";
-
         Map<String, String> arguments = new HashMap<>();
         arguments.put("client_id", clientId);
         arguments.put("client_secret", clientSecret);
         arguments.put("grant_type", "client_credentials");
         StringJoiner sj = new StringJoiner("&");
-        for (Map.Entry<String, String> entry : arguments.entrySet()) {
+        for (Map.Entry<String, String> entry : arguments.entrySet())
+        {
             sj.add(URLEncoder.encode(entry.getKey(), "UTF-8") + "=" + URLEncoder.encode(entry.getValue(), "UTF-8"));
         }
         byte[] out = sj.toString().getBytes(StandardCharsets.UTF_8);
         int length = out.length;
         http.setFixedLengthStreamingMode(length);
         http.connect();
-        try (OutputStream os = http.getOutputStream()) {
+        try (OutputStream os = http.getOutputStream())
+        {
             os.write(out);
         }
 
@@ -253,8 +289,7 @@ public class ChatChainMC
             config.init(loader, node, token);
             config.save();
             return config;
-        }
-        catch (IOException | ObjectMappingException | IllegalAccessException | InstantiationException e)
+        } catch (IOException | ObjectMappingException | IllegalAccessException | InstantiationException e)
         {
             logger.warn("Getting the config failed", e);
             return null;

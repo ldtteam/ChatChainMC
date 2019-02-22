@@ -5,6 +5,7 @@ import co.chatchain.mc.capabilities.GroupProvider;
 import co.chatchain.mc.capabilities.IGroupSettings;
 import co.chatchain.mc.configs.GroupsConfig;
 import co.chatchain.mc.message.objects.GenericMessage;
+import co.chatchain.mc.message.objects.GetClientResponseMessage;
 import co.chatchain.mc.message.objects.GetGroupsResponseMessage;
 import co.chatchain.mc.message.objects.Group;
 import net.minecraft.entity.player.EntityPlayer;
@@ -22,15 +23,6 @@ public class APIMessages
     {
         if (!ChatChainMC.instance.getGroupsConfig().getGroupStorage().containsKey(message.getGroup().getGroupId()))
         {
-            //final Group configGroup = message.getGroup();
-            //groupsConfig.groupStorage.put(message.getGroup().getGroupId(), message.getGroup());
-            //TODO: REMOVE THIS
-            /*message.getGroup().setAllowedPlayers(new ArrayList<>());
-            for (final EntityPlayer player : ChatChainMC.instance.getServer().getPlayerList().getPlayers())
-            {
-                message.getGroup().getAllowedPlayers().add(player.getUniqueID());
-            }*/
-
             ChatChainMC.instance.getGroupsConfig().getGroupStorage().put(message.getGroup().getGroupId(), message.getGroup());
             ChatChainMC.instance.getGroupsConfig().save();
         }
@@ -46,8 +38,7 @@ public class APIMessages
                     .replace(SENDING_CLIENT_NAME, message.getSendingClient().getClientName())
                     .replace(SENDING_CLIENT_GUID, message.getSendingClient().getClientGuid())
                     .replace(MESSAGE, message.getMessage()));
-        }
-        else
+        } else
         {
             messageToSend = new TextComponentString(ChatChainMC.instance.getFormattingConfig().getDefaultGenericMessageFormat()
                     .replace(GROUP_NAME, message.getGroup().getGroupName())
@@ -70,8 +61,7 @@ public class APIMessages
                     player.sendMessage(messageToSend);
                 }
             }
-        }
-        else
+        } else
         {
             for (final UUID playerUUID : ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(message.getGroup().getGroupId()).getAllowedPlayers())
             {
@@ -103,6 +93,11 @@ public class APIMessages
         }
 
         groupsConfig.save();
+    }
+
+    public static void GetClientResponse(final GetClientResponseMessage message)
+    {
+        ChatChainMC.instance.setClient(message.getClient());
     }
 
 }
