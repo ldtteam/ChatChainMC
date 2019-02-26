@@ -31,6 +31,7 @@ public class GenericMessage
      * The client who sent the message (Only used when receiving)
      */
     @Getter
+    @Setter
     private Client sendingClient;
 
     /**
@@ -46,7 +47,7 @@ public class GenericMessage
      * @param user    which is sending the message
      * @param message that is being sent
      */
-    public GenericMessage(final Group group, final User user, final String message, final boolean sendToSelf)
+    private GenericMessage(final Group group, final User user, final String message, final boolean sendToSelf)
     {
         this.group = group;
         this.user = user;

@@ -165,11 +165,13 @@ public class ChatChainMC
         logger.info("Connection Status: " + connection.getConnectionState());
 
         connection.on("ReceiveGenericMessage", APIMessages::ReceiveGenericMessage, GenericMessage.class);
-        connection.on("GetGroupsResponse", APIMessages::GetGroupsResponse, GetGroupsResponseMessage.class);
-        connection.on("GetClientResponse", APIMessages::GetClientResponse, GetClientResponseMessage.class);
+        connection.on("ReceiveClientEventMessage", APIMessages::ReceiveClientEvent, ClientEventMessage.class);
+        connection.on("ReceiveGroups", APIMessages::ReceiveGroups, ReceiveGroupsMessage.class);
+        connection.on("ReceiveClient", APIMessages::ReceiveClient, ReceiveClientMessage.class);
 
         connection.send("GetGroups");
         connection.send("GetClient");
+        connection.send("SendClientEventMessage", new ClientEventMessage("START"));
 
         event.registerServerCommand(new BaseCommand());
         //event.registerServerCommand(new ReloadCommand());
@@ -178,7 +180,8 @@ public class ChatChainMC
     public synchronized void serverStop(FMLServerStoppingEvent event)
     {
         logger.info("FMLServerStoppingEvent");
-        connection.stop().blockingAwait();
+        //connection.send("SendClientEventMessage", new ClientEventMessage(ClientEvent.STOP));
+        //connection.stop().blockingAwait();
     }
 
     @SubscribeEvent
@@ -198,15 +201,17 @@ public class ChatChainMC
                 event.getPlayer().sendMessage(new TextComponentString("Group unmuted"));
             }
 
+            message.setSendingClient(ChatChainMC.instance.getClient());
+
             if (ChatChainMC.instance.connection.getConnectionState() == HubConnectionState.CONNECTED)
             {
                 instance.logger.info("Message Sent");
                 ChatChainMC.instance.connection.send("SendGenericMessage", message);
             }
 
-            final ITextComponent messageToSend;
+            final ITextComponent messageToSend = ChatChainMC.instance.getFormattingConfig().getGenericMessage(message);
 
-            if (ChatChainMC.instance.getFormattingConfig().getGenericMessageFormats().containsKey(message.getGroup().getGroupId()))
+            /*if (ChatChainMC.instance.getFormattingConfig().getGenericMessageFormats().containsKey(message.getGroup().getGroupId()))
             {
                 messageToSend = new TextComponentString(ChatChainMC.instance.getFormattingConfig().getGenericMessageFormats().get(message.getGroup().getGroupId())
                         .replace(GROUP_NAME, message.getGroup().getGroupName())
@@ -224,13 +229,13 @@ public class ChatChainMC
                         .replace(SENDING_CLIENT_NAME, ChatChainMC.instance.getClient().getClientName())
                         .replace(SENDING_CLIENT_GUID, ChatChainMC.instance.getClient().getClientGuid())
                         .replace(MESSAGE, message.getMessage()));
-            }
+            }*/
 
             event.setComponent(messageToSend);
         }
     }
 
-    private String getAccessToken() throws MalformedURLException, IOException
+    private String getAccessToken() throws IOException
     {
         System.out.println("Ran Here");
 
@@ -283,7 +288,7 @@ public class ChatChainMC
                 Files.createFile(file);
             }
 
-            TypeToken token = TypeToken.of(clazz);
+            @SuppressWarnings("UnstableApiUsage") TypeToken token = TypeToken.of(clazz);
             ConfigurationNode node = loader.load(ConfigurationOptions.defaults());
             M config = (M) node.getValue(token, clazz.newInstance());
             config.init(loader, node, token);

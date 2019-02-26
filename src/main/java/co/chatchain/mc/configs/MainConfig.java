@@ -1,11 +1,16 @@
 package co.chatchain.mc.configs;
 
+import lombok.Getter;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
 @ConfigSerializable
 public class MainConfig extends AbstractConfig
 {
+
+    @Getter
+    @Setting(value = "clickable-group-mute-or-talk")
+    private String clickableGroupMuteOrTalk = "talk";
 
     //####### Client ID #######\\
 
