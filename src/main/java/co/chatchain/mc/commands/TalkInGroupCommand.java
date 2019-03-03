@@ -94,7 +94,7 @@ public class TalkInGroupCommand extends CommandBase
         for (final String groupId : ChatChainMC.instance.getGroupsConfig().getGroupStorage().keySet())
         {
             final Group group = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(groupId);
-            if (group.getAllowedPlayers().contains(player.getUniqueID()))
+            if (group.getAllowedPlayers().contains(player.getUniqueID()) || group.isAllowAllPlayers())
             {
                 groupNames.add(group.getCommandName());
             }

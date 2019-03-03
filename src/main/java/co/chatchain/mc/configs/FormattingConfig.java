@@ -46,12 +46,8 @@ public class FormattingConfig extends AbstractConfig
 
         for (final String part : message.split("((?<=\\{clickable-group-name})|(?=\\{clickable-group-name})|(?<=\\{clickable-group-id})|(?=\\{clickable-group-id}))"))
         {
-            System.out.println("part: " + part.replace("§", "{}"));
-            System.out.println("formattingForNext: " + formattingForNext.replace("§", "{}"));
             if (part.contains("{clickable-group-name}") || part.contains("{clickable-group-id}"))
             {
-                System.out.println("part-codes: " + formattingForNext.replace("§", "{}"));
-
                 final String replacement;
                 final ClickEvent clickEvent = new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/chatchain " + ChatChainMC.instance.getMainConfig().getClickableGroupMuteOrTalk() + " " + group.getCommandName());
                 if (part.contains("{clickable-group-name}"))
@@ -89,9 +85,9 @@ public class FormattingConfig extends AbstractConfig
     @Setting("generic-messages-formats_comment")
     private String genericMessageComment = "Template options: " +
             Constants.GROUP_NAME + " - The message's group's name " +
-            //Constants.CLICKABLE_GROUP_NAME + " - Same as above (name), however you can click it to change to change talking to this group" + //TODO: Maybe someday, but not today
+            Constants.CLICKABLE_GROUP_NAME + " - Same as above (name), however you can click it to change to change talking to this group" +
             Constants.GROUP_ID + " - The message's group's ID " +
-            //Constants.CLICKABLE_GROUP_ID + " - Same as above (id), however you can click it to change to change talking to this group" + //TODO: Maybe someday, same here
+            Constants.CLICKABLE_GROUP_ID + " - Same as above (id), however you can click it to change to change talking to this group" +
             Constants.USER_NAME + " - Name of the user who sent the message " +
             Constants.SENDING_CLIENT_NAME + " - Name of the Client who sent the message " +
             Constants.SENDING_CLIENT_GUID + " - The GUID of the client who sent the message " +

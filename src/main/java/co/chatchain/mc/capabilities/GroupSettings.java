@@ -10,7 +10,7 @@ public class GroupSettings implements IGroupSettings
 {
 
     private List<String> mutedGroups = new ArrayList<>();
-    private String talkingGroup = ChatChainMC.instance.getGroupsConfig().getDefaultGroup().getGroupId();
+    private String talkingGroup = ChatChainMC.instance.getGroupsConfig().getDefaultGroup();
 
     @Override
     public void addMutedGroup(Group group)

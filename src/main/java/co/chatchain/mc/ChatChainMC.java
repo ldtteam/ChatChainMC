@@ -211,26 +211,6 @@ public class ChatChainMC
 
             final ITextComponent messageToSend = ChatChainMC.instance.getFormattingConfig().getGenericMessage(message);
 
-            /*if (ChatChainMC.instance.getFormattingConfig().getGenericMessageFormats().containsKey(message.getGroup().getGroupId()))
-            {
-                messageToSend = new TextComponentString(ChatChainMC.instance.getFormattingConfig().getGenericMessageFormats().get(message.getGroup().getGroupId())
-                        .replace(GROUP_NAME, message.getGroup().getGroupName())
-                        .replace(GROUP_ID, message.getGroup().getGroupId())
-                        .replace(USER_NAME, message.getUser().getName())
-                        .replace(SENDING_CLIENT_NAME, ChatChainMC.instance.getClient().getClientName())
-                        .replace(SENDING_CLIENT_GUID, ChatChainMC.instance.getClient().getClientGuid())
-                        .replace(MESSAGE, message.getMessage()));
-            } else
-            {
-                messageToSend = new TextComponentString(ChatChainMC.instance.getFormattingConfig().getDefaultGenericMessageFormat()
-                        .replace(GROUP_NAME, message.getGroup().getGroupName())
-                        .replace(GROUP_ID, message.getGroup().getGroupId())
-                        .replace(USER_NAME, message.getUser().getName())
-                        .replace(SENDING_CLIENT_NAME, ChatChainMC.instance.getClient().getClientName())
-                        .replace(SENDING_CLIENT_GUID, ChatChainMC.instance.getClient().getClientGuid())
-                        .replace(MESSAGE, message.getMessage()));
-            }*/
-
             event.setComponent(messageToSend);
         }
     }

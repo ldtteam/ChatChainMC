@@ -46,7 +46,7 @@ public class GroupsConfig extends AbstractConfig
         return returnList;
     }
 
-    public Group getDefaultGroup()
+    public String getDefaultGroup()
     {
         Group returnGroup = null;
 
@@ -69,6 +69,6 @@ public class GroupsConfig extends AbstractConfig
             returnGroup = groupStorage.get(defaultGroup);
         }
 
-        return returnGroup;
+        return returnGroup != null ? returnGroup.getGroupId() : "";
     }
 }
