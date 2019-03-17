@@ -1,8 +1,11 @@
 package co.chatchain.mc.configs;
 
+import co.chatchain.commons.messages.objects.Client;
+import co.chatchain.commons.messages.objects.Group;
+import co.chatchain.commons.messages.objects.message.ClientEventMessage;
+import co.chatchain.commons.messages.objects.message.GenericMessage;
 import co.chatchain.mc.ChatChainMC;
 import co.chatchain.mc.Constants;
-import co.chatchain.mc.message.objects.*;
 import lombok.Getter;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.Style;
@@ -29,8 +32,15 @@ public class FormattingConfig extends AbstractConfig
         return defaultString;
     }
 
-    private String getReplacements(final Group group, final Client client, final String messageToReplace)
+    private String getReplacements(final Group group, Client client, final String messageToReplace)
     {
+        ChatChainMC.instance.getLogger().info("Client: " + client);
+        ChatChainMC.instance.getLogger().info("Message: " + messageToReplace);
+        if (client == null)
+        {
+            client = ChatChainMC.instance.getClient();
+        }
+
         return messageToReplace
                 .replaceAll("(\\{group-name})", group.getGroupName())
                 .replaceAll("(\\{group-id})", group.getGroupId())
@@ -40,6 +50,8 @@ public class FormattingConfig extends AbstractConfig
 
     private ITextComponent getTextComponent(final String message, final Group group)
     {
+        final GroupConfig groupConfig = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(group.getGroupId());
+
         final ITextComponent finalMessage = new TextComponentString("");
 
         String formattingForNext = "";
@@ -49,19 +61,17 @@ public class FormattingConfig extends AbstractConfig
             if (part.contains("{clickable-group-name}") || part.contains("{clickable-group-id}"))
             {
                 final String replacement;
-                final ClickEvent clickEvent = new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/chatchain " + ChatChainMC.instance.getMainConfig().getClickableGroupMuteOrTalk() + " " + group.getCommandName());
+                final ClickEvent clickEvent = new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/chatchain " + ChatChainMC.instance.getMainConfig().getClickableGroupMuteOrTalk() + " " + groupConfig.getCommandName());
                 if (part.contains("{clickable-group-name}"))
                 {
                     replacement = formattingForNext + group.getGroupName();
-                }
-                else
+                } else
                 {
                     replacement = formattingForNext + group.getGroupId();
                 }
                 ITextComponent component = new TextComponentString(replacement).setStyle(new Style().setClickEvent(clickEvent));
                 finalMessage.appendSibling(component);
-            }
-            else
+            } else
             {
                 finalMessage.appendSibling(new TextComponentString(formattingForNext + part));
             }
@@ -105,7 +115,7 @@ public class FormattingConfig extends AbstractConfig
     {
         if (ChatChainMC.instance.getGroupsConfig().getGroupStorage().containsKey(message.getGroup().getGroupId()))
         {
-            final Group group = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(message.getGroup().getGroupId());
+            final Group group = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(message.getGroup().getGroupId()).getGroup();
 
             final String defaultOrOverride = getDefaultOrOverride(group.getGroupId(), defaultGenericMessageFormat, genericMessageFormats);
 
@@ -147,17 +157,15 @@ public class FormattingConfig extends AbstractConfig
         if (message.getEvent().equalsIgnoreCase("START"))
         {
             defaultOrOverride = getDefaultOrOverride(group.getGroupId(), defaultClientStartEventFormats, clientStartEventFormats);
-        }
-        else if (message.getEvent().equalsIgnoreCase("STOP"))
+        } else if (message.getEvent().equalsIgnoreCase("STOP"))
         {
             defaultOrOverride = getDefaultOrOverride(group.getGroupId(), defaultClientStopEventFormats, clientStopEventFormats);
-        }
-        else
+        } else
         {
             return null;
         }
 
-        final String stringMessage = getReplacements(group, message.getSendingClient(), defaultOrOverride);
+        final String stringMessage = getReplacements(group, message.getClient(), defaultOrOverride);
         return getTextComponent(stringMessage, group);
     }
 

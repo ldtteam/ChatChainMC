@@ -3,7 +3,7 @@ package co.chatchain.mc.commands;
 import co.chatchain.mc.ChatChainMC;
 import co.chatchain.mc.capabilities.GroupProvider;
 import co.chatchain.mc.capabilities.IGroupSettings;
-import co.chatchain.mc.message.objects.Group;
+import co.chatchain.mc.configs.GroupConfig;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
@@ -47,22 +47,21 @@ public class TalkInGroupCommand extends CommandBase
         if (sender instanceof EntityPlayerMP)
         {
 
-            Group group = null;
+            GroupConfig groupConfig = null;
 
             for (final String id : ChatChainMC.instance.getGroupsConfig().getGroupStorage().keySet())
             {
-                final Group fgroup = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(id);
+                final GroupConfig fGroupConfig = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(id);
 
-                if (fgroup.getCommandName().equalsIgnoreCase(args[0]))
+                if (fGroupConfig.getCommandName().equalsIgnoreCase(args[0]))
                 {
-                    group = fgroup;
+                    groupConfig = fGroupConfig;
                 }
             }
 
             final EntityPlayerMP player = (EntityPlayerMP) sender;
 
-            if (group == null ||
-                    (!group.getAllowedPlayers().contains(player.getUniqueID()) && !group.isAllowAllPlayers()))
+            if (groupConfig == null || !groupConfig.getPlayersForGroup().contains(player))
             {
                 sender.sendMessage(new TextComponentString("This group is invalid!"));
                 return;
@@ -72,7 +71,7 @@ public class TalkInGroupCommand extends CommandBase
 
             if (groupSettings != null)
             {
-                groupSettings.setTalkingGroup(group);
+                groupSettings.setTalkingGroup(groupConfig.getGroup());
                 sender.sendMessage(new TextComponentString("Talking group set to: " + args[0]));
             }
         }
@@ -93,10 +92,10 @@ public class TalkInGroupCommand extends CommandBase
 
         for (final String groupId : ChatChainMC.instance.getGroupsConfig().getGroupStorage().keySet())
         {
-            final Group group = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(groupId);
-            if (group.getAllowedPlayers().contains(player.getUniqueID()) || group.isAllowAllPlayers())
+            final GroupConfig groupConfig = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(groupId);
+            if (groupConfig.getPlayersForGroup().contains(player))
             {
-                groupNames.add(group.getCommandName());
+                groupNames.add(groupConfig.getCommandName());
             }
         }
 

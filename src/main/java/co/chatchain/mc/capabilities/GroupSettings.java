@@ -1,7 +1,7 @@
 package co.chatchain.mc.capabilities;
 
+import co.chatchain.commons.messages.objects.Group;
 import co.chatchain.mc.ChatChainMC;
-import co.chatchain.mc.message.objects.Group;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +33,7 @@ public class GroupSettings implements IGroupSettings
         {
             if (ChatChainMC.instance.getGroupsConfig().getGroupStorage().containsKey(groupId))
             {
-                groups.add(ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(groupId));
+                groups.add(ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(groupId).getGroup());
             }
         }
 
@@ -51,7 +51,7 @@ public class GroupSettings implements IGroupSettings
     {
         if (ChatChainMC.instance.getGroupsConfig().getGroupStorage().containsKey(talkingGroup))
         {
-            return ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(talkingGroup);
+            return ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(talkingGroup).getGroup();
         }
         return null;
     }

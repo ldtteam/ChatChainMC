@@ -1,15 +1,17 @@
 package co.chatchain.mc.message.handling;
 
+import co.chatchain.commons.messages.objects.Group;
+import co.chatchain.commons.messages.objects.message.ClientEventMessage;
+import co.chatchain.commons.messages.objects.message.GenericMessage;
+import co.chatchain.commons.messages.objects.message.GetClientResponse;
+import co.chatchain.commons.messages.objects.message.GetGroupsResponse;
 import co.chatchain.mc.ChatChainMC;
 import co.chatchain.mc.capabilities.GroupProvider;
 import co.chatchain.mc.capabilities.IGroupSettings;
+import co.chatchain.mc.configs.GroupConfig;
 import co.chatchain.mc.configs.GroupsConfig;
-import co.chatchain.mc.message.objects.*;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
-
-import static co.chatchain.mc.Constants.*;
 
 public class APIMessages
 {
@@ -18,7 +20,10 @@ public class APIMessages
     {
         if (!ChatChainMC.instance.getGroupsConfig().getGroupStorage().containsKey(message.getGroup().getGroupId()))
         {
-            ChatChainMC.instance.getGroupsConfig().getGroupStorage().put(message.getGroup().getGroupId(), message.getGroup());
+            GroupConfig config = new GroupConfig();
+            config.setGroup(message.getGroup());
+
+            ChatChainMC.instance.getGroupsConfig().getGroupStorage().put(message.getGroup().getGroupId(), config);
             ChatChainMC.instance.getGroupsConfig().save();
         }
 
@@ -29,34 +34,13 @@ public class APIMessages
             return;
         }
 
-        /*if (ChatChainMC.instance.getFormattingConfig().getGenericMessageFormats().containsKey(message.getGroup().getGroupId()))
-        {
-            messageToSend = new TextComponentString(ChatChainMC.instance.getFormattingConfig().getGenericMessageFormats().get(message.getGroup().getGroupId())
-                    .replace(GROUP_NAME, message.getGroup().getGroupName())
-                    .replace(GROUP_ID, message.getGroup().getGroupId())
-                    .replace(USER_NAME, message.getUser().getName())
-                    .replace(SENDING_CLIENT_NAME, message.getSendingClient().getClientName())
-                    .replace(SENDING_CLIENT_GUID, message.getSendingClient().getClientGuid())
-                    .replace(MESSAGE, message.getMessage()));
-        }
-        else
-        {
-            messageToSend = new TextComponentString(ChatChainMC.instance.getFormattingConfig().getDefaultGenericMessageFormat()
-                    .replace(GROUP_NAME, message.getGroup().getGroupName())
-                    .replace(GROUP_ID, message.getGroup().getGroupId())
-                    .replace(USER_NAME, message.getUser().getName())
-                    .replace(SENDING_CLIENT_NAME, message.getSendingClient().getClientName())
-                    .replace(SENDING_CLIENT_GUID, message.getSendingClient().getClientGuid())
-                    .replace(MESSAGE, message.getMessage()));
-        }*/
+        final GroupConfig groupConfig = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(message.getGroup().getGroupId());
 
-        final Group configGroup = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(message.getGroup().getGroupId());
-
-        for (final EntityPlayer player : ChatChainMC.instance.getGroupsConfig().getPlayersForGroup(configGroup))
+        for (final EntityPlayer player : groupConfig.getPlayersForGroup())
         {
             final IGroupSettings groupSettings = player.getCapability(GroupProvider.GROUP_SETTINGS_CAP, null);
 
-            if (groupSettings != null && !groupSettings.getMutedGroups().contains(configGroup))
+            if (groupSettings != null && !groupSettings.getMutedGroups().contains(groupConfig.getGroup()))
             {
                 player.sendMessage(messageToSend);
             }
@@ -71,62 +55,19 @@ public class APIMessages
         {
             if (ChatChainMC.instance.getGroupsConfig().getGroupStorage().containsKey(groupId))
             {
-                final Group group = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(groupId);
-                final ITextComponent messageToSend = ChatChainMC.instance.getFormattingConfig().getClientEventMessage(message, group);
+                final GroupConfig groupConfig = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(groupId);
+                final ITextComponent messageToSend = ChatChainMC.instance.getFormattingConfig().getClientEventMessage(message, groupConfig.getGroup());
 
                 if (messageToSend == null)
                 {
                     return;
                 }
 
-                /*if (message.getEvent().equals("START"))
-                {
-                    if (ChatChainMC.instance.getFormattingConfig().getClientStartEventFormats().containsKey(group.getGroupId()))
-                    {
-                        messageToSend = new TextComponentString(ChatChainMC.instance.getFormattingConfig().getClientStartEventFormats().get(group.getGroupId())
-                                .replace(GROUP_NAME, group.getGroupName())
-                                .replace(GROUP_ID, group.getGroupId())
-                                .replace(SENDING_CLIENT_NAME, message.getSendingClient().getClientName())
-                                .replace(SENDING_CLIENT_GUID, message.getSendingClient().getClientGuid()));
-                    }
-                    else
-                    {
-                        messageToSend = new TextComponentString(ChatChainMC.instance.getFormattingConfig().getDefaultClientStartEventFormats()
-                                .replace(GROUP_NAME, group.getGroupName())
-                                .replace(GROUP_ID, group.getGroupId())
-                                .replace(SENDING_CLIENT_NAME, message.getSendingClient().getClientName())
-                                .replace(SENDING_CLIENT_GUID, message.getSendingClient().getClientGuid()));
-                    }
-                }
-                else if (message.getEvent().equals("STOP"))
-                {
-                    if (ChatChainMC.instance.getFormattingConfig().getClientStopEventFormats().containsKey(group.getGroupId()))
-                    {
-                        messageToSend = new TextComponentString(ChatChainMC.instance.getFormattingConfig().getClientStopEventFormats().get(group.getGroupId())
-                                .replace(GROUP_NAME, group.getGroupName())
-                                .replace(GROUP_ID, group.getGroupId())
-                                .replace(SENDING_CLIENT_NAME, message.getSendingClient().getClientName())
-                                .replace(SENDING_CLIENT_GUID, message.getSendingClient().getClientGuid()));
-                    }
-                    else
-                    {
-                        messageToSend = new TextComponentString(ChatChainMC.instance.getFormattingConfig().getDefaultClientStopEventFormats()
-                                .replace(GROUP_NAME, group.getGroupName())
-                                .replace(GROUP_ID, group.getGroupId())
-                                .replace(SENDING_CLIENT_NAME, message.getSendingClient().getClientName())
-                                .replace(SENDING_CLIENT_GUID, message.getSendingClient().getClientGuid()));
-                    }
-                }
-                else
-                {
-                    return;
-                }*/
-
-                for (final EntityPlayer player : ChatChainMC.instance.getGroupsConfig().getPlayersForGroup(group))
+                for (final EntityPlayer player : groupConfig.getPlayersForGroup())
                 {
                     final IGroupSettings groupSettings = player.getCapability(GroupProvider.GROUP_SETTINGS_CAP, null);
 
-                    if (groupSettings != null && !groupSettings.getMutedGroups().contains(group))
+                    if (groupSettings != null && !groupSettings.getMutedGroups().contains(groupConfig.getGroup()))
                     {
                         player.sendMessage(messageToSend);
                     }
@@ -136,7 +77,7 @@ public class APIMessages
         }
     }
 
-    public static void ReceiveGroups(final ReceiveGroupsMessage message)
+    public static void ReceiveGroups(final GetGroupsResponse message)
     {
         final GroupsConfig groupsConfig = ChatChainMC.instance.getGroupsConfig();
 
@@ -144,14 +85,15 @@ public class APIMessages
         {
             if (!groupsConfig.getGroupStorage().containsKey(group.getGroupId()))
             {
-                groupsConfig.getGroupStorage().put(group.getGroupId(), group);
+                GroupConfig config = new GroupConfig();
+                config.setGroup(group);
+                groupsConfig.getGroupStorage().put(group.getGroupId(), config);
             }
         }
-
         groupsConfig.save();
     }
 
-    public static void ReceiveClient(final ReceiveClientMessage message)
+    public static void ReceiveClient(final GetClientResponse message)
     {
         ChatChainMC.instance.setClient(message.getClient());
     }

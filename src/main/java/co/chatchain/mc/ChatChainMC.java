@@ -1,25 +1,27 @@
 package co.chatchain.mc;
 
+import co.chatchain.commons.AccessTokenResolver;
+import co.chatchain.commons.ChatChainHubConnection;
+import co.chatchain.commons.messages.objects.Client;
+import co.chatchain.commons.messages.objects.Group;
+import co.chatchain.commons.messages.objects.User;
+import co.chatchain.commons.messages.objects.message.ClientEventMessage;
+import co.chatchain.commons.messages.objects.message.GenericMessage;
+import co.chatchain.commons.messages.objects.message.GetClientResponse;
+import co.chatchain.commons.messages.objects.message.GetGroupsResponse;
 import co.chatchain.mc.capabilities.GroupProvider;
 import co.chatchain.mc.capabilities.IGroupSettings;
 import co.chatchain.mc.commands.BaseCommand;
-import co.chatchain.mc.configs.AbstractConfig;
-import co.chatchain.mc.configs.FormattingConfig;
-import co.chatchain.mc.configs.GroupsConfig;
-import co.chatchain.mc.configs.MainConfig;
+import co.chatchain.mc.configs.*;
 import co.chatchain.mc.message.handling.APIMessages;
-import co.chatchain.mc.message.objects.*;
+import co.chatchain.mc.serializers.GroupTypeSerializer;
 import com.google.common.reflect.TypeToken;
-import com.microsoft.signalr.HubConnection;
-import com.microsoft.signalr.HubConnectionBuilder;
 import com.microsoft.signalr.HubConnectionState;
-import io.reactivex.Single;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
@@ -36,22 +38,13 @@ import ninja.leaping.configurate.ConfigurationOptions;
 import ninja.leaping.configurate.gson.GsonConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+import ninja.leaping.configurate.objectmapping.serialize.TypeSerializers;
 import org.apache.logging.log4j.Logger;
-import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.net.*;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.StringJoiner;
-
-import static co.chatchain.mc.Constants.*;
 
 @Mod(
         modid = ChatChainMC.MOD_ID,
@@ -66,8 +59,6 @@ public class ChatChainMC
     public static final String MOD_ID = "chatchainmc";
     public static final String MOD_NAME = "ChatChainMC";
     public static final String VERSION = "1.0-SNAPSHOT";
-    @SuppressWarnings("squid:S1192")
-    public static final String CLIENT_TYPE = "ChatChainMC";
 
     /**
      * This is the instance of your mod as created by Forge. It will never be null.
@@ -83,7 +74,7 @@ public class ChatChainMC
     private String accessToken = "";
 
     @Getter
-    private HubConnection connection = null;
+    private ChatChainHubConnection connection = null;
 
     @Getter
     private MainConfig mainConfig;
@@ -93,9 +84,6 @@ public class ChatChainMC
 
     @Getter
     private FormattingConfig formattingConfig;
-
-    @Getter
-    private MinecraftServer server;
 
     @Getter
     @Setter
@@ -120,6 +108,8 @@ public class ChatChainMC
             }
         }
 
+        TypeSerializers.getDefaultSerializers().registerType(TypeToken.of(Group.class), new GroupTypeSerializer());
+
         final Path mainConfigPath = configDir.toPath().resolve("main.json");
         mainConfig = getConfig(mainConfigPath, MainConfig.class,
                 GsonConfigurationLoader.builder().setPath(mainConfigPath).build());
@@ -141,47 +131,41 @@ public class ChatChainMC
         if (event.getObject() instanceof EntityPlayer)
         {
             event.addCapability(new ResourceLocation(MOD_ID, "groupsettings"), new GroupProvider());
-
         }
     }
 
     @Mod.EventHandler
     public synchronized void serverStart(FMLServerStartingEvent event)
     {
-        server = event.getServer();
         try
         {
-            accessToken = getAccessToken();
-        } catch (Exception e)
+            accessToken = new AccessTokenResolver(mainConfig.getClientId(), mainConfig.getClientSecret(), mainConfig.getIdentityUrl()).getAccessToken();//getAccessToken();
+        } catch (IOException e)
         {
             logger.error("Exception while attempting to get ChatChain Access Token from IdentityServer", e);
         }
 
-        connection = HubConnectionBuilder.create(mainConfig.getApiUrl() /*"https://api.chatchain.co/hubs/chatchain"*/)
-                .withAccessTokenProvider(Single.defer(() -> Single.just(accessToken)))
-                .build();
-        connection.start().blockingAwait();
+        connection = new ChatChainHubConnection(mainConfig.getApiUrl(), accessToken);
+        connection.connect();
 
         logger.info("Connection Status: " + connection.getConnectionState());
 
-        connection.on("ReceiveGenericMessage", APIMessages::ReceiveGenericMessage, GenericMessage.class);
-        connection.on("ReceiveClientEventMessage", APIMessages::ReceiveClientEvent, ClientEventMessage.class);
-        connection.on("ReceiveGroups", APIMessages::ReceiveGroups, ReceiveGroupsMessage.class);
-        connection.on("ReceiveClient", APIMessages::ReceiveClient, ReceiveClientMessage.class);
+        connection.onGenericMessage(APIMessages::ReceiveGenericMessage, GenericMessage.class);
+        connection.onClientEventMessage(APIMessages::ReceiveClientEvent, ClientEventMessage.class);
+        connection.onGetGroupsResponse(APIMessages::ReceiveGroups, GetGroupsResponse.class);
+        connection.onGetClientResponse(APIMessages::ReceiveClient, GetClientResponse.class);
 
-        connection.send("GetGroups");
-        connection.send("GetClient");
-        connection.send("SendClientEventMessage", new ClientEventMessage("START"));
+        connection.sendGetGroups();
+        connection.sendGetClient();
+        connection.sendClientEventMessage(new ClientEventMessage("START"));
 
         event.registerServerCommand(new BaseCommand());
-        //event.registerServerCommand(new ReloadCommand());
     }
 
+    @Mod.EventHandler
     public synchronized void serverStop(FMLServerStoppingEvent event)
     {
-        logger.info("FMLServerStoppingEvent");
-        //connection.send("SendClientEventMessage", new ClientEventMessage(ClientEvent.STOP));
-        //connection.stop().blockingAwait();
+        connection.disconnect();
     }
 
     @SubscribeEvent
@@ -193,7 +177,39 @@ public class ChatChainMC
         {
             final User user = new User(event.getUsername());
 
-            final GenericMessage message = new GenericMessage(groupSettings.getTalkingGroup(), user, event.getMessage());
+            final GenericMessage message = new GenericMessage(groupSettings.getTalkingGroup(), user, event.getMessage(), false);
+
+            if (groupSettings.getTalkingGroup() == null)
+            {
+                final String defaultGroupString = ChatChainMC.instance.getGroupsConfig().getDefaultGroup();
+                if (defaultGroupString != null && !defaultGroupString.isEmpty())
+                {
+                    final GroupConfig groupConfig = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(defaultGroupString);
+                    if (groupConfig.getPlayersForGroup().contains(event.getPlayer()))
+                    {
+                        groupSettings.setTalkingGroup(groupConfig.getGroup());
+                    } else
+                    {
+                        event.getPlayer().sendMessage(new TextComponentString("§cYou do not have perms for default group in the config!"));
+                        event.setCanceled(true);
+                        return;
+                    }
+                } else
+                {
+                    event.getPlayer().sendMessage(new TextComponentString("§cPlease set a default group for chat in the config!"));
+                    event.setCanceled(true);
+                    return;
+                }
+            }
+
+            final GroupConfig groupConfig = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(groupSettings.getTalkingGroup().getGroupId());
+
+            if (!groupConfig.getPlayersForGroup().contains(event.getPlayer()))
+            {
+                event.getPlayer().sendMessage(new TextComponentString("§cYou do not have perms for your talking group!"));
+                event.setCanceled(true);
+                return;
+            }
 
             if (groupSettings.getMutedGroups().contains(groupSettings.getTalkingGroup()))
             {
@@ -201,61 +217,16 @@ public class ChatChainMC
                 event.getPlayer().sendMessage(new TextComponentString("Group unmuted"));
             }
 
-            message.setSendingClient(ChatChainMC.instance.getClient());
-
             if (ChatChainMC.instance.connection.getConnectionState() == HubConnectionState.CONNECTED)
             {
                 instance.logger.info("Message Sent");
-                ChatChainMC.instance.connection.send("SendGenericMessage", message);
+                ChatChainMC.instance.connection.sendGenericMessage(message);
             }
 
             final ITextComponent messageToSend = ChatChainMC.instance.getFormattingConfig().getGenericMessage(message);
 
             event.setComponent(messageToSend);
         }
-    }
-
-    private String getAccessToken() throws IOException
-    {
-        System.out.println("Ran Here");
-
-        URL url = new URL(mainConfig.getIdentityUrl() /*"https://identity.chatchain.co/connect/token"*/);
-
-        URLConnection con = url.openConnection();
-        HttpURLConnection http = (HttpURLConnection) con;
-        http.setRequestMethod("POST");
-        http.setDoOutput(true);
-
-        final String clientId = mainConfig.getClientId();//System.getenv("CLIENT_ID");
-        final String clientSecret = mainConfig.getClientSecret();//System.getenv("CLIENT_SECRET");
-
-        logger.info("clientId: " + clientId);
-        logger.info("clientSecret: " + clientSecret);
-
-        Map<String, String> arguments = new HashMap<>();
-        arguments.put("client_id", clientId);
-        arguments.put("client_secret", clientSecret);
-        arguments.put("grant_type", "client_credentials");
-        StringJoiner sj = new StringJoiner("&");
-        for (Map.Entry<String, String> entry : arguments.entrySet())
-        {
-            sj.add(URLEncoder.encode(entry.getKey(), "UTF-8") + "=" + URLEncoder.encode(entry.getValue(), "UTF-8"));
-        }
-        byte[] out = sj.toString().getBytes(StandardCharsets.UTF_8);
-        int length = out.length;
-        http.setFixedLengthStreamingMode(length);
-        http.connect();
-        try (OutputStream os = http.getOutputStream())
-        {
-            os.write(out);
-        }
-
-        Scanner s = new Scanner(http.getInputStream()).useDelimiter("\\A");
-        String output = s.hasNext() ? s.next() : "";
-
-        JSONObject jsonObject = new JSONObject(output);
-
-        return jsonObject.getString("access_token");
     }
 
     @SuppressWarnings("unchecked")

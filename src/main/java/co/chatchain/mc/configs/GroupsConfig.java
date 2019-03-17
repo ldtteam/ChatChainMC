@@ -1,13 +1,14 @@
 package co.chatchain.mc.configs;
 
-import co.chatchain.mc.ChatChainMC;
-import co.chatchain.mc.message.objects.Group;
+import co.chatchain.commons.messages.objects.Group;
 import lombok.Getter;
-import net.minecraft.entity.player.EntityPlayer;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @ConfigSerializable
 public class GroupsConfig extends AbstractConfig
@@ -22,51 +23,25 @@ public class GroupsConfig extends AbstractConfig
 
     @Getter
     @Setting(value = "group-storage")
-    private Map<String, Group> groupStorage = new HashMap<>();
-
-    public List<EntityPlayer> getPlayersForGroup(final Group group)
-    {
-        final List<EntityPlayer> returnList = new ArrayList<>();
-        if (group.isAllowAllPlayers())
-        {
-            returnList.addAll(ChatChainMC.instance.getServer().getPlayerList().getPlayers());
-        }
-        else
-        {
-            for (final UUID uuid : group.getAllowedPlayers())
-            {
-                final EntityPlayer player = ChatChainMC.instance.getServer().getPlayerList().getPlayerByUUID(uuid);
-                if (ChatChainMC.instance.getServer().getPlayerList().getPlayers().contains(player))
-                {
-                    returnList.add(player);
-                }
-            }
-        }
-
-        return returnList;
-    }
+    private Map<String, GroupConfig> groupStorage = new HashMap<>();
 
     public String getDefaultGroup()
     {
         Group returnGroup = null;
 
-        if (defaultGroup == null || defaultGroup.isEmpty())
+        if (groupStorage.containsKey(defaultGroup))
+        {
+            returnGroup = groupStorage.get(defaultGroup).getGroup();
+        } else
         {
             for (final String key : groupStorage.keySet())
             {
                 if (groupStorage.get(key).isAllowAllPlayers())
                 {
-                    returnGroup = groupStorage.get(key);
+                    returnGroup = groupStorage.get(key).getGroup();
                     break;
                 }
             }
-
-            //returnGroup = groupStorage.entrySet().stream().findFirst().get().getValue();
-        }
-
-        if (groupStorage.containsKey(defaultGroup))
-        {
-            returnGroup = groupStorage.get(defaultGroup);
         }
 
         return returnGroup != null ? returnGroup.getGroupId() : "";
