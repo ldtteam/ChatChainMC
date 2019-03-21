@@ -4,6 +4,7 @@ import co.chatchain.commons.messages.objects.Client;
 import co.chatchain.commons.messages.objects.Group;
 import co.chatchain.commons.messages.objects.message.ClientEventMessage;
 import co.chatchain.commons.messages.objects.message.GenericMessage;
+import co.chatchain.commons.messages.objects.message.UserEventMessage;
 import co.chatchain.mc.ChatChainMC;
 import co.chatchain.mc.Constants;
 import lombok.Getter;
@@ -50,6 +51,7 @@ public class FormattingConfig extends AbstractConfig
 
     private ITextComponent getTextComponent(final String message, final Group group)
     {
+
         final GroupConfig groupConfig = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(group.getGroupId());
 
         final ITextComponent finalMessage = new TextComponentString("");
@@ -65,13 +67,15 @@ public class FormattingConfig extends AbstractConfig
                 if (part.contains("{clickable-group-name}"))
                 {
                     replacement = formattingForNext + group.getGroupName();
-                } else
+                }
+                else
                 {
                     replacement = formattingForNext + group.getGroupId();
                 }
                 ITextComponent component = new TextComponentString(replacement).setStyle(new Style().setClickEvent(clickEvent));
                 finalMessage.appendSibling(component);
-            } else
+            }
+            else
             {
                 finalMessage.appendSibling(new TextComponentString(formattingForNext + part));
             }
@@ -157,10 +161,12 @@ public class FormattingConfig extends AbstractConfig
         if (message.getEvent().equalsIgnoreCase("START"))
         {
             defaultOrOverride = getDefaultOrOverride(group.getGroupId(), defaultClientStartEventFormats, clientStartEventFormats);
-        } else if (message.getEvent().equalsIgnoreCase("STOP"))
+        }
+        else if (message.getEvent().equalsIgnoreCase("STOP"))
         {
             defaultOrOverride = getDefaultOrOverride(group.getGroupId(), defaultClientStopEventFormats, clientStopEventFormats);
-        } else
+        }
+        else
         {
             return null;
         }
@@ -169,5 +175,89 @@ public class FormattingConfig extends AbstractConfig
         return getTextComponent(stringMessage, group);
     }
 
+    @Setting("user-event-formats_comment")
+    private String userEventComment = "Template options: " +
+            Constants.GROUP_NAME + " - The message's group's name " +
+            Constants.CLICKABLE_GROUP_NAME + " - Same as above (name), however you can click it to change to change talking to this group" +
+            Constants.GROUP_ID + " - The message's group's ID " +
+            Constants.CLICKABLE_GROUP_ID + " - Same as above (id), however you can click it to change to change talking to this group" +
+            Constants.USER_NAME + " - Name of the user who sent the message " +
+            Constants.SENDING_CLIENT_NAME + " - Name of the Client who sent the message " +
+            Constants.SENDING_CLIENT_GUID + " - The GUID of the client who sent the message ";
+
+    @Getter
+    @Setting("user-login-event-formats")
+    private Map<String, String> userLoginEventFormats = new HashMap<>();
+
+    @Getter
+    @Setting("default-user-login-event-format")
+    private String defaultUserLoginEventFormats = "§f[§c{group-name}§f] [§6{sending-client-name}§f] §e{user-name} has §alogged in§f";
+
+    @Getter
+    @Setting("user-logout-event-formats")
+    private Map<String, String> userLogoutEventFormats = new HashMap<>();
+
+    @Getter
+    @Setting("default-user-logout-event-format")
+    private String defaultUserLogoutEventFormats = "§f[§c{group-name}§f] [§6{sending-client-name}§f] §e{user-name} has §clogged out§f";
+
+    @Getter
+    @Setting("user-death-event-formats")
+    private Map<String, String> userDeathEventFormats = new HashMap<>();
+
+    @Getter
+    @Setting("default-user-death-event-format")
+    private String defaultUserDeathEventFormats = "§f[§c{group-name}§f] [§6{sending-client-name}§f] §e{user-name} has §8died§f";
+
+    /*@Getter
+    @Setting("user-achievement-event-formats")
+    private Map<String, String> userAchievementEventFormats = new HashMap<>();
+
+    @Getter
+    @Setting("default-user-achievement-event-format")
+    private String defaultUserAchievementEventFormats = "§f[§c{group-name}§f] [§6{sending-client-name}§f] §e{user-name} has gained §2achievement: {achievement-name}";*/
+
+    public ITextComponent getUserEventMessage(final UserEventMessage message, final Group group)
+    {
+        final String defaultOrOverride;
+        if (message.getEvent().equalsIgnoreCase("LOGIN"))
+        {
+            defaultOrOverride = getDefaultOrOverride(group.getGroupId(), defaultUserLoginEventFormats, userLoginEventFormats);
+        }
+        else if (message.getEvent().equalsIgnoreCase("LOGOUT"))
+        {
+            defaultOrOverride = getDefaultOrOverride(group.getGroupId(), defaultUserLogoutEventFormats, userLogoutEventFormats);
+        }
+        else if (message.getEvent().equalsIgnoreCase("DEATH"))
+        {
+            defaultOrOverride = getDefaultOrOverride(group.getGroupId(), defaultUserDeathEventFormats, userDeathEventFormats);
+        }
+        /*else if (message.getEvent().equalsIgnoreCase("ACHIEVEMENT"))
+        {
+            defaultOrOverride = getDefaultOrOverride(group.getGroupId(), defaultUserAchievementEventFormats, userAchievementEventFormats);
+        }*/
+        else
+        {
+            return null;
+        }
+
+        String stringMessage = getReplacements(group, message.getClient(), defaultOrOverride).replaceAll("(\\{user-name})", message.getUser().getName());
+
+        /*if (message.getEvent().equalsIgnoreCase("ACHIEVEMENT"))
+        {
+            for (final String key : message.getExtraEventData().keySet())
+            {
+                ChatChainMC.instance.getLogger().info("here: " + key);
+                if (key.equalsIgnoreCase("achievement-name"))
+                {
+                    stringMessage = stringMessage.replaceAll("(\\{achievement-name})", message.getExtraEventData().get(key));
+                }
+
+            }
+        }*/
+
+        ChatChainMC.instance.getLogger().info("passed here");
+        return getTextComponent(stringMessage, group);
+    }
 
 }

@@ -1,13 +1,8 @@
 package co.chatchain.mc.message.handling;
 
 import co.chatchain.commons.messages.objects.Group;
-import co.chatchain.commons.messages.objects.message.ClientEventMessage;
-import co.chatchain.commons.messages.objects.message.GenericMessage;
-import co.chatchain.commons.messages.objects.message.GetClientResponse;
-import co.chatchain.commons.messages.objects.message.GetGroupsResponse;
+import co.chatchain.commons.messages.objects.message.*;
 import co.chatchain.mc.ChatChainMC;
-import co.chatchain.mc.capabilities.GroupProvider;
-import co.chatchain.mc.capabilities.IGroupSettings;
 import co.chatchain.mc.configs.GroupConfig;
 import co.chatchain.mc.configs.GroupsConfig;
 import net.minecraft.entity.player.EntityPlayer;
@@ -36,14 +31,9 @@ public class APIMessages
 
         final GroupConfig groupConfig = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(message.getGroup().getGroupId());
 
-        for (final EntityPlayer player : groupConfig.getPlayersForGroup())
+        for (final EntityPlayer player : groupConfig.getPlayersForGroupUnmuted())
         {
-            final IGroupSettings groupSettings = player.getCapability(GroupProvider.GROUP_SETTINGS_CAP, null);
-
-            if (groupSettings != null && !groupSettings.getMutedGroups().contains(groupConfig.getGroup()))
-            {
-                player.sendMessage(messageToSend);
-            }
+            player.sendMessage(messageToSend);
         }
 
         ChatChainMC.instance.getLogger().info("New Message in Channel: " + message.getGroup().getGroupName() + " Client: " + message.getSendingClient() + " User: " + message.getUser().getName() + " Message: " + message.getMessage());
@@ -63,16 +53,32 @@ public class APIMessages
                     return;
                 }
 
-                for (final EntityPlayer player : groupConfig.getPlayersForGroup())
+                for (final EntityPlayer player : groupConfig.getPlayersForGroupUnmuted())
                 {
-                    final IGroupSettings groupSettings = player.getCapability(GroupProvider.GROUP_SETTINGS_CAP, null);
+                    player.sendMessage(messageToSend);
+                }
+            }
+        }
+    }
 
-                    if (groupSettings != null && !groupSettings.getMutedGroups().contains(groupConfig.getGroup()))
-                    {
-                        player.sendMessage(messageToSend);
-                    }
+    public static void ReceiveUserEvent(final UserEventMessage message)
+    {
+        for (final String groupId : ChatChainMC.instance.getGroupsConfig().getUserEventGroups())
+        {
+            if (ChatChainMC.instance.getGroupsConfig().getGroupStorage().containsKey(groupId))
+            {
+                final GroupConfig groupConfig = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(groupId);
+                final ITextComponent messageToSend = ChatChainMC.instance.getFormattingConfig().getUserEventMessage(message, groupConfig.getGroup());
+
+                if (messageToSend == null)
+                {
+                    return;
                 }
 
+                for (final EntityPlayer player : groupConfig.getPlayersForGroupUnmuted())
+                {
+                    player.sendMessage(messageToSend);
+                }
             }
         }
     }

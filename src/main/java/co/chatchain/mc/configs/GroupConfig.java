@@ -1,6 +1,8 @@
 package co.chatchain.mc.configs;
 
 import co.chatchain.commons.messages.objects.Group;
+import co.chatchain.mc.capabilities.GroupProvider;
+import co.chatchain.mc.capabilities.IGroupSettings;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Delegate;
@@ -48,7 +50,8 @@ public class GroupConfig
         if (allowAllPlayers)
         {
             returnList.addAll(FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayers());
-        } else
+        }
+        else
         {
             for (final UUID uuid : allowedPlayers)
             {
@@ -60,6 +63,21 @@ public class GroupConfig
             }
         }
 
+        return returnList;
+    }
+
+    public List<EntityPlayer> getPlayersForGroupUnmuted()
+    {
+        final List<EntityPlayer> returnList = new ArrayList<>();
+        for (final EntityPlayer player : getPlayersForGroup())
+        {
+            final IGroupSettings groupSettings = player.getCapability(GroupProvider.GROUP_SETTINGS_CAP, null);
+
+            if (groupSettings != null && !groupSettings.getMutedGroups().contains(group))
+            {
+                returnList.add(player);
+            }
+        }
         return returnList;
     }
 

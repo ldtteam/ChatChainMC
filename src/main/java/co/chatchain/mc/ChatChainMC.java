@@ -5,10 +5,7 @@ import co.chatchain.commons.ChatChainHubConnection;
 import co.chatchain.commons.messages.objects.Client;
 import co.chatchain.commons.messages.objects.Group;
 import co.chatchain.commons.messages.objects.User;
-import co.chatchain.commons.messages.objects.message.ClientEventMessage;
-import co.chatchain.commons.messages.objects.message.GenericMessage;
-import co.chatchain.commons.messages.objects.message.GetClientResponse;
-import co.chatchain.commons.messages.objects.message.GetGroupsResponse;
+import co.chatchain.commons.messages.objects.message.*;
 import co.chatchain.mc.capabilities.GroupProvider;
 import co.chatchain.mc.capabilities.IGroupSettings;
 import co.chatchain.mc.commands.BaseCommand;
@@ -28,11 +25,14 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.ServerChatEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.player.AdvancementEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.ConfigurationOptions;
 import ninja.leaping.configurate.gson.GsonConfigurationLoader;
@@ -45,6 +45,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 
 @Mod(
         modid = ChatChainMC.MOD_ID,
@@ -139,7 +141,7 @@ public class ChatChainMC
     {
         try
         {
-            accessToken = new AccessTokenResolver(mainConfig.getClientId(), mainConfig.getClientSecret(), mainConfig.getIdentityUrl()).getAccessToken();//getAccessToken();
+            accessToken = new AccessTokenResolver(mainConfig.getClientId(), mainConfig.getClientSecret(), mainConfig.getIdentityUrl()).getAccessToken();
         } catch (IOException e)
         {
             logger.error("Exception while attempting to get ChatChain Access Token from IdentityServer", e);
@@ -152,6 +154,7 @@ public class ChatChainMC
 
         connection.onGenericMessage(APIMessages::ReceiveGenericMessage, GenericMessage.class);
         connection.onClientEventMessage(APIMessages::ReceiveClientEvent, ClientEventMessage.class);
+        connection.onUserEventMessage(APIMessages::ReceiveUserEvent, UserEventMessage.class);
         connection.onGetGroupsResponse(APIMessages::ReceiveGroups, GetGroupsResponse.class);
         connection.onGetClientResponse(APIMessages::ReceiveClient, GetClientResponse.class);
 
@@ -188,13 +191,15 @@ public class ChatChainMC
                     if (groupConfig.getPlayersForGroup().contains(event.getPlayer()))
                     {
                         groupSettings.setTalkingGroup(groupConfig.getGroup());
-                    } else
+                    }
+                    else
                     {
                         event.getPlayer().sendMessage(new TextComponentString("§cYou do not have perms for default group in the config!"));
                         event.setCanceled(true);
                         return;
                     }
-                } else
+                }
+                else
                 {
                     event.getPlayer().sendMessage(new TextComponentString("§cPlease set a default group for chat in the config!"));
                     event.setCanceled(true);
@@ -228,6 +233,62 @@ public class ChatChainMC
             event.setComponent(messageToSend);
         }
     }
+
+    @SubscribeEvent
+    public static void playerLoggedIn(PlayerEvent.PlayerLoggedInEvent event)
+    {
+        if (event.player != null && !event.player.world.isRemote && ChatChainMC.instance.connection.getConnection().getConnectionState() == HubConnectionState.CONNECTED)
+        {
+            final User user = new User(event.player.getName());
+
+            ChatChainMC.instance.connection.sendUserEventMessage(new UserEventMessage("LOGIN", user));
+        }
+    }
+
+    @SubscribeEvent
+    public static void playerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event)
+    {
+        if (event.player != null && !event.player.world.isRemote && ChatChainMC.instance.connection.getConnection().getConnectionState() == HubConnectionState.CONNECTED)
+        {
+            final User user = new User(event.player.getName());
+
+            ChatChainMC.instance.connection.sendUserEventMessage(new UserEventMessage("LOGOUT", user));
+        }
+    }
+
+    @SubscribeEvent
+    public static void playerDied(LivingDeathEvent event)
+    {
+        if (event.getEntity() instanceof EntityPlayer
+                && !event.getEntity().world.isRemote && ChatChainMC.instance.connection.getConnection().getConnectionState() == HubConnectionState.CONNECTED)
+        {
+            final User user = new User(event.getEntity().getName());
+
+            ChatChainMC.instance.connection.sendUserEventMessage(new UserEventMessage("DEATH", user));
+        }
+    }
+
+    /*@SubscribeEvent TODO: Disabled until i can figure out a better way to do this, currently the names for advancements aren't always there (some have names, some dont.....)
+    public static void playerAdvancement(AdvancementEvent event)
+    {
+        if (event.getEntityPlayer() != null
+                && !event.getEntity().world.isRemote && ChatChainMC.instance.connection.getConnection().getConnectionState() == HubConnectionState.CONNECTED)
+        {
+            final User user = new User(event.getEntity().getName());
+
+            final Map<String, String> extraEventData = new HashMap<>();
+            if (event.getAdvancement().getDisplay() != null)
+            {
+                extraEventData.put("achievement-name", event.getAdvancement().getDisplayText().getUnformattedText());
+                ChatChainMC.instance.getLogger().info("achievement: " + event.getAdvancement().getDisplay().getTitle().getFormattedText());
+            }
+
+            final UserEventMessage message = new UserEventMessage("ACHIEVEMENT", user, false, extraEventData);
+            //message.getExtraEventData().put("ACHIEVEMENT_NAME", event.getAdvancement().getDisplayText().getUnformattedText());
+
+            ChatChainMC.instance.connection.sendUserEventMessage(message);
+        }
+    }*/
 
     @SuppressWarnings("unchecked")
     private <M extends AbstractConfig> M getConfig(Path file, Class<M> clazz, ConfigurationLoader loader)
