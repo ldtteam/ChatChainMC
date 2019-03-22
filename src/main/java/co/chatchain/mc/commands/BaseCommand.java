@@ -1,6 +1,7 @@
 package co.chatchain.mc.commands;
 
 import net.minecraft.command.ICommandSender;
+import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.server.command.CommandTreeBase;
 
 public class BaseCommand extends CommandTreeBase
@@ -24,5 +25,11 @@ public class BaseCommand extends CommandTreeBase
     public String getUsage(ICommandSender sender)
     {
         return "chatchain <talk | mute>";
+    }
+
+    @Override
+    public boolean checkPermission(MinecraftServer server, ICommandSender sender)
+    {
+        return true;
     }
 }

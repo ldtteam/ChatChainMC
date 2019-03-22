@@ -36,6 +36,12 @@ public class TalkInGroupCommand extends CommandBase
     }
 
     @Override
+    public boolean checkPermission(MinecraftServer server, ICommandSender sender)
+    {
+        return true;
+    }
+
+    @Override
     public void execute(@NotNull MinecraftServer server, @NotNull ICommandSender sender, @NotNull String[] args)
     {
         if (args.length != 1)

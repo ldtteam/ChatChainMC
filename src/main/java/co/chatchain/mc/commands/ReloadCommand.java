@@ -24,6 +24,12 @@ public class ReloadCommand extends CommandBase
     }
 
     @Override
+    public boolean checkPermission(MinecraftServer server, ICommandSender sender)
+    {
+        return sender.canUseCommand(2, "");
+    }
+
+    @Override
     public void execute(@NotNull MinecraftServer server, @NotNull ICommandSender sender, @NotNull String[] args)
     {
         ChatChainMC.instance.reloadConfigs();
