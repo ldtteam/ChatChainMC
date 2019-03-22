@@ -73,7 +73,7 @@ public class ChatChainMC
     @Getter
     private Logger logger = null;
 
-    private String accessToken = "";
+    private AccessTokenResolver accessToken = null;
 
     @Getter
     private ChatChainHubConnection connection = null;
@@ -141,7 +141,7 @@ public class ChatChainMC
     {
         try
         {
-            accessToken = new AccessTokenResolver(mainConfig.getClientId(), mainConfig.getClientSecret(), mainConfig.getIdentityUrl()).getAccessToken();
+            accessToken = new AccessTokenResolver(mainConfig.getClientId(), mainConfig.getClientSecret(), mainConfig.getIdentityUrl());
         } catch (IOException e)
         {
             logger.error("Exception while attempting to get ChatChain Access Token from IdentityServer", e);
