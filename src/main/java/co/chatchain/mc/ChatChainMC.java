@@ -5,7 +5,7 @@ import co.chatchain.commons.ChatChainHubConnection;
 import co.chatchain.commons.messages.objects.Client;
 import co.chatchain.commons.messages.objects.Group;
 import co.chatchain.commons.messages.objects.User;
-import co.chatchain.commons.messages.objects.message.*;
+import co.chatchain.commons.messages.objects.messages.*;
 import co.chatchain.mc.capabilities.GroupProvider;
 import co.chatchain.mc.capabilities.IGroupSettings;
 import co.chatchain.mc.commands.BaseCommand;
@@ -283,10 +283,10 @@ public class ChatChainMC
                 ChatChainMC.instance.getLogger().info("achievement: " + event.getAdvancement().getDisplay().getTitle().getFormattedText());
             }
 
-            final UserEventMessage message = new UserEventMessage("ACHIEVEMENT", user, false, extraEventData);
-            //message.getExtraEventData().put("ACHIEVEMENT_NAME", event.getAdvancement().getDisplayText().getUnformattedText());
+            final UserEventMessage messages = new UserEventMessage("ACHIEVEMENT", user, false, extraEventData);
+            //messages.getExtraEventData().put("ACHIEVEMENT_NAME", event.getAdvancement().getDisplayText().getUnformattedText());
 
-            ChatChainMC.instance.connection.sendUserEventMessage(message);
+            ChatChainMC.instance.connection.sendUserEventMessage(messages);
         }
     }*/
 
