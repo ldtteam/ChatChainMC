@@ -36,7 +36,7 @@ public class APIMessages
             player.sendMessage(messageToSend);
         }
 
-        ChatChainMC.instance.getLogger().info("New ChatChain Message", messageToSend);
+        ChatChainMC.instance.getLogger().info("New Generic Message" + messageToSend.getFormattedText());
     }
 
     public static void ReceiveClientEvent(final ClientEventMessage message)
@@ -58,7 +58,7 @@ public class APIMessages
                     player.sendMessage(messageToSend);
                 }
 
-                ChatChainMC.instance.getLogger().info("New Client Message", messageToSend);
+                ChatChainMC.instance.getLogger().info("New Client Message" + messageToSend.getFormattedText());
             }
         }
     }
@@ -81,6 +81,8 @@ public class APIMessages
                 {
                     player.sendMessage(messageToSend);
                 }
+
+                ChatChainMC.instance.getLogger().info("New User Message" + messageToSend.getFormattedText());
             }
         }
     }
