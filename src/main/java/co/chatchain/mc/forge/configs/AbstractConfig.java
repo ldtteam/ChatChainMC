@@ -1,6 +1,6 @@
-package co.chatchain.mc.configs;
+package co.chatchain.mc.forge.configs;
 
-import co.chatchain.mc.ChatChainMC;
+import co.chatchain.mc.forge.ChatChainMC;
 import com.google.common.reflect.TypeToken;
 import lombok.Getter;
 import ninja.leaping.configurate.ConfigurationNode;

@@ -1,6 +1,6 @@
-package co.chatchain.mc.commands;
+package co.chatchain.mc.forge.commands;
 
-import co.chatchain.mc.ChatChainMC;
+import co.chatchain.mc.forge.ChatChainMC;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;

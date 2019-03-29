@@ -1,9 +1,9 @@
-package co.chatchain.mc.commands;
+package co.chatchain.mc.forge.commands;
 
-import co.chatchain.mc.ChatChainMC;
-import co.chatchain.mc.capabilities.GroupProvider;
-import co.chatchain.mc.capabilities.IGroupSettings;
-import co.chatchain.mc.configs.GroupConfig;
+import co.chatchain.mc.forge.ChatChainMC;
+import co.chatchain.mc.forge.capabilities.GroupProvider;
+import co.chatchain.mc.forge.capabilities.IGroupSettings;
+import co.chatchain.mc.forge.configs.GroupConfig;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
@@ -18,21 +18,21 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class MuteGroupCommand extends CommandBase
+public class IgnoreGroupCommand extends CommandBase
 {
 
     @NotNull
     @Override
     public String getName()
     {
-        return "mute";
+        return "ignore";
     }
 
     @NotNull
     @Override
     public String getUsage(@NotNull ICommandSender sender)
     {
-        return "/chatchain mute <group name>";
+        return "/chatchain ignore <group name>";
     }
 
     @Override
@@ -73,9 +73,9 @@ public class MuteGroupCommand extends CommandBase
                 return;
             }
 
-            if (!groupConfig.isGroupMutable())
+            if (!groupConfig.isGroupIgnorable())
             {
-                sender.sendMessage(new TextComponentString("This group is unmutable!"));
+                sender.sendMessage(new TextComponentString("This group is ignorable!"));
                 return;
             }
 
@@ -83,14 +83,15 @@ public class MuteGroupCommand extends CommandBase
 
             if (groupSettings != null)
             {
-                if (groupSettings.getMutedGroups().contains(groupConfig.getGroup()))
+                if (groupSettings.getIgnoredGroups().contains(groupConfig.getGroup()))
                 {
-                    groupSettings.removeMutedGroup(groupConfig.getGroup());
-                    sender.sendMessage(new TextComponentString("Group unmuted"));
-                } else
+                    groupSettings.removeIgnoredGroup(groupConfig.getGroup());
+                    sender.sendMessage(new TextComponentString("Group ignored"));
+                }
+                else
                 {
-                    groupSettings.addMutedGroup(groupConfig.getGroup());
-                    sender.sendMessage(new TextComponentString("Group muted"));
+                    groupSettings.addIgnoredGroup(groupConfig.getGroup());
+                    sender.sendMessage(new TextComponentString("Group un-ignored"));
                 }
             }
         }

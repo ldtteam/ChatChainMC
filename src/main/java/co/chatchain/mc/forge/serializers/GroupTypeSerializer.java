@@ -1,4 +1,4 @@
-package co.chatchain.mc.serializers;
+package co.chatchain.mc.forge.serializers;
 
 import co.chatchain.commons.messages.objects.Group;
 import com.google.common.reflect.TypeToken;

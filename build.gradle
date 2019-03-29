@@ -25,7 +25,7 @@ apply plugin: "net.minecraftforge.gradle.forge"
 group = modGroup
 archivesBaseName = modBaseName
 version = System.getenv()['BUILD_NUMBER'] != null ? System.getenv()['BUILD_NUMBER'] : System.getenv()['TRAVIS_BUILD_NUMBER']
-mainClassName = 'co.chatchain.mc.ChatChainMC'
+mainClassName = 'co.chatchain.mc.forge.ChatChainMC'
 
 sourceSets {
     api {

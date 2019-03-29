@@ -1,8 +1,8 @@
-package co.chatchain.mc.configs;
+package co.chatchain.mc.forge.configs;
 
 import co.chatchain.commons.messages.objects.Group;
-import co.chatchain.mc.capabilities.GroupProvider;
-import co.chatchain.mc.capabilities.IGroupSettings;
+import co.chatchain.mc.forge.capabilities.GroupProvider;
+import co.chatchain.mc.forge.capabilities.IGroupSettings;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Delegate;
@@ -66,14 +66,14 @@ public class GroupConfig
         return returnList;
     }
 
-    public List<EntityPlayer> getPlayersForGroupUnmuted()
+    public List<EntityPlayer> getPlayersForGroupUnignored()
     {
         final List<EntityPlayer> returnList = new ArrayList<>();
         for (final EntityPlayer player : getPlayersForGroup())
         {
             final IGroupSettings groupSettings = player.getCapability(GroupProvider.GROUP_SETTINGS_CAP, null);
 
-            if (groupSettings != null && !groupSettings.getMutedGroups().contains(group))
+            if (groupSettings != null && !groupSettings.getIgnoredGroups().contains(group))
             {
                 returnList.add(player);
             }
@@ -84,5 +84,5 @@ public class GroupConfig
     @Getter
     @Setter
     @Setting("is-group-mutable")
-    private boolean isGroupMutable = true;
+    private boolean isGroupIgnorable = true;
 }

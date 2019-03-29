@@ -1,4 +1,4 @@
-package co.chatchain.mc.commands;
+package co.chatchain.mc.forge.commands;
 
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
@@ -10,7 +10,7 @@ public class BaseCommand extends CommandTreeBase
     public BaseCommand()
     {
         addSubcommand(new TalkInGroupCommand());
-        addSubcommand(new MuteGroupCommand());
+        addSubcommand(new IgnoreGroupCommand());
         addSubcommand(new ReloadCommand());
         //addSubcommand(new AddPlayerCommand());
     }

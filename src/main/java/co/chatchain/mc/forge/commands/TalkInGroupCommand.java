@@ -1,9 +1,9 @@
-package co.chatchain.mc.commands;
+package co.chatchain.mc.forge.commands;
 
-import co.chatchain.mc.ChatChainMC;
-import co.chatchain.mc.capabilities.GroupProvider;
-import co.chatchain.mc.capabilities.IGroupSettings;
-import co.chatchain.mc.configs.GroupConfig;
+import co.chatchain.mc.forge.ChatChainMC;
+import co.chatchain.mc.forge.capabilities.GroupProvider;
+import co.chatchain.mc.forge.capabilities.IGroupSettings;
+import co.chatchain.mc.forge.configs.GroupConfig;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;

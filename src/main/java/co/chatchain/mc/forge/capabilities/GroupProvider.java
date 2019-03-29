@@ -1,4 +1,4 @@
-package co.chatchain.mc.capabilities;
+package co.chatchain.mc.forge.capabilities;
 
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;

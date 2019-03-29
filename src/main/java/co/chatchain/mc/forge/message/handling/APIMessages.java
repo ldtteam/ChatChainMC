@@ -1,10 +1,10 @@
-package co.chatchain.mc.message.handling;
+package co.chatchain.mc.forge.message.handling;
 
 import co.chatchain.commons.messages.objects.Group;
 import co.chatchain.commons.messages.objects.messages.*;
-import co.chatchain.mc.ChatChainMC;
-import co.chatchain.mc.configs.GroupConfig;
-import co.chatchain.mc.configs.GroupsConfig;
+import co.chatchain.mc.forge.ChatChainMC;
+import co.chatchain.mc.forge.configs.GroupConfig;
+import co.chatchain.mc.forge.configs.GroupsConfig;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.text.ITextComponent;
 
@@ -31,7 +31,7 @@ public class APIMessages
 
         final GroupConfig groupConfig = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(message.getGroup().getGroupId());
 
-        for (final EntityPlayer player : groupConfig.getPlayersForGroupUnmuted())
+        for (final EntityPlayer player : groupConfig.getPlayersForGroupUnignored())
         {
             player.sendMessage(messageToSend);
         }
@@ -53,7 +53,7 @@ public class APIMessages
                     return;
                 }
 
-                for (final EntityPlayer player : groupConfig.getPlayersForGroupUnmuted())
+                for (final EntityPlayer player : groupConfig.getPlayersForGroupUnignored())
                 {
                     player.sendMessage(messageToSend);
                 }
@@ -77,7 +77,7 @@ public class APIMessages
                     return;
                 }
 
-                for (final EntityPlayer player : groupConfig.getPlayersForGroupUnmuted())
+                for (final EntityPlayer player : groupConfig.getPlayersForGroupUnignored())
                 {
                     player.sendMessage(messageToSend);
                 }

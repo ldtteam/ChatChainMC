@@ -1,4 +1,4 @@
-package co.chatchain.mc.configs;
+package co.chatchain.mc.forge.configs;
 
 import co.chatchain.commons.messages.objects.Group;
 import lombok.Getter;
@@ -36,7 +36,8 @@ public class GroupsConfig extends AbstractConfig
         if (groupStorage.containsKey(defaultGroup))
         {
             returnGroup = groupStorage.get(defaultGroup).getGroup();
-        } else
+        }
+        else
         {
             for (final String key : groupStorage.keySet())
             {

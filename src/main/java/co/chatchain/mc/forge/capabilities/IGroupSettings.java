@@ -1,4 +1,4 @@
-package co.chatchain.mc.capabilities;
+package co.chatchain.mc.forge.capabilities;
 
 import co.chatchain.commons.messages.objects.Group;
 import net.minecraft.nbt.NBTBase;
@@ -12,11 +12,11 @@ import java.util.concurrent.Callable;
 public interface IGroupSettings
 {
 
-    void addMutedGroup(final co.chatchain.commons.messages.objects.Group group);
+    void addIgnoredGroup(final co.chatchain.commons.messages.objects.Group group);
 
-    void removeMutedGroup(final Group group);
+    void removeIgnoredGroup(final Group group);
 
-    List<Group> getMutedGroups();
+    List<Group> getIgnoredGroups();
 
     void setTalkingGroup(final Group group);
 

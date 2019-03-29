@@ -1,4 +1,4 @@
-package co.chatchain.mc;
+package co.chatchain.mc.forge;
 
 public class Constants
 {

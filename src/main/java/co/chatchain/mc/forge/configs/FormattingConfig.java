@@ -1,12 +1,12 @@
-package co.chatchain.mc.configs;
+package co.chatchain.mc.forge.configs;
 
 import co.chatchain.commons.messages.objects.Client;
 import co.chatchain.commons.messages.objects.Group;
 import co.chatchain.commons.messages.objects.messages.ClientEventMessage;
 import co.chatchain.commons.messages.objects.messages.GenericMessage;
 import co.chatchain.commons.messages.objects.messages.UserEventMessage;
-import co.chatchain.mc.ChatChainMC;
-import co.chatchain.mc.Constants;
+import co.chatchain.mc.forge.ChatChainMC;
+import co.chatchain.mc.forge.Constants;
 import lombok.Getter;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.Style;

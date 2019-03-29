@@ -1,4 +1,4 @@
-package co.chatchain.mc;
+package co.chatchain.mc.forge;
 
 import co.chatchain.commons.AccessTokenResolver;
 import co.chatchain.commons.ChatChainHubConnection;
@@ -6,12 +6,12 @@ import co.chatchain.commons.messages.objects.Client;
 import co.chatchain.commons.messages.objects.Group;
 import co.chatchain.commons.messages.objects.User;
 import co.chatchain.commons.messages.objects.messages.*;
-import co.chatchain.mc.capabilities.GroupProvider;
-import co.chatchain.mc.capabilities.IGroupSettings;
-import co.chatchain.mc.commands.BaseCommand;
-import co.chatchain.mc.configs.*;
-import co.chatchain.mc.message.handling.APIMessages;
-import co.chatchain.mc.serializers.GroupTypeSerializer;
+import co.chatchain.mc.forge.capabilities.GroupProvider;
+import co.chatchain.mc.forge.capabilities.IGroupSettings;
+import co.chatchain.mc.forge.commands.BaseCommand;
+import co.chatchain.mc.forge.configs.*;
+import co.chatchain.mc.forge.message.handling.APIMessages;
+import co.chatchain.mc.forge.serializers.GroupTypeSerializer;
 import com.google.common.reflect.TypeToken;
 import com.microsoft.signalr.HubConnectionState;
 import lombok.Getter;
@@ -26,7 +26,6 @@ import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.player.AdvancementEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
@@ -45,8 +44,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
 
 @Mod(
         modid = ChatChainMC.MOD_ID,
@@ -216,9 +213,9 @@ public class ChatChainMC
                 return;
             }
 
-            if (groupSettings.getMutedGroups().contains(groupSettings.getTalkingGroup()))
+            if (groupSettings.getIgnoredGroups().contains(groupSettings.getTalkingGroup()))
             {
-                groupSettings.removeMutedGroup(groupSettings.getTalkingGroup());
+                groupSettings.removeIgnoredGroup(groupSettings.getTalkingGroup());
                 event.getPlayer().sendMessage(new TextComponentString("Group unmuted"));
             }
 

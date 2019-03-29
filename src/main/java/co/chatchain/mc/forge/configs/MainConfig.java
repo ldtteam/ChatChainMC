@@ -1,4 +1,4 @@
-package co.chatchain.mc.configs;
+package co.chatchain.mc.forge.configs;
 
 import lombok.Getter;
 import ninja.leaping.configurate.objectmapping.Setting;

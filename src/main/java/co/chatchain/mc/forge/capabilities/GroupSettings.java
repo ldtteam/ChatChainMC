@@ -1,7 +1,7 @@
-package co.chatchain.mc.capabilities;
+package co.chatchain.mc.forge.capabilities;
 
 import co.chatchain.commons.messages.objects.Group;
-import co.chatchain.mc.ChatChainMC;
+import co.chatchain.mc.forge.ChatChainMC;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,27 +9,27 @@ import java.util.List;
 public class GroupSettings implements IGroupSettings
 {
 
-    private List<String> mutedGroups = new ArrayList<>();
+    private List<String> ignoredGroups = new ArrayList<>();
     private String talkingGroup = ChatChainMC.instance.getGroupsConfig().getDefaultGroup();
 
     @Override
-    public void addMutedGroup(Group group)
+    public void addIgnoredGroup(Group group)
     {
-        this.mutedGroups.add(group.getGroupId());
+        this.ignoredGroups.add(group.getGroupId());
     }
 
     @Override
-    public void removeMutedGroup(Group group)
+    public void removeIgnoredGroup(Group group)
     {
-        this.mutedGroups.remove(group.getGroupId());
+        this.ignoredGroups.remove(group.getGroupId());
     }
 
     @Override
-    public List<Group> getMutedGroups()
+    public List<Group> getIgnoredGroups()
     {
         final List<Group> groups = new ArrayList<>();
 
-        for (final String groupId : mutedGroups)
+        for (final String groupId : ignoredGroups)
         {
             if (ChatChainMC.instance.getGroupsConfig().getGroupStorage().containsKey(groupId))
             {
