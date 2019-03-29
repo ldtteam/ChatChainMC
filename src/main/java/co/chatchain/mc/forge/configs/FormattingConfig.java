@@ -111,7 +111,7 @@ public class FormattingConfig extends AbstractConfig
 
     @Setting("default-generic-messages-format")
     @Getter
-    private String defaultGenericMessageFormat = "§f[§c{group-name}§f] [§6{sending-client-name}§f] <§e{user-name}§f>: {messages}";
+    private String defaultGenericMessageFormat = "§f[§c{group-name}§f] §f[§6{sending-client-name}§f] §f<§e{user-name}§f>: {messages}";
 
     public ITextComponent getGenericMessage(final GenericMessage message)
     {

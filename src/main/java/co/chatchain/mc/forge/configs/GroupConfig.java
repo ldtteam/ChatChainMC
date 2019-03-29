@@ -23,6 +23,10 @@ public class GroupConfig
     @Setting("group")
     private Group group;
 
+    @Getter
+    @Setting("cancel-chat-event")
+    private boolean cancelChatEvent = false;
+
     @Setting("command-name")
     private String commandName = "";
 

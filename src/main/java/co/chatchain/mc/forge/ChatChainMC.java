@@ -227,6 +227,16 @@ public class ChatChainMC
             final ITextComponent messageToSend = ChatChainMC.instance.getFormattingConfig().getGenericMessage(message);
 
             event.setComponent(messageToSend);
+
+            if (groupConfig.isCancelChatEvent())
+            {
+                event.setCanceled(true);
+
+                for (final EntityPlayer player: groupConfig.getPlayersForGroupUnignored())
+                {
+                    player.sendMessage(messageToSend);
+                }
+            }
         }
     }
 
