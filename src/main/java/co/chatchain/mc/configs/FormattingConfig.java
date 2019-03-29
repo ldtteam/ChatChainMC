@@ -26,7 +26,7 @@ public class FormattingConfig extends AbstractConfig
 
     private String getDefaultOrOverride(final String groupId, final String defaultString, final Map<String, String> overrideStrings)
     {
-        if (defaultString.contains(groupId))
+        if (overrideStrings.containsKey(groupId))
         {
             return overrideStrings.get(groupId);
         }
@@ -35,8 +35,6 @@ public class FormattingConfig extends AbstractConfig
 
     private String getReplacements(final Group group, Client client, final String messageToReplace)
     {
-        ChatChainMC.instance.getLogger().info("Client: " + client);
-        ChatChainMC.instance.getLogger().info("Message: " + messageToReplace);
         if (client == null)
         {
             client = ChatChainMC.instance.getClient();
@@ -256,7 +254,6 @@ public class FormattingConfig extends AbstractConfig
             }
         }*/
 
-        ChatChainMC.instance.getLogger().info("passed here");
         return getTextComponent(stringMessage, group);
     }
 

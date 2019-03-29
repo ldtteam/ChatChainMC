@@ -36,7 +36,7 @@ public class APIMessages
             player.sendMessage(messageToSend);
         }
 
-        ChatChainMC.instance.getLogger().info("New Message in Channel: " + message.getGroup().getGroupName() + " Client: " + message.getSendingClient() + " User: " + message.getUser().getName() + " Message: " + message.getMessage());
+        ChatChainMC.instance.getLogger().info("New ChatChain Message", messageToSend);
     }
 
     public static void ReceiveClientEvent(final ClientEventMessage message)
@@ -57,6 +57,8 @@ public class APIMessages
                 {
                     player.sendMessage(messageToSend);
                 }
+
+                ChatChainMC.instance.getLogger().info("New Client Message", messageToSend);
             }
         }
     }

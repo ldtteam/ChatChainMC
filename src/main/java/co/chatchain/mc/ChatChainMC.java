@@ -224,7 +224,6 @@ public class ChatChainMC
 
             if (ChatChainMC.instance.connection.getConnectionState() == HubConnectionState.CONNECTED)
             {
-                instance.logger.info("Message Sent");
                 ChatChainMC.instance.connection.sendGenericMessage(message);
             }
 
