@@ -149,15 +149,17 @@ public class ChatChainMC
 
         logger.info("Connection Status: " + connection.getConnectionState());
 
-        connection.onGenericMessage(APIMessages::ReceiveGenericMessage, GenericMessage.class);
-        connection.onClientEventMessage(APIMessages::ReceiveClientEvent, ClientEventMessage.class);
-        connection.onUserEventMessage(APIMessages::ReceiveUserEvent, UserEventMessage.class);
-        connection.onGetGroupsResponse(APIMessages::ReceiveGroups, GetGroupsResponse.class);
-        connection.onGetClientResponse(APIMessages::ReceiveClient, GetClientResponse.class);
+        connection.onConnection(hub -> {
+            hub.onGenericMessage(APIMessages::ReceiveGenericMessage, GenericMessage.class);
+            hub.onClientEventMessage(APIMessages::ReceiveClientEvent, ClientEventMessage.class);
+            hub.onUserEventMessage(APIMessages::ReceiveUserEvent, UserEventMessage.class);
+            hub.onGetGroupsResponse(APIMessages::ReceiveGroups, GetGroupsResponse.class);
+            hub.onGetClientResponse(APIMessages::ReceiveClient, GetClientResponse.class);
 
-        connection.sendGetGroups();
-        connection.sendGetClient();
-        connection.sendClientEventMessage(new ClientEventMessage("START"));
+            hub.sendGetGroups();
+            hub.sendGetClient();
+            hub.sendClientEventMessage(new ClientEventMessage("START"));
+        });
 
         event.registerServerCommand(new BaseCommand());
     }
