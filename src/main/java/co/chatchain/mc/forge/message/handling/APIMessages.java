@@ -8,6 +8,8 @@ import co.chatchain.mc.forge.configs.GroupsConfig;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.text.ITextComponent;
 
+import java.util.List;
+
 public class APIMessages
 {
 
@@ -41,7 +43,12 @@ public class APIMessages
 
     public static void ReceiveClientEvent(final ClientEventMessage message)
     {
-        for (final String groupId : ChatChainMC.instance.getGroupsConfig().getClientEventGroups())
+       if (!ChatChainMC.instance.getGroupsConfig().getClientEventGroups().containsKey(message.getSendingClient().getClientId()))
+       {
+           return;
+       }
+
+        for (final String groupId : ChatChainMC.instance.getGroupsConfig().getClientEventGroups().get(message.getSendingClient().getClientId()))
         {
             if (ChatChainMC.instance.getGroupsConfig().getGroupStorage().containsKey(groupId))
             {
@@ -65,7 +72,12 @@ public class APIMessages
 
     public static void ReceiveUserEvent(final UserEventMessage message)
     {
-        for (final String groupId : ChatChainMC.instance.getGroupsConfig().getUserEventGroups())
+        if (!ChatChainMC.instance.getGroupsConfig().getUserEventGroups().containsKey(message.getSendingClient().getClientId()))
+        {
+            return;
+        }
+
+        for (final String groupId : ChatChainMC.instance.getGroupsConfig().getUserEventGroups().get(message.getSendingClient().getClientId()))
         {
             if (ChatChainMC.instance.getGroupsConfig().getGroupStorage().containsKey(groupId))
             {
