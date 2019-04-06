@@ -23,6 +23,18 @@ import java.util.regex.Pattern;
 @ConfigSerializable
 public class FormattingConfig extends AbstractConfig
 {
+    public static String escapeMetaCharacters(String inputString){
+        final String[] metaCharacters = {"\\","$","{","}","[","]","(",")",".","*","+","?","|","<",">","-","&","%"};
+
+        for (String metaCharacter : metaCharacters)
+        {
+            if (inputString.contains(metaCharacter))
+            {
+                inputString = inputString.replace(metaCharacter, "\\" + metaCharacter);
+            }
+        }
+        return inputString;
+    }
 
     private String getDefaultOrOverride(final String groupId, final String defaultString, final Map<String, String> overrideStrings)
     {
@@ -122,7 +134,7 @@ public class FormattingConfig extends AbstractConfig
             final String defaultOrOverride = getDefaultOrOverride(group.getGroupId(), defaultGenericMessageFormat, genericMessageFormats);
 
             final String stringMessage = getReplacements(group, message.getSendingClient(), defaultOrOverride).replaceAll("(\\{user-name})", message.getUser().getName())
-                    .replaceAll("(\\{messages})", message.getMessage());
+                    .replaceAll("(\\{messages})", escapeMetaCharacters(message.getMessage()));
             return getTextComponent(stringMessage, group);
         }
         return null;
