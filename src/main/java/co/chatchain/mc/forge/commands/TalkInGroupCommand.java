@@ -67,7 +67,7 @@ public class TalkInGroupCommand extends CommandBase
 
             final EntityPlayerMP player = (EntityPlayerMP) sender;
 
-            if (groupConfig == null || !groupConfig.getPlayersForGroup().contains(player))
+            if (groupConfig == null || !groupConfig.getPlayersCanTalk().contains(player))
             {
                 sender.sendMessage(new TextComponentString("This group is invalid!"));
                 return;
@@ -99,7 +99,7 @@ public class TalkInGroupCommand extends CommandBase
         for (final String groupId : ChatChainMC.instance.getGroupsConfig().getGroupStorage().keySet())
         {
             final GroupConfig groupConfig = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(groupId);
-            if (groupConfig.getPlayersForGroup().contains(player))
+            if (groupConfig.getPlayersCanTalk().contains(player))
             {
                 groupNames.add(groupConfig.getCommandName());
             }

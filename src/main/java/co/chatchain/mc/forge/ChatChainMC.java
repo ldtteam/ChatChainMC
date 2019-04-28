@@ -187,7 +187,7 @@ public class ChatChainMC
                 if (defaultGroupString != null && !defaultGroupString.isEmpty())
                 {
                     final GroupConfig groupConfig = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(defaultGroupString);
-                    if (groupConfig.getPlayersForGroup().contains(event.getPlayer()))
+                    if (groupConfig.getPlayersCanTalk().contains(event.getPlayer()))
                     {
                         groupSettings.setTalkingGroup(groupConfig.getGroup());
                     }
@@ -208,7 +208,7 @@ public class ChatChainMC
 
             final GroupConfig groupConfig = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(groupSettings.getTalkingGroup().getGroupId());
 
-            if (!groupConfig.getPlayersForGroup().contains(event.getPlayer()))
+            if (!groupConfig.getPlayersCanTalk().contains(event.getPlayer()))
             {
                 event.getPlayer().sendMessage(new TextComponentString("§cYou do not have perms for your talking group!"));
                 event.setCanceled(true);
@@ -234,7 +234,7 @@ public class ChatChainMC
             {
                 event.setCanceled(true);
 
-                for (final EntityPlayer player: groupConfig.getPlayersForGroupUnignored())
+                for (final EntityPlayer player: groupConfig.getPlayersListening())
                 {
                     player.sendMessage(messageToSend);
                 }

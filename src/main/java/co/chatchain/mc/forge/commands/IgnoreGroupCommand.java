@@ -75,7 +75,7 @@ public class IgnoreGroupCommand extends CommandBase
 
             if (!groupConfig.isGroupIgnorable())
             {
-                sender.sendMessage(new TextComponentString("This group is ignorable!"));
+                sender.sendMessage(new TextComponentString("This group is not ignorable!"));
                 return;
             }
 
@@ -86,12 +86,12 @@ public class IgnoreGroupCommand extends CommandBase
                 if (groupSettings.getIgnoredGroups().contains(groupConfig.getGroup()))
                 {
                     groupSettings.removeIgnoredGroup(groupConfig.getGroup());
-                    sender.sendMessage(new TextComponentString("Group ignored"));
+                    sender.sendMessage(new TextComponentString("Group un-ignored"));
                 }
                 else
                 {
                     groupSettings.addIgnoredGroup(groupConfig.getGroup());
-                    sender.sendMessage(new TextComponentString("Group un-ignored"));
+                    sender.sendMessage(new TextComponentString("Group ignored"));
                 }
             }
         }

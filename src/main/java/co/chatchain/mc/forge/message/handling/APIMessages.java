@@ -36,7 +36,7 @@ public class APIMessages
 
         final GroupConfig groupConfig = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(message.getGroup().getGroupId());
 
-        for (final EntityPlayer player : groupConfig.getPlayersForGroupUnignored())
+        for (final EntityPlayer player : groupConfig.getPlayersListening())
         {
             player.sendMessage(messageToSend);
         }
@@ -57,7 +57,7 @@ public class APIMessages
 
         final GroupConfig groupsConfig = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(message.getGroup().getGroupId());
 
-        for (final EntityPlayer player : groupsConfig.getPlayersForGroupUnignored())
+        for (final EntityPlayer player : groupsConfig.getPlayersListening())
         {
             player.sendMessage(messageToSend);
         }
@@ -78,7 +78,7 @@ public class APIMessages
 
         final GroupConfig groupsConfig = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(message.getGroup().getGroupId());
 
-        for (final EntityPlayer player : groupsConfig.getPlayersForGroupUnignored())
+        for (final EntityPlayer player : groupsConfig.getPlayersListening())
         {
             player.sendMessage(messageToSend);
         }

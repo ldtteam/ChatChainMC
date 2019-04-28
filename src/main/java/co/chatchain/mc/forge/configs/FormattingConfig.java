@@ -52,11 +52,25 @@ public class FormattingConfig extends AbstractConfig
             client = ChatChainMC.instance.getClient();
         }
 
+        String clientName;
+        String clientGuid;
+
+        if (client == null)
+        {
+            clientName = "Server";
+            clientGuid = "Server";
+        }
+        else
+        {
+            clientName = client.getClientName();
+            clientGuid = client.getClientGuid();
+        }
+
         return messageToReplace
                 .replaceAll("(\\{group-name})", group.getGroupName())
                 .replaceAll("(\\{group-id})", group.getGroupId())
-                .replaceAll("(\\{sending-client-name})", client.getClientName())
-                .replaceAll("(\\{sending-client-guid})", client.getClientGuid());
+                .replaceAll("(\\{sending-client-name})", clientName)
+                .replaceAll("(\\{sending-client-guid})", clientGuid);
     }
 
     private ITextComponent getTextComponent(final String message, final Group group)

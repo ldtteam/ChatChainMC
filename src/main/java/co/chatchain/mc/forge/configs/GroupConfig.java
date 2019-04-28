@@ -24,6 +24,10 @@ public class GroupConfig
     private Group group;
 
     @Getter
+    @Setting("can-allowed-chat")
+    private boolean canAllowedChat = true;
+
+    @Getter
     @Setting("cancel-chat-event")
     private boolean cancelChatEvent = false;
 
@@ -51,6 +55,7 @@ public class GroupConfig
     public List<EntityPlayer> getPlayersForGroup()
     {
         final List<EntityPlayer> returnList = new ArrayList<>();
+
         if (allowAllPlayers)
         {
             returnList.addAll(FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayers());
@@ -70,7 +75,17 @@ public class GroupConfig
         return returnList;
     }
 
-    public List<EntityPlayer> getPlayersForGroupUnignored()
+    public List<EntityPlayer> getPlayersCanTalk()
+    {
+        if (!canAllowedChat)
+        {
+            return new ArrayList<>();
+        }
+
+        return getPlayersForGroup();
+    }
+
+    public List<EntityPlayer> getPlayersListening()
     {
         final List<EntityPlayer> returnList = new ArrayList<>();
         for (final EntityPlayer player : getPlayersForGroup())
