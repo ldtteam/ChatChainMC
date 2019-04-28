@@ -245,7 +245,7 @@ public class ChatChainMC
     @SubscribeEvent
     public static void playerLoggedIn(PlayerEvent.PlayerLoggedInEvent event)
     {
-        if (event.player != null && !event.player.world.isRemote && ChatChainMC.instance.connection.getConnection().getConnectionState() == HubConnectionState.CONNECTED)
+        if (event.player != null && !event.player.world.isRemote && ChatChainMC.instance.connection.getConnectionState() == HubConnectionState.CONNECTED)
         {
             final User user = new User(event.player.getName());
 
@@ -256,7 +256,7 @@ public class ChatChainMC
     @SubscribeEvent
     public static void playerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event)
     {
-        if (event.player != null && !event.player.world.isRemote && ChatChainMC.instance.connection.getConnection().getConnectionState() == HubConnectionState.CONNECTED)
+        if (event.player != null && !event.player.world.isRemote && ChatChainMC.instance.connection.getConnectionState() == HubConnectionState.CONNECTED)
         {
             final User user = new User(event.player.getName());
 
@@ -268,7 +268,7 @@ public class ChatChainMC
     public static void playerDied(LivingDeathEvent event)
     {
         if (event.getEntity() instanceof EntityPlayer
-                && !event.getEntity().world.isRemote && ChatChainMC.instance.connection.getConnection().getConnectionState() == HubConnectionState.CONNECTED)
+                && !event.getEntity().world.isRemote && ChatChainMC.instance.connection.getConnectionState() == HubConnectionState.CONNECTED)
         {
             final User user = new User(event.getEntity().getName());
 

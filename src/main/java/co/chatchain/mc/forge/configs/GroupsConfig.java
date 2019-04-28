@@ -18,14 +18,6 @@ public class GroupsConfig extends AbstractConfig
     private String defaultGroup = "";
 
     @Getter
-    @Setting(value = "client-events-groups")
-    private Map<String, List<String>> clientEventGroups = new HashMap<>();
-
-    @Getter
-    @Setting(value = "user-events-groups")
-    private Map<String, List<String>> userEventGroups = new HashMap<>();
-
-    @Getter
     @Setting(value = "group-storage")
     private Map<String, GroupConfig> groupStorage = new HashMap<>();
 
