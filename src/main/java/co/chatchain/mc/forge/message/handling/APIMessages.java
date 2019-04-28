@@ -8,21 +8,24 @@ import co.chatchain.mc.forge.configs.GroupsConfig;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.text.ITextComponent;
 
-import java.util.List;
-
 public class APIMessages
 {
 
-    public static void ReceiveGenericMessage(final GenericMessage message)
+    public static void createGroupInConfig(final Group group)
     {
-        if (!ChatChainMC.instance.getGroupsConfig().getGroupStorage().containsKey(message.getGroup().getGroupId()))
+        if (!ChatChainMC.instance.getGroupsConfig().getGroupStorage().containsKey(group.getGroupId()))
         {
             GroupConfig config = new GroupConfig();
-            config.setGroup(message.getGroup());
+            config.setGroup(group);
 
-            ChatChainMC.instance.getGroupsConfig().getGroupStorage().put(message.getGroup().getGroupId(), config);
+            ChatChainMC.instance.getGroupsConfig().getGroupStorage().put(group.getGroupId(), config);
             ChatChainMC.instance.getGroupsConfig().save();
         }
+    }
+
+    public static void ReceiveGenericMessage(final GenericMessage message)
+    {
+        createGroupInConfig(message.getGroup());
 
         final ITextComponent messageToSend = ChatChainMC.instance.getFormattingConfig().getGenericMessage(message);
 
@@ -38,65 +41,49 @@ public class APIMessages
             player.sendMessage(messageToSend);
         }
 
-        ChatChainMC.instance.getLogger().info("New Generic Message" + messageToSend.getFormattedText());
+        ChatChainMC.instance.getLogger().info("New Generic Message " + messageToSend.getFormattedText());
     }
 
     public static void ReceiveClientEvent(final ClientEventMessage message)
     {
-       if (!ChatChainMC.instance.getGroupsConfig().getClientEventGroups().containsKey(message.getSendingClient().getClientId()))
-       {
-           return;
-       }
+        createGroupInConfig(message.getGroup());
 
-        for (final String groupId : ChatChainMC.instance.getGroupsConfig().getClientEventGroups().get(message.getSendingClient().getClientId()))
-        {
-            if (ChatChainMC.instance.getGroupsConfig().getGroupStorage().containsKey(groupId))
-            {
-                final GroupConfig groupConfig = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(groupId);
-                final ITextComponent messageToSend = ChatChainMC.instance.getFormattingConfig().getClientEventMessage(message, groupConfig.getGroup());
+        final ITextComponent messageToSend = ChatChainMC.instance.getFormattingConfig().getClientEventMessage(message);
 
-                if (messageToSend == null)
-                {
-                    return;
-                }
-
-                for (final EntityPlayer player : groupConfig.getPlayersForGroupUnignored())
-                {
-                    player.sendMessage(messageToSend);
-                }
-
-                ChatChainMC.instance.getLogger().info("New Client Message" + messageToSend.getFormattedText());
-            }
-        }
-    }
-
-    public static void ReceiveUserEvent(final UserEventMessage message)
-    {
-        if (!ChatChainMC.instance.getGroupsConfig().getUserEventGroups().containsKey(message.getSendingClient().getClientId()))
+        if (messageToSend == null)
         {
             return;
         }
 
-        for (final String groupId : ChatChainMC.instance.getGroupsConfig().getUserEventGroups().get(message.getSendingClient().getClientId()))
+        final GroupConfig groupsConfig = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(message.getGroup().getGroupId());
+
+        for (final EntityPlayer player : groupsConfig.getPlayersForGroupUnignored())
         {
-            if (ChatChainMC.instance.getGroupsConfig().getGroupStorage().containsKey(groupId))
-            {
-                final GroupConfig groupConfig = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(groupId);
-                final ITextComponent messageToSend = ChatChainMC.instance.getFormattingConfig().getUserEventMessage(message, groupConfig.getGroup());
-
-                if (messageToSend == null)
-                {
-                    return;
-                }
-
-                for (final EntityPlayer player : groupConfig.getPlayersForGroupUnignored())
-                {
-                    player.sendMessage(messageToSend);
-                }
-
-                ChatChainMC.instance.getLogger().info("New User Message" + messageToSend.getFormattedText());
-            }
+            player.sendMessage(messageToSend);
         }
+
+        ChatChainMC.instance.getLogger().info("New Client Event Message " + messageToSend.getFormattedText());
+    }
+
+    public static void ReceiveUserEvent(final UserEventMessage message)
+    {
+        createGroupInConfig(message.getGroup());
+
+        final ITextComponent messageToSend = ChatChainMC.instance.getFormattingConfig().getUserEventMessage(message);
+
+        if (messageToSend == null)
+        {
+            return;
+        }
+
+        final GroupConfig groupsConfig = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(message.getGroup().getGroupId());
+
+        for (final EntityPlayer player : groupsConfig.getPlayersForGroupUnignored())
+        {
+            player.sendMessage(messageToSend);
+        }
+
+        ChatChainMC.instance.getLogger().info("New Client Event Message " + messageToSend.getFormattedText());
     }
 
     public static void ReceiveGroups(final GetGroupsResponse message)

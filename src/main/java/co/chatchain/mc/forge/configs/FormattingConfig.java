@@ -165,24 +165,24 @@ public class FormattingConfig extends AbstractConfig
     @Setting("default-client-stop-event-format")
     private String defaultClientStopEventFormats = "§f[§c{group-name}§f] §6{sending-client-name}§c has §cdisconnected";
 
-    public ITextComponent getClientEventMessage(final ClientEventMessage message, final Group group)
+    public ITextComponent getClientEventMessage(final ClientEventMessage message)
     {
         final String defaultOrOverride;
         if (message.getEvent().equalsIgnoreCase("START"))
         {
-            defaultOrOverride = getDefaultOrOverride(group.getGroupId(), defaultClientStartEventFormats, clientStartEventFormats);
+            defaultOrOverride = getDefaultOrOverride(message.getGroup().getGroupId(), defaultClientStartEventFormats, clientStartEventFormats);
         }
         else if (message.getEvent().equalsIgnoreCase("STOP"))
         {
-            defaultOrOverride = getDefaultOrOverride(group.getGroupId(), defaultClientStopEventFormats, clientStopEventFormats);
+            defaultOrOverride = getDefaultOrOverride(message.getGroup().getGroupId(), defaultClientStopEventFormats, clientStopEventFormats);
         }
         else
         {
             return null;
         }
 
-        final String stringMessage = getReplacements(group, message.getSendingClient(), defaultOrOverride);
-        return getTextComponent(stringMessage, group);
+        final String stringMessage = getReplacements(message.getGroup(), message.getSendingClient(), defaultOrOverride);
+        return getTextComponent(stringMessage, message.getGroup());
     }
 
     @Setting("user-event-formats_comment")
@@ -227,20 +227,20 @@ public class FormattingConfig extends AbstractConfig
     @Setting("default-user-achievement-event-format")
     private String defaultUserAchievementEventFormats = "§f[§c{group-name}§f] [§6{sending-client-name}§f] §e{user-name} has gained §2achievement: {achievement-name}";*/
 
-    public ITextComponent getUserEventMessage(final UserEventMessage message, final Group group)
+    public ITextComponent getUserEventMessage(final UserEventMessage message)
     {
         final String defaultOrOverride;
         if (message.getEvent().equalsIgnoreCase("LOGIN"))
         {
-            defaultOrOverride = getDefaultOrOverride(group.getGroupId(), defaultUserLoginEventFormats, userLoginEventFormats);
+            defaultOrOverride = getDefaultOrOverride(message.getGroup().getGroupId(), defaultUserLoginEventFormats, userLoginEventFormats);
         }
         else if (message.getEvent().equalsIgnoreCase("LOGOUT"))
         {
-            defaultOrOverride = getDefaultOrOverride(group.getGroupId(), defaultUserLogoutEventFormats, userLogoutEventFormats);
+            defaultOrOverride = getDefaultOrOverride(message.getGroup().getGroupId(), defaultUserLogoutEventFormats, userLogoutEventFormats);
         }
         else if (message.getEvent().equalsIgnoreCase("DEATH"))
         {
-            defaultOrOverride = getDefaultOrOverride(group.getGroupId(), defaultUserDeathEventFormats, userDeathEventFormats);
+            defaultOrOverride = getDefaultOrOverride(message.getGroup().getGroupId(), defaultUserDeathEventFormats, userDeathEventFormats);
         }
         /*else if (messages.getEvent().equalsIgnoreCase("ACHIEVEMENT"))
         {
@@ -251,7 +251,7 @@ public class FormattingConfig extends AbstractConfig
             return null;
         }
 
-        String stringMessage = getReplacements(group, message.getSendingClient(), defaultOrOverride).replaceAll("(\\{user-name})", message.getUser().getName());
+        String stringMessage = getReplacements(message.getGroup(), message.getSendingClient(), defaultOrOverride).replaceAll("(\\{user-name})", message.getUser().getName());
 
         /*if (messages.getEvent().equalsIgnoreCase("ACHIEVEMENT"))
         {
@@ -266,7 +266,7 @@ public class FormattingConfig extends AbstractConfig
             }
         }*/
 
-        return getTextComponent(stringMessage, group);
+        return getTextComponent(stringMessage, message.getGroup());
     }
 
 }
