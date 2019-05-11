@@ -9,35 +9,54 @@ import java.awt.*;
 public class ColourUtils
 {
 
-    private enum Colour
+    public enum Colour
     {
-        DARK_RED(new Color(170, 0, 0), TextFormatting.DARK_RED),
-        RED(new Color(255, 85, 85), TextFormatting.RED),
-        GOLD(new Color(255, 170, 0), TextFormatting.GOLD),
-        YELLOW(new Color(255, 255, 85), TextFormatting.YELLOW),
-        DARK_GREEN(new Color(0, 170, 0), TextFormatting.DARK_GREEN),
-        GREEN(new Color(85, 255, 85), TextFormatting.GREEN),
-        AQUA(new Color(85, 255, 255), TextFormatting.AQUA),
-        DARK_AQUA(new Color(0, 170, 170), TextFormatting.DARK_AQUA),
-        DARK_BLUE(new Color(0, 0, 170), TextFormatting.DARK_BLUE),
-        BLUE(new Color(85, 85, 255), TextFormatting.BLUE),
-        LIGHT_PURPLE(new Color(255, 85, 255), TextFormatting.LIGHT_PURPLE),
-        DARK_PURPLE(new Color(170, 0, 170), TextFormatting.DARK_PURPLE),
-        WHITE(new Color(255, 255, 255), TextFormatting.WHITE),
-        GRAY(new Color(170, 170, 170), TextFormatting.GRAY),
-        DARK_GRAY(new Color(85, 85, 85), TextFormatting.DARK_GRAY),
-        BLACK(new Color(0, 0, 0), TextFormatting.BLACK);
+        DARK_RED(new Color(170, 0, 0), "#AA0000", "4", TextFormatting.DARK_RED),
+        RED(new Color(255, 85, 85), "#FF5555", "c", TextFormatting.RED),
+        GOLD(new Color(255, 170, 0), "#FFAA00", "6", TextFormatting.GOLD),
+        YELLOW(new Color(255, 255, 85), "#FFFF55", "e", TextFormatting.YELLOW),
+        DARK_GREEN(new Color(0, 170, 0), "#00AA00", "2", TextFormatting.DARK_GREEN),
+        GREEN(new Color(85, 255, 85), "#55FF55", "a", TextFormatting.GREEN),
+        AQUA(new Color(85, 255, 255), "#55FFFF", "b", TextFormatting.AQUA),
+        DARK_AQUA(new Color(0, 170, 170), "#00AAAA", "3", TextFormatting.DARK_AQUA),
+        DARK_BLUE(new Color(0, 0, 170), "#0000AA", "1", TextFormatting.DARK_BLUE),
+        BLUE(new Color(85, 85, 255), "#5555FF", "9", TextFormatting.BLUE),
+        LIGHT_PURPLE(new Color(255, 85, 255), "#FF55FF", "d", TextFormatting.LIGHT_PURPLE),
+        DARK_PURPLE(new Color(170, 0, 170), "#AA00AA", "5", TextFormatting.DARK_PURPLE),
+        WHITE(new Color(255, 255, 255), "#FFFFFF", "f", TextFormatting.WHITE),
+        GRAY(new Color(170, 170, 170), "#AAAAAA", "7", TextFormatting.GRAY),
+        DARK_GRAY(new Color(85, 85, 85), "#555555", "8", TextFormatting.DARK_GRAY),
+        BLACK(new Color(0, 0, 0), "#000000", "0", TextFormatting.BLACK);
 
         @Getter
         private final Color colour;
 
         @Getter
+        private final String hexCode;
+
+        @Getter
+        private final String colourCode;
+
+        @Getter
         private final TextFormatting textFormatting;
 
-        private Colour(final Color colour, final TextFormatting textFormatting)
+        Colour(final Color colour, final String hexCode, final String colourCode, final TextFormatting textFormatting)
         {
             this.colour = colour;
+            this.hexCode = hexCode;
+            this.colourCode = colourCode;
             this.textFormatting = textFormatting;
+        }
+
+        public static Colour getFromColourCode(final String colourCode)
+        {
+            for (final Colour colour : values())
+            {
+                if (colour.getColourCode().equalsIgnoreCase(colourCode))
+                    return colour;
+            }
+
+            return Colour.WHITE;
         }
     }
 
@@ -58,7 +77,7 @@ public class ColourUtils
         return Math.sqrt(redSqrd + greenSqrd + blueSqrd);
     }
 
-    public static TextFormatting getTextFormatFromHexColour(final String hexColour)
+    public static Colour getColourFromHexColour(final String hexColour)
     {
         final Color colour = convertHexToColour(hexColour);
 
@@ -76,7 +95,7 @@ public class ColourUtils
             }
         }
 
-        return currentClosestColour.getTextFormatting();
+        return currentClosestColour;
     }
 
 }

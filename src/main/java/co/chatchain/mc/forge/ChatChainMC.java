@@ -3,6 +3,7 @@ package co.chatchain.mc.forge;
 import co.chatchain.commons.AccessTokenResolver;
 import co.chatchain.commons.ChatChainHubConnection;
 import co.chatchain.commons.messages.objects.Client;
+import co.chatchain.commons.messages.objects.ClientRank;
 import co.chatchain.commons.messages.objects.Group;
 import co.chatchain.commons.messages.objects.User;
 import co.chatchain.commons.messages.objects.messages.*;
@@ -48,6 +49,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 @Mod(
         modid = ChatChainMC.MOD_ID,
@@ -192,17 +195,17 @@ public class ChatChainMC
 
         if (groupSettings != null)
         {
-            if (ChatChainMC.instance.isSpongeIsPresent())
+            final List<ClientRank> clientRanks = new ArrayList<>();
+            if (ChatChainMC.instance.isSpongeIsPresent() && ChatChainMC.instance.getMainConfig().isUseSponge())
             {
-                final String rank = ChatChainSpongePlugin.getPlayerRank(event.getPlayer());
-                ChatChainMC.instance.getLogger().info("PLAYERS RANK IS: " + rank);
+                clientRanks.addAll(ChatChainSpongePlugin.getPlayerRank(event.getPlayer()));
             }
             else
             {
                 ChatChainMC.instance.getLogger().info("SPONGE IS NOT PRESENT");
             }
 
-            final User user = new User(event.getUsername(), event.getPlayer().getUniqueID().toString());
+            final User user = new User(event.getUsername(), event.getPlayer().getUniqueID().toString(), null, clientRanks);
 
             final GenericMessage message = new GenericMessage(groupSettings.getTalkingGroup(), user, event.getMessage(), false);
 
@@ -257,7 +260,7 @@ public class ChatChainMC
 
             if (groupConfig.isCancelChatEvent())
             {
-                ChatChainMC.instance.getLogger().info("New Generic Message " + messageToSend);
+                ChatChainMC.instance.getLogger().info("New Generic Message " + messageToSend.toString());
                 event.setCanceled(true);
 
                 for (final EntityPlayer player: groupConfig.getPlayersListening())

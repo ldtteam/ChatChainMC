@@ -18,9 +18,10 @@ public class DefaultFormats extends MessageFormats
     private List<String> genericMessage = new ArrayList<String>()
     {
         {
-            add("§f[§c{group-name}§f] ");
-            add("§f[§6{client-name}§f] ");
-            add("§f<§e{client-user-name}§f>: {message}");
+            add("§f[§c{group-name}§f]§r ");
+            add("§f[§6{client-name}§f]§r ");
+            add("§f[§r{client-rank-colour}{client-rank-display}§f]§r ");
+            add("§f<§e{client-user-nickname||client-user-name}§f>:§r {message}");
         }
     };
 
@@ -57,7 +58,7 @@ public class DefaultFormats extends MessageFormats
                 {
                     add("§f[§c{group-name}§f] ");
                     add("[§6{client-name}§f] ");
-                    add("§e{client-user-name} has §clogged out§f");
+                    add("§e{client-user-nickname||client-user-name} has §alogged in");
                 }
             });
             put("LOGOUT", new ArrayList<String>()
@@ -65,7 +66,7 @@ public class DefaultFormats extends MessageFormats
                 {
                     add("§f[§c{group-name}§f] ");
                     add("[§6{client-name}§f] ");
-                    add("§e{client-user-name} has §alogged in§f");
+                    add("§e{client-user-nickname||client-user-name} has §clogged out§f");
                 }
             });
             put("DEATH", new ArrayList<String>()
@@ -73,7 +74,7 @@ public class DefaultFormats extends MessageFormats
                 {
                     add("§f[§c{group-name}§f] ");
                     add("[§6{client-name}§f] ");
-                    add("§e{client-user-name} has §8died§f");
+                    add("§e{client-user-nickname||client-user-name} has §8died§f");
                 }
             });
         }

@@ -1,6 +1,7 @@
 package co.chatchain.mc.forge.configs.formatting;
 
 import co.chatchain.commons.messages.objects.Client;
+import co.chatchain.commons.messages.objects.ClientRank;
 import co.chatchain.commons.messages.objects.Group;
 import co.chatchain.commons.messages.objects.User;
 import co.chatchain.commons.messages.objects.messages.ClientEventMessage;
@@ -8,11 +9,14 @@ import co.chatchain.commons.messages.objects.messages.GenericMessage;
 import co.chatchain.commons.messages.objects.messages.UserEventMessage;
 import co.chatchain.mc.forge.ChatChainMC;
 import co.chatchain.mc.forge.configs.formatting.formats.MessageFormats;
+import co.chatchain.mc.forge.configs.formatting.replacements.ClientRankReplacements;
 import co.chatchain.mc.forge.configs.formatting.replacements.ClientReplacements;
 import co.chatchain.mc.forge.configs.formatting.replacements.ClientUserReplacements;
 import co.chatchain.mc.forge.configs.formatting.replacements.GroupReplacements;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -114,6 +118,7 @@ public class ReplacementUtils
             {
                 if (GroupReplacements.GetFromReplacement(matchString) == null &&
                         ClientReplacements.GetFromReplacement(matchString) == null &&
+                        ClientRankReplacements.GetFromReplacement(matchString) == null &&
                         ClientUserReplacements.GetFromReplacement(matchString) == null)
                 {
                     if (matchString.equalsIgnoreCase("message"))
@@ -123,21 +128,25 @@ public class ReplacementUtils
 
                 String returnString = GroupReplacements.GetReplacementObject(group, matchString);
                 if (returnString != null)
-                {
                     return returnString;
-                }
 
                 returnString = ClientReplacements.GetReplacementObject(client, matchString);
                 if (returnString != null)
-                {
                     return returnString;
-                }
+
+                final List<ClientRank> clientRanks = user.getClientRanks();
+
+                clientRanks.sort(Comparator.comparingInt(ClientRank::getPriority));
+
+                final ClientRank rank = clientRanks.stream().findFirst().orElse(null);
+
+                returnString = ClientRankReplacements.GetReplacementObject(rank, matchString);
+                if (returnString != null)
+                    return returnString;
 
                 returnString = ClientUserReplacements.GetReplacementObject(user, matchString);
                 if (returnString != null)
-                {
                     return returnString;
-                }
             }
         }
 

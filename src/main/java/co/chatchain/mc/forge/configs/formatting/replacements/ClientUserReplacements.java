@@ -7,7 +7,8 @@ import org.jetbrains.annotations.Nullable;
 public enum ClientUserReplacements
 {
     NAME("client-user-name", User::getName),
-    UID("client-user-uid", User::getUniqueId);
+    UID("client-user-uid", User::getUniqueId),
+    NICKNAME("client-user-nickname", User::getNickName);
 
     @Getter
     final String replacement;
