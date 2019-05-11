@@ -9,7 +9,11 @@ import co.chatchain.commons.messages.objects.messages.*;
 import co.chatchain.mc.forge.capabilities.GroupProvider;
 import co.chatchain.mc.forge.capabilities.IGroupSettings;
 import co.chatchain.mc.forge.commands.BaseCommand;
+import co.chatchain.mc.forge.compatibility.sponge.ChatChainSpongePlugin;
 import co.chatchain.mc.forge.configs.*;
+import co.chatchain.mc.forge.configs.formatting.AdvancedFormattingConfig;
+import co.chatchain.mc.forge.configs.formatting.ReplacementUtils;
+import co.chatchain.mc.forge.configs.formatting.FormattingConfig;
 import co.chatchain.mc.forge.message.handling.APIMessages;
 import co.chatchain.mc.forge.serializers.GroupTypeSerializer;
 import com.google.common.reflect.TypeToken;
@@ -85,8 +89,15 @@ public class ChatChainMC
     private FormattingConfig formattingConfig;
 
     @Getter
+    private AdvancedFormattingConfig advancedFormattingConfig;
+
+    @Getter
     @Setter
     private Client client;
+
+    @Getter
+    @Setter
+    private boolean spongeIsPresent;
 
     private File configDir;
 
@@ -120,6 +131,10 @@ public class ChatChainMC
         final Path formattingConfigPath = configDir.toPath().resolve("formatting.json");
         formattingConfig = getConfig(formattingConfigPath, FormattingConfig.class,
                 GsonConfigurationLoader.builder().setPath(formattingConfigPath).build());
+
+        final Path advancedFormattingConfigPath = configDir.toPath().resolve("advanced-formatting.json");
+        advancedFormattingConfig = getConfig(advancedFormattingConfigPath, AdvancedFormattingConfig.class,
+                GsonConfigurationLoader.builder().setPath(advancedFormattingConfigPath).build());
 
         CapabilityManager.INSTANCE.register(IGroupSettings.class, new IGroupSettings.Storage(), new IGroupSettings.Factory());
     }
@@ -177,7 +192,17 @@ public class ChatChainMC
 
         if (groupSettings != null)
         {
-            final User user = new User(event.getUsername());
+            if (ChatChainMC.instance.isSpongeIsPresent())
+            {
+                final String rank = ChatChainSpongePlugin.getPlayerRank(event.getPlayer());
+                ChatChainMC.instance.getLogger().info("PLAYERS RANK IS: " + rank);
+            }
+            else
+            {
+                ChatChainMC.instance.getLogger().info("SPONGE IS NOT PRESENT");
+            }
+
+            final User user = new User(event.getUsername(), event.getPlayer().getUniqueID().toString());
 
             final GenericMessage message = new GenericMessage(groupSettings.getTalkingGroup(), user, event.getMessage(), false);
 
@@ -226,12 +251,13 @@ public class ChatChainMC
                 ChatChainMC.instance.connection.sendGenericMessage(message);
             }
 
-            final ITextComponent messageToSend = ChatChainMC.instance.getFormattingConfig().getGenericMessage(message);
+            final ITextComponent messageToSend = new TextComponentString(ReplacementUtils.getFormat(message, ChatChainMC.instance.getClient()));
 
             event.setComponent(messageToSend);
 
             if (groupConfig.isCancelChatEvent())
             {
+                ChatChainMC.instance.getLogger().info("New Generic Message " + messageToSend);
                 event.setCanceled(true);
 
                 for (final EntityPlayer player: groupConfig.getPlayersListening())
@@ -247,7 +273,7 @@ public class ChatChainMC
     {
         if (event.player != null && !event.player.world.isRemote && ChatChainMC.instance.connection.getConnectionState() == HubConnectionState.CONNECTED)
         {
-            final User user = new User(event.player.getName());
+            final User user = new User(event.player.getName(), event.player.getUniqueID().toString());
 
             ChatChainMC.instance.connection.sendUserEventMessage(new UserEventMessage("LOGIN", user));
         }
@@ -258,7 +284,7 @@ public class ChatChainMC
     {
         if (event.player != null && !event.player.world.isRemote && ChatChainMC.instance.connection.getConnectionState() == HubConnectionState.CONNECTED)
         {
-            final User user = new User(event.player.getName());
+            final User user = new User(event.player.getName(), event.player.getUniqueID().toString());
 
             ChatChainMC.instance.connection.sendUserEventMessage(new UserEventMessage("LOGOUT", user));
         }
@@ -270,7 +296,7 @@ public class ChatChainMC
         if (event.getEntity() instanceof EntityPlayer
                 && !event.getEntity().world.isRemote && ChatChainMC.instance.connection.getConnectionState() == HubConnectionState.CONNECTED)
         {
-            final User user = new User(event.getEntity().getName());
+            final User user = new User(event.getEntity().getName(), event.getEntity().getUniqueID().toString());
 
             ChatChainMC.instance.connection.sendUserEventMessage(new UserEventMessage("DEATH", user));
         }
@@ -334,5 +360,9 @@ public class ChatChainMC
         final Path formattingConfigPath = configDir.toPath().resolve("formatting.json");
         formattingConfig = getConfig(formattingConfigPath, FormattingConfig.class,
                 GsonConfigurationLoader.builder().setPath(formattingConfigPath).build());
+
+        final Path advancedFormattingConfigPath = configDir.toPath().resolve("advanced-formatting.json");
+        advancedFormattingConfig = getConfig(advancedFormattingConfigPath, AdvancedFormattingConfig.class,
+                GsonConfigurationLoader.builder().setPath(advancedFormattingConfigPath).build());
     }
 }
