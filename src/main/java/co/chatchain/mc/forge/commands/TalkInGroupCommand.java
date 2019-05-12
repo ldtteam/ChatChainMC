@@ -52,7 +52,6 @@ public class TalkInGroupCommand extends CommandBase
 
         if (sender instanceof EntityPlayerMP)
         {
-
             GroupConfig groupConfig = null;
 
             for (final String id : ChatChainMC.instance.getGroupsConfig().getGroupStorage().keySet())

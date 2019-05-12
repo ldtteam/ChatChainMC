@@ -52,6 +52,18 @@ public class MainConfig extends AbstractConfig
         return getSystemValueOrConfigValue("CHATCHAIN_IDENTITY_URL", identityUrl);
     }
 
+    //####### Use Advanced Formatting #######\\
+
+    @Getter
+    @Setting("advanced-formatting")
+    private Boolean advancedFormatting = false;
+
+    //####### Use Sponge #######\\
+
+    @Getter
+    @Setting(value = "use-sponge", comment = "Whether to use sponge or not")
+    private boolean useSponge = false;
+
     private String getSystemValueOrConfigValue(final String systemValue, String configValue)
     {
         final String value = System.getenv(systemValue);

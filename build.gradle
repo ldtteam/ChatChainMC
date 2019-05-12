@@ -75,7 +75,7 @@ dependencies {
 
     compile('org.java-websocket:Java-WebSocket:1.3.4')
 
-    compile('org.spongepowered:spongeapi:' + spongeApiVersion)
+    compileOnly('org.spongepowered:spongeapi:' + spongeApiVersion)
     
     compile 'io.reactivex.rxjava2:rxjava:2.2.2'
 

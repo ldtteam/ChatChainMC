@@ -5,8 +5,10 @@ import co.chatchain.commons.messages.objects.messages.*;
 import co.chatchain.mc.forge.ChatChainMC;
 import co.chatchain.mc.forge.configs.GroupConfig;
 import co.chatchain.mc.forge.configs.GroupsConfig;
+import co.chatchain.mc.forge.configs.formatting.ReplacementUtils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
 
 public class APIMessages
 {
@@ -27,12 +29,8 @@ public class APIMessages
     {
         createGroupInConfig(message.getGroup());
 
-        final ITextComponent messageToSend = ChatChainMC.instance.getFormattingConfig().getGenericMessage(message);
+        final ITextComponent messageToSend = new TextComponentString(ReplacementUtils.getFormat(message));
 
-        if (messageToSend == null)
-        {
-            return;
-        }
 
         final GroupConfig groupConfig = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(message.getGroup().getGroupId());
 
@@ -48,12 +46,8 @@ public class APIMessages
     {
         createGroupInConfig(message.getGroup());
 
-        final ITextComponent messageToSend = ChatChainMC.instance.getFormattingConfig().getClientEventMessage(message);
+        final ITextComponent messageToSend = new TextComponentString(ReplacementUtils.getFormat(message));
 
-        if (messageToSend == null)
-        {
-            return;
-        }
 
         final GroupConfig groupsConfig = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(message.getGroup().getGroupId());
 
@@ -69,12 +63,7 @@ public class APIMessages
     {
         createGroupInConfig(message.getGroup());
 
-        final ITextComponent messageToSend = ChatChainMC.instance.getFormattingConfig().getUserEventMessage(message);
-
-        if (messageToSend == null)
-        {
-            return;
-        }
+        final ITextComponent messageToSend = new TextComponentString(ReplacementUtils.getFormat(message));
 
         final GroupConfig groupsConfig = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(message.getGroup().getGroupId());
 
@@ -83,7 +72,7 @@ public class APIMessages
             player.sendMessage(messageToSend);
         }
 
-        ChatChainMC.instance.getLogger().info("New Client Event Message " + messageToSend.getFormattedText());
+        ChatChainMC.instance.getLogger().info("New User Event Message " + messageToSend.getFormattedText());
     }
 
     public static void ReceiveGroups(final GetGroupsResponse message)

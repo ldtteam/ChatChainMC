@@ -12,6 +12,7 @@ public class BaseCommand extends CommandTreeBase
         addSubcommand(new TalkInGroupCommand());
         addSubcommand(new IgnoreGroupCommand());
         addSubcommand(new ReloadCommand());
+        addSubcommand(new UUIDCommand());
         //addSubcommand(new AddPlayerCommand());
     }
 
@@ -24,7 +25,9 @@ public class BaseCommand extends CommandTreeBase
     @Override
     public String getUsage(ICommandSender sender)
     {
-        return "chatchain <talk | mute>";
+        if (sender.canUseCommand(2, ""))
+            return "chatchain <talk | ignore | reload | uuid>";
+        return "chatchain <talk | ignore>";
     }
 
     @Override
