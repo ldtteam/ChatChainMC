@@ -4,6 +4,7 @@ import co.chatchain.commons.messages.objects.ClientRank;
 import co.chatchain.mc.forge.ChatChainMC;
 import co.chatchain.mc.forge.util.ColourUtils;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.plugin.Plugin;
@@ -31,12 +32,11 @@ public class ChatChainSpongePlugin
         ChatChainMC.instance.setSpongeIsPresent(true);
     }
 
-    public static List<ClientRank> getPlayerRank(final EntityPlayer player)
+    public static List<ClientRank> getPlayerRanks(final EntityPlayer player)
     {
         final List<ClientRank> returnList = new ArrayList<>();
 
         final Player spongePlayer = (Player) player;
-        final Optional<SubjectReference> optionalRank = spongePlayer.getParents().stream().findFirst();
 
         int priority = 0;
 
@@ -59,21 +59,40 @@ public class ChatChainSpongePlugin
                     hexColour = ColourUtils.Colour.getFromColourCode(matcher.group().split("")[1]).getHexCode();
             }
 
+            prefix = prefix == null ? null : prefix.replaceAll("§.", "");
+
             if (prefix == null || prefix.equals(lastDisplay))
                 returnList.add(new ClientRank(parent.getSubjectIdentifier(), parent.getSubjectIdentifier(), priority, null, null));
             else
                 returnList.add(new ClientRank(parent.getSubjectIdentifier(), parent.getSubjectIdentifier(), priority, prefix, hexColour));
 
             lastDisplay = prefix;
-            //final ClientRank clientRank = new ClientRank(parent.getSubjectIdentifier(), parent.getSubjectIdentifier(), priority, prefix, hexColour);
-            //returnList.add(new ClientRank(parent.getSubjectIdentifier(), parent.getSubjectIdentifier(), priority, prefix, hexColour));
 
             priority++;
         }
 
-        //return optionalRank.map(SubjectReference::getSubjectIdentifier).orElse("");
-
         return returnList;
     }
+
+    public static String getPlayerColour(final EntityPlayer player)
+    {
+        final Player spongePlayer = (Player) player;
+
+        String prefix = spongePlayer.getOption("prefix").orElse(null);
+        prefix = prefix == null ? null : prefix.replaceAll("&", "§");
+
+        String hexColour = null;
+
+        if (prefix != null)
+        {
+            final Matcher matcher = COLOUR_CODE_PATTERN.matcher(prefix);
+
+            if (matcher.find())
+                hexColour = ColourUtils.Colour.getFromColourCode(matcher.group().split("")[1]).getHexCode();
+        }
+
+        return hexColour;
+    }
+
 
 }

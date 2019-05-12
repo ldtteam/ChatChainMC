@@ -196,16 +196,14 @@ public class ChatChainMC
         if (groupSettings != null)
         {
             final List<ClientRank> clientRanks = new ArrayList<>();
+            String userColour = null;
             if (ChatChainMC.instance.isSpongeIsPresent() && ChatChainMC.instance.getMainConfig().isUseSponge())
             {
-                clientRanks.addAll(ChatChainSpongePlugin.getPlayerRank(event.getPlayer()));
-            }
-            else
-            {
-                ChatChainMC.instance.getLogger().info("SPONGE IS NOT PRESENT");
+                clientRanks.addAll(ChatChainSpongePlugin.getPlayerRanks(event.getPlayer()));
+                userColour = ChatChainSpongePlugin.getPlayerColour(event.getPlayer());
             }
 
-            final User user = new User(event.getUsername(), event.getPlayer().getUniqueID().toString(), null, clientRanks);
+            final User user = new User(event.getUsername(), event.getPlayer().getUniqueID().toString(), null, userColour, clientRanks);
 
             final GenericMessage message = new GenericMessage(groupSettings.getTalkingGroup(), user, event.getMessage(), false);
 

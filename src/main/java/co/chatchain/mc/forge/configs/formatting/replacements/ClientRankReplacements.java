@@ -10,7 +10,7 @@ public enum ClientRankReplacements
     NAME("client-rank-name", ClientRank::getName),
     UID("client-rank-uid", ClientRank::getUniqueId),
     DISPLAY("client-rank-display", ClientRank::getDisplay),
-    COLOUR("client-rank-colour", rank -> "§" + ColourUtils.getColourFromHexColour(rank.getColour()).getColourCode());
+    COLOUR("client-rank-colour", rank -> rank.getColour() == null ? null : "§" + ColourUtils.getColourFromHexColour(rank.getColour()).getColourCode());
 
     @Getter
     final String replacement;

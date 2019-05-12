@@ -1,6 +1,7 @@
 package co.chatchain.mc.forge.configs.formatting.replacements;
 
 import co.chatchain.commons.messages.objects.User;
+import co.chatchain.mc.forge.util.ColourUtils;
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 
@@ -8,7 +9,8 @@ public enum ClientUserReplacements
 {
     NAME("client-user-name", User::getName),
     UID("client-user-uid", User::getUniqueId),
-    NICKNAME("client-user-nickname", User::getNickName);
+    NICKNAME("client-user-nickname", User::getNickName),
+    COLOUR("client-user-colour", user -> user.getColour() == null ? null : "§" + ColourUtils.getColourFromHexColour(user.getColour()).getColourCode());
 
     @Getter
     final String replacement;
