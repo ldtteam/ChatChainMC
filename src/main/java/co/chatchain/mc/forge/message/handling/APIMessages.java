@@ -31,6 +31,7 @@ public class APIMessages
 
         final ITextComponent messageToSend = new TextComponentString(ReplacementUtils.getFormat(message));
 
+
         final GroupConfig groupConfig = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(message.getGroup().getGroupId());
 
         for (final EntityPlayer player : groupConfig.getPlayersListening())
@@ -46,6 +47,7 @@ public class APIMessages
         createGroupInConfig(message.getGroup());
 
         final ITextComponent messageToSend = new TextComponentString(ReplacementUtils.getFormat(message));
+
 
         final GroupConfig groupsConfig = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(message.getGroup().getGroupId());
 

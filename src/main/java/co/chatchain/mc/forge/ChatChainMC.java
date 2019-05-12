@@ -101,7 +101,6 @@ public class ChatChainMC
     @Getter
     @Setter
     private boolean spongeIsPresent;
-
     private File configDir;
 
     @Mod.EventHandler
@@ -138,7 +137,6 @@ public class ChatChainMC
         final Path advancedFormattingConfigPath = configDir.toPath().resolve("advanced-formatting.json");
         advancedFormattingConfig = getConfig(advancedFormattingConfigPath, AdvancedFormattingConfig.class,
                 GsonConfigurationLoader.builder().setPath(advancedFormattingConfigPath).build());
-
         CapabilityManager.INSTANCE.register(IGroupSettings.class, new IGroupSettings.Storage(), new IGroupSettings.Factory());
     }
 
@@ -298,6 +296,7 @@ public class ChatChainMC
                 && !event.getEntity().world.isRemote && ChatChainMC.instance.connection.getConnectionState() == HubConnectionState.CONNECTED)
         {
             final User user = new User(event.getEntity().getName(), event.getEntity().getUniqueID().toString());
+
 
             ChatChainMC.instance.connection.sendUserEventMessage(new UserEventMessage("DEATH", user));
         }
