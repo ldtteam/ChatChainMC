@@ -28,11 +28,6 @@ version = System.getenv()['BUILD_NUMBER'] != null ? System.getenv()['BUILD_NUMBE
 mainClassName = 'co.chatchain.mc.forge.ChatChainMC'
 
 sourceSets {
-    api {
-        java {
-            srcDir 'src/api/java'
-        }
-    }
     main {
         java {
             srcDir 'src/main/java'
@@ -40,7 +35,6 @@ sourceSets {
         resources {
             srcDir 'src/main/resources'
         }
-        compileClasspath += sourceSets.api.output
     }
 }
 
@@ -52,10 +46,9 @@ minecraft {
 }
 
 repositories {
-    ivy {
-        name 'Minecolonies TeamCity Repo'
-        ivyPattern 'http://teamcity.minecolonies.com/guestAuth/repository/download/[module]/[revision]/teamcity-ivy.xml'
-        artifactPattern 'http://teamcity.minecolonies.com/guestAuth/repository/download/[module]/[revision]/[artifact](.[ext])'
+    maven {
+        name 'LDTTeam - Modding'
+        url 'https://ldtteam.jfrog.io/ldtteam/modding/'
     }
     mavenCentral()
     jcenter()
@@ -79,17 +72,7 @@ dependencies {
     
     compile 'io.reactivex.rxjava2:rxjava:2.2.2'
 
-    compile('org:ChatChain_ChatChainCommons_Branches:' + chatChainCommonsVersion) {
-        artifact {
-            name = 'ChatChainCommons-' + chatChainCommonsVersion + '-all'
-            type = 'jar'
-        }
-        artifact {
-            name = 'ChatChainCommons-' + chatChainCommonsVersion + '-sources'
-            type = 'jar'
-            classifier = "sources"
-        }
-    }
+    compile 'co.chatchain:commons:29602'
 }
 
 processResources {
