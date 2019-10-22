@@ -1,8 +1,8 @@
 package co.chatchain.mc.forge.capabilities;
 
 import co.chatchain.commons.messages.objects.Group;
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.nbt.INBT;
+import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 
 import javax.annotation.Nullable;
@@ -24,20 +24,18 @@ public interface IGroupSettings
 
     class Storage implements Capability.IStorage<IGroupSettings>
     {
-
         @Nullable
         @Override
-        public NBTBase writeNBT(Capability<IGroupSettings> capability, IGroupSettings instance, EnumFacing side)
+        public INBT writeNBT(final Capability<IGroupSettings> capability, final IGroupSettings instance, final Direction side)
         {
             return null;
         }
 
         @Override
-        public void readNBT(Capability<IGroupSettings> capability, IGroupSettings instance, EnumFacing side, NBTBase nbt)
+        public void readNBT(final Capability<IGroupSettings> capability, final IGroupSettings instance, final Direction side, final INBT nbt)
         {
 
         }
-
     }
 
     class Factory implements Callable<IGroupSettings>

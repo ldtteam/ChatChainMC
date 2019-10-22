@@ -9,8 +9,8 @@ import co.chatchain.mc.forge.ChatChainMC;
 import co.chatchain.mc.forge.Constants;
 import lombok.Getter;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.Style;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.event.ClickEvent;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
@@ -23,7 +23,8 @@ import java.util.regex.Pattern;
 @ConfigSerializable
 public class FormattingConfig extends AbstractConfig
 {
-    public static String escapeMetaCharacters(String inputString){
+    private static String escapeMetaCharacters(String inputString)
+    {
         final String[] metaCharacters = {"\\","$","{","}","[","]","(",")",".","*","+","?","|","<",">","-","&","%"};
 
         for (String metaCharacter : metaCharacters)
@@ -49,7 +50,7 @@ public class FormattingConfig extends AbstractConfig
     {
         if (client == null)
         {
-            client = ChatChainMC.instance.getClient();
+            client = ChatChainMC.INSTANCE.getClient();
         }
 
         String clientName;
@@ -76,9 +77,9 @@ public class FormattingConfig extends AbstractConfig
     private ITextComponent getTextComponent(final String message, final Group group)
     {
 
-        final GroupConfig groupConfig = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(group.getGroupId());
+        final GroupConfig groupConfig = ChatChainMC.INSTANCE.getGroupsConfig().getGroupStorage().get(group.getGroupId());
 
-        final ITextComponent finalMessage = new TextComponentString("");
+        final ITextComponent finalMessage = new StringTextComponent("");
 
         String formattingForNext = "";
 
@@ -87,7 +88,7 @@ public class FormattingConfig extends AbstractConfig
             if (part.contains("{clickable-group-name}") || part.contains("{clickable-group-id}"))
             {
                 final String replacement;
-                final ClickEvent clickEvent = new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/chatchain " + ChatChainMC.instance.getMainConfig().getClickableGroupMuteOrTalk() + " " + groupConfig.getCommandName());
+                final ClickEvent clickEvent = new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/chatchain " + ChatChainMC.INSTANCE.getMainConfig().getClickableGroupMuteOrTalk() + " " + groupConfig.getCommandName());
                 if (part.contains("{clickable-group-name}"))
                 {
                     replacement = formattingForNext + group.getGroupName();
@@ -96,12 +97,12 @@ public class FormattingConfig extends AbstractConfig
                 {
                     replacement = formattingForNext + group.getGroupId();
                 }
-                ITextComponent component = new TextComponentString(replacement).setStyle(new Style().setClickEvent(clickEvent));
+                ITextComponent component = new StringTextComponent(replacement).setStyle(new Style().setClickEvent(clickEvent));
                 finalMessage.appendSibling(component);
             }
             else
             {
-                finalMessage.appendSibling(new TextComponentString(formattingForNext + part));
+                finalMessage.appendSibling(new StringTextComponent(formattingForNext + part));
             }
 
             final Pattern formattingAtEndPattern = Pattern.compile("(§.)*$");
@@ -141,9 +142,9 @@ public class FormattingConfig extends AbstractConfig
 
     public ITextComponent getGenericMessage(final GenericMessage message)
     {
-        if (ChatChainMC.instance.getGroupsConfig().getGroupStorage().containsKey(message.getGroup().getGroupId()))
+        if (ChatChainMC.INSTANCE.getGroupsConfig().getGroupStorage().containsKey(message.getGroup().getGroupId()))
         {
-            final Group group = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(message.getGroup().getGroupId()).getGroup();
+            final Group group = ChatChainMC.INSTANCE.getGroupsConfig().getGroupStorage().get(message.getGroup().getGroupId()).getGroup();
 
             final String defaultOrOverride = getDefaultOrOverride(group.getGroupId(), defaultGenericMessageFormat, genericMessageFormats);
 
@@ -271,7 +272,7 @@ public class FormattingConfig extends AbstractConfig
         {
             for (final String key : messages.getExtraEventData().keySet())
             {
-                ChatChainMC.instance.getLogger().info("here: " + key);
+                ChatChainMC.INSTANCE.getLogger().info("here: " + key);
                 if (key.equalsIgnoreCase("achievement-name"))
                 {
                     stringMessage = stringMessage.replaceAll("(\\{achievement-name})", messages.getExtraEventData().get(key));

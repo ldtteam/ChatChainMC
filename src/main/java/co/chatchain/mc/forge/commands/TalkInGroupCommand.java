@@ -2,109 +2,61 @@ package co.chatchain.mc.forge.commands;
 
 import co.chatchain.mc.forge.ChatChainMC;
 import co.chatchain.mc.forge.capabilities.GroupProvider;
-import co.chatchain.mc.forge.capabilities.IGroupSettings;
 import co.chatchain.mc.forge.configs.GroupConfig;
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
-import org.jetbrains.annotations.NotNull;
+import co.chatchain.mc.forge.util.CommandUtils;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.minecraft.command.CommandSource;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.util.text.StringTextComponent;
 
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-public class TalkInGroupCommand extends CommandBase
+public class TalkInGroupCommand extends AbstractCommand
 {
 
-    @NotNull
-    @Override
-    public String getName()
-    {
-        return "talk";
-    }
+    private final static String NAME = "talk";
 
-    @NotNull
-    @Override
-    public String getUsage(@NotNull ICommandSender sender)
-    {
-        return "/chatchain talk <group>";
-    }
+    private static final String GROUP_NAME = "groupName";
 
-    @Override
-    public boolean checkPermission(MinecraftServer server, ICommandSender sender)
+    private static int onExecute(final CommandContext<CommandSource> context) throws CommandSyntaxException
     {
-        return true;
-    }
+        ServerPlayerEntity player = context.getSource().asPlayer();
+        final String groupName = context.getArgument(GROUP_NAME, String.class);
 
-    @Override
-    public void execute(@NotNull MinecraftServer server, @NotNull ICommandSender sender, @NotNull String[] args)
-    {
-        if (args.length != 1)
+        GroupConfig groupConfig = null;
+
+        for (final String id : ChatChainMC.INSTANCE.getGroupsConfig().getGroupStorage().keySet())
         {
-            sender.sendMessage(new TextComponentString("Invalid Arguments"));
-            return;
-        }
+            final GroupConfig fGroupConfig = ChatChainMC.INSTANCE.getGroupsConfig().getGroupStorage().get(id);
 
-        if (sender instanceof EntityPlayerMP)
-        {
-            GroupConfig groupConfig = null;
-
-            for (final String id : ChatChainMC.instance.getGroupsConfig().getGroupStorage().keySet())
+            if (fGroupConfig.getCommandName().equalsIgnoreCase(groupName))
             {
-                final GroupConfig fGroupConfig = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(id);
-
-                if (fGroupConfig.getCommandName().equalsIgnoreCase(args[0]))
-                {
-                    groupConfig = fGroupConfig;
-                }
-            }
-
-            final EntityPlayerMP player = (EntityPlayerMP) sender;
-
-            if (groupConfig == null || !groupConfig.getPlayersCanTalk().contains(player))
-            {
-                sender.sendMessage(new TextComponentString("This group is invalid!"));
-                return;
-            }
-
-            final IGroupSettings groupSettings = player.getCapability(GroupProvider.GROUP_SETTINGS_CAP, null);
-
-            if (groupSettings != null)
-            {
-                groupSettings.setTalkingGroup(groupConfig.getGroup());
-                sender.sendMessage(new TextComponentString("Talking group set to: " + args[0]));
-            }
-        }
-    }
-
-    @NotNull
-    @Override
-    public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos targetPos)
-    {
-        if (!(sender instanceof EntityPlayerMP))
-        {
-            return Collections.emptyList();
-        }
-
-        final EntityPlayer player = (EntityPlayer) sender;
-
-        final ArrayList<String> groupNames = new ArrayList<>();
-
-        for (final String groupId : ChatChainMC.instance.getGroupsConfig().getGroupStorage().keySet())
-        {
-            final GroupConfig groupConfig = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(groupId);
-            if (groupConfig.getPlayersCanTalk().contains(player))
-            {
-                groupNames.add(groupConfig.getCommandName());
+                groupConfig = fGroupConfig;
+                break;
             }
         }
 
-        groupNames.sort(null);
-        return getListOfStringsMatchingLastWord(args, groupNames);
+        if (groupConfig == null || !groupConfig.getPlayersCanTalk().contains(player))
+        {
+            context.getSource().sendErrorMessage(new StringTextComponent("This group is invalid!"));
+            return 0;
+        }
+
+        final GroupConfig finalGroupConfig = groupConfig;
+
+        player.getCapability(GroupProvider.GROUP_SETTINGS_CAP, null).ifPresent(settings -> {
+            settings.setTalkingGroup(finalGroupConfig.getGroup());
+            context.getSource().sendFeedback(new StringTextComponent("Talking group set to: " + groupName), true);
+        });
+
+        return 1;
+    }
+
+    protected static LiteralArgumentBuilder<CommandSource> build()
+    {
+        return newLiteral(NAME)
+                .then(newArgument(GROUP_NAME, StringArgumentType.word()).suggests(CommandUtils::getGroupSuggestions)
+                        .executes(TalkInGroupCommand::onExecute));
     }
 }

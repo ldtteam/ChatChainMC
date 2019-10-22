@@ -1,50 +1,31 @@
 package co.chatchain.mc.forge.commands;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import org.jetbrains.annotations.NotNull;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.minecraft.command.CommandSource;
+import net.minecraft.command.arguments.EntityArgument;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.util.text.StringTextComponent;
 
-public class UUIDCommand extends CommandBase
+public class UUIDCommand extends AbstractCommand
 {
-    @NotNull
-    @Override
-    public String getName()
+
+    private final static String NAME = "uuid";
+
+    private final static String PLAYER = "player";
+
+    private static int onExecute(final CommandContext<CommandSource> context) throws CommandSyntaxException
     {
-        return "uuid";
+        final ServerPlayerEntity player = EntityArgument.getPlayer(context, PLAYER);
+        context.getSource().sendFeedback(new StringTextComponent("Player UUID: " + player.getUniqueID()), true);
+        return 1;
     }
 
-    @NotNull
-    @Override
-    public String getUsage(@NotNull ICommandSender sender)
+    protected static LiteralArgumentBuilder<CommandSource> build()
     {
-        return "/chatchain uuid <username>";
-    }
-
-    @Override
-    public boolean checkPermission(MinecraftServer server, ICommandSender sender)
-    {
-        return sender.canUseCommand(2, "");
-    }
-
-    @Override
-    public void execute(@NotNull MinecraftServer server, @NotNull ICommandSender sender, @NotNull String[] args)
-    {
-        if (args.length != 1)
-        {
-            sender.sendMessage(new TextComponentString("Invalid Arguments"));
-            return;
-        }
-
-        final EntityPlayerMP player = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUsername(args[0]);
-        if (player != null)
-        {
-            sender.sendMessage(new TextComponentString("Player UUID: " + player.getUniqueID()));
-        }
-
+        return newLiteral(NAME)
+                .then(newArgument(PLAYER, EntityArgument.player())
+                        .executes(UUIDCommand::onExecute));
     }
 }

@@ -58,12 +58,6 @@ public class MainConfig extends AbstractConfig
     @Setting("advanced-formatting")
     private Boolean advancedFormatting = false;
 
-    //####### Use Sponge #######\\
-
-    @Getter
-    @Setting(value = "use-sponge", comment = "Whether to use sponge or not")
-    private boolean useSponge = false;
-
     private String getSystemValueOrConfigValue(final String systemValue, String configValue)
     {
         final String value = System.getenv(systemValue);

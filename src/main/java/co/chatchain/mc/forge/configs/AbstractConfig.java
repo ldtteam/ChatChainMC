@@ -1,6 +1,6 @@
 package co.chatchain.mc.forge.configs;
 
-import co.chatchain.mc.forge.ChatChainMC;
+import co.chatchain.mc.forge.util.Log;
 import com.google.common.reflect.TypeToken;
 import lombok.Getter;
 import ninja.leaping.configurate.ConfigurationNode;
@@ -9,6 +9,7 @@ import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
 import java.io.IOException;
 
+@SuppressWarnings("UnstableApiUsage")
 public abstract class AbstractConfig<T extends ConfigurationLoader<K>, K extends ConfigurationNode>
 {
 
@@ -32,7 +33,7 @@ public abstract class AbstractConfig<T extends ConfigurationLoader<K>, K extends
             this.loader.save(this.node);
         } catch (IOException | ObjectMappingException e)
         {
-            ChatChainMC.instance.getLogger().error("Error saving config", e);
+            Log.getLogger().error("Error saving config", e);
         }
     }
 
@@ -43,7 +44,7 @@ public abstract class AbstractConfig<T extends ConfigurationLoader<K>, K extends
             this.node = this.loader.load();
         } catch (IOException e)
         {
-            ChatChainMC.instance.getLogger().error("Error loading config", e);
+            Log.getLogger().error("Error loading config", e);
         }
     }
 

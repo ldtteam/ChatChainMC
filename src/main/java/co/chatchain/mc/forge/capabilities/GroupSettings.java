@@ -10,7 +10,7 @@ public class GroupSettings implements IGroupSettings
 {
 
     private List<String> ignoredGroups = new ArrayList<>();
-    private String talkingGroup = ChatChainMC.instance.getGroupsConfig().getDefaultGroup();
+    private String talkingGroup = ChatChainMC.INSTANCE.getGroupsConfig().getDefaultGroup();
 
     @Override
     public void addIgnoredGroup(Group group)
@@ -31,9 +31,9 @@ public class GroupSettings implements IGroupSettings
 
         for (final String groupId : ignoredGroups)
         {
-            if (ChatChainMC.instance.getGroupsConfig().getGroupStorage().containsKey(groupId))
+            if (ChatChainMC.INSTANCE.getGroupsConfig().getGroupStorage().containsKey(groupId))
             {
-                groups.add(ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(groupId).getGroup());
+                groups.add(ChatChainMC.INSTANCE.getGroupsConfig().getGroupStorage().get(groupId).getGroup());
             }
         }
 
@@ -49,9 +49,9 @@ public class GroupSettings implements IGroupSettings
     @Override
     public Group getTalkingGroup()
     {
-        if (ChatChainMC.instance.getGroupsConfig().getGroupStorage().containsKey(talkingGroup))
+        if (ChatChainMC.INSTANCE.getGroupsConfig().getGroupStorage().containsKey(talkingGroup))
         {
-            return ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(talkingGroup).getGroup();
+            return ChatChainMC.INSTANCE.getGroupsConfig().getGroupStorage().get(talkingGroup).getGroup();
         }
         return null;
     }

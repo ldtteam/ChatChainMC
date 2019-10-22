@@ -49,17 +49,17 @@ public class ReplacementUtils
         return getFormat(message.getGroup(), message.getSendingClient(), message.getUser(), formats -> formats.getUserEventMessages().get(message.getEvent().toUpperCase()));
     }
 
-    public static String getFormat(final Group group, final Client client, final User user, final FormatAction action)
+    private static String getFormat(final Group group, final Client client, final User user, final FormatAction action)
     {
         final List<String> format = new ArrayList<>();
 
-        if (ChatChainMC.instance.getMainConfig().getAdvancedFormatting())
+        if (ChatChainMC.INSTANCE.getMainConfig().getAdvancedFormatting())
         {
-            format.addAll(ChatChainMC.instance.getAdvancedFormattingConfig().getOverride(group, client, user, action));
+            format.addAll(ChatChainMC.INSTANCE.getAdvancedFormattingConfig().getOverride(group, client, user, action));
         }
         else
         {
-            format.addAll(ChatChainMC.instance.getFormattingConfig().getOverride(action));
+            format.addAll(ChatChainMC.INSTANCE.getFormattingConfig().getOverride(action));
         }
 
         final StringBuilder outputStringBuilder = new StringBuilder();

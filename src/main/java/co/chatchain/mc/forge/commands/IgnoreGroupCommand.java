@@ -2,124 +2,75 @@ package co.chatchain.mc.forge.commands;
 
 import co.chatchain.mc.forge.ChatChainMC;
 import co.chatchain.mc.forge.capabilities.GroupProvider;
-import co.chatchain.mc.forge.capabilities.IGroupSettings;
 import co.chatchain.mc.forge.configs.GroupConfig;
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
-import org.jetbrains.annotations.NotNull;
+import co.chatchain.mc.forge.util.CommandUtils;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.minecraft.command.CommandSource;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.util.text.StringTextComponent;
 
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-public class IgnoreGroupCommand extends CommandBase
+public class IgnoreGroupCommand extends AbstractCommand
 {
 
-    @NotNull
-    @Override
-    public String getName()
-    {
-        return "ignore";
-    }
+    private final static String NAME = "ignore";
 
-    @NotNull
-    @Override
-    public String getUsage(@NotNull ICommandSender sender)
-    {
-        return "/chatchain ignore <group name>";
-    }
+    private static final String GROUP_NAME = "groupName";
 
-    @Override
-    public boolean checkPermission(MinecraftServer server, ICommandSender sender)
+    private static int onExecute(final CommandContext<CommandSource> context) throws CommandSyntaxException
     {
-        return true;
-    }
+        ServerPlayerEntity player = context.getSource().asPlayer();
+        final String groupName = context.getArgument(GROUP_NAME, String.class);
 
-    @Override
-    public void execute(@NotNull MinecraftServer server, @NotNull ICommandSender sender, @NotNull String[] args)
-    {
-        if (args.length != 1)
+        GroupConfig groupConfig = null;
+
+        for (final String id : ChatChainMC.INSTANCE.getGroupsConfig().getGroupStorage().keySet())
         {
-            sender.sendMessage(new TextComponentString("Invalid Arguments"));
-            return;
-        }
+            final GroupConfig fGroupConfig = ChatChainMC.INSTANCE.getGroupsConfig().getGroupStorage().get(id);
 
-        if (sender instanceof EntityPlayerMP)
-        {
-
-            GroupConfig groupConfig = null;
-
-            for (final String id : ChatChainMC.instance.getGroupsConfig().getGroupStorage().keySet())
+            if (fGroupConfig.getCommandName().equalsIgnoreCase(groupName))
             {
-                final GroupConfig fGroupConfig = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(id);
-
-                if (fGroupConfig.getCommandName().equalsIgnoreCase(args[0]))
-                {
-                    groupConfig = fGroupConfig;
-                }
-            }
-
-            final EntityPlayerMP player = (EntityPlayerMP) sender;
-
-            if (groupConfig == null || !groupConfig.getPlayersForGroup().contains(player))
-            {
-                sender.sendMessage(new TextComponentString("This group is invalid!"));
-                return;
-            }
-
-            if (!groupConfig.isGroupIgnorable())
-            {
-                sender.sendMessage(new TextComponentString("This group is not ignorable!"));
-                return;
-            }
-
-            final IGroupSettings groupSettings = player.getCapability(GroupProvider.GROUP_SETTINGS_CAP, null);
-
-            if (groupSettings != null)
-            {
-                if (groupSettings.getIgnoredGroups().contains(groupConfig.getGroup()))
-                {
-                    groupSettings.removeIgnoredGroup(groupConfig.getGroup());
-                    sender.sendMessage(new TextComponentString("Group un-ignored"));
-                }
-                else
-                {
-                    groupSettings.addIgnoredGroup(groupConfig.getGroup());
-                    sender.sendMessage(new TextComponentString("Group ignored"));
-                }
-            }
-        }
-    }
-
-    @NotNull
-    @Override
-    public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos targetPos)
-    {
-        if (!(sender instanceof EntityPlayerMP))
-        {
-            return Collections.emptyList();
-        }
-
-        final EntityPlayer player = (EntityPlayer) sender;
-
-        final ArrayList<String> groupNames = new ArrayList<>();
-
-        for (final String groupId : ChatChainMC.instance.getGroupsConfig().getGroupStorage().keySet())
-        {
-            final GroupConfig groupConfig = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(groupId);
-            if (groupConfig.getPlayersForGroup().contains(player))
-            {
-                groupNames.add(groupConfig.getCommandName());
+                groupConfig = fGroupConfig;
+                break;
             }
         }
 
-        groupNames.sort(null);
-        return getListOfStringsMatchingLastWord(args, groupNames);
+        if (groupConfig == null || !groupConfig.getPlayersForGroup().contains(player))
+        {
+            context.getSource().sendErrorMessage(new StringTextComponent("This group is invalid!"));
+            return 0;
+        }
+
+        if (!groupConfig.isGroupIgnorable())
+        {
+            context.getSource().sendErrorMessage(new StringTextComponent("This group is not ignorable!"));
+            return 0;
+        }
+
+        final GroupConfig finalGroupConfig = groupConfig;
+
+        player.getCapability(GroupProvider.GROUP_SETTINGS_CAP, null).ifPresent(settings -> {
+            if (settings.getIgnoredGroups().contains(finalGroupConfig.getGroup()))
+            {
+                settings.removeIgnoredGroup(finalGroupConfig.getGroup());
+                context.getSource().sendFeedback(new StringTextComponent("Group un-ignored"), true);
+            }
+            else
+            {
+                settings.addIgnoredGroup(finalGroupConfig.getGroup());
+                context.getSource().sendFeedback(new StringTextComponent("Group ignored"), true);
+            }
+        });
+
+        return 1;
+    }
+
+    protected static LiteralArgumentBuilder<CommandSource> build()
+    {
+        return newLiteral(NAME)
+                .then(newArgument(GROUP_NAME, StringArgumentType.word()).suggests(CommandUtils::getGroupSuggestions)
+                    .executes(IgnoreGroupCommand::onExecute));
     }
 }

@@ -1,13 +1,12 @@
 package co.chatchain.mc.forge.configs;
 
 import co.chatchain.commons.messages.objects.Group;
+import co.chatchain.mc.forge.ChatChainMC;
 import co.chatchain.mc.forge.capabilities.GroupProvider;
-import co.chatchain.mc.forge.capabilities.IGroupSettings;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Delegate;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
@@ -52,30 +51,29 @@ public class GroupConfig
     @Setting("allowed-players")
     private List<UUID> allowedPlayers = new ArrayList<>();
 
-    public List<EntityPlayer> getPlayersForGroup()
+    public List<ServerPlayerEntity> getPlayersForGroup()
     {
-        final List<EntityPlayer> returnList = new ArrayList<>();
-
         if (allowAllPlayers)
         {
-            returnList.addAll(FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayers());
+            return ChatChainMC.MINECRAFT_SERVER.getPlayerList().getPlayers();
         }
         else
         {
+            final List<ServerPlayerEntity> returnList = new ArrayList<>();
             for (final UUID uuid : allowedPlayers)
             {
-                final EntityPlayer player = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUUID(uuid);
-                if (FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayers().contains(player))
+                final ServerPlayerEntity player = ChatChainMC.MINECRAFT_SERVER.getPlayerList().getPlayerByUUID(uuid);
+                if (ChatChainMC.MINECRAFT_SERVER.getPlayerList().getPlayers().contains(player))
                 {
                     returnList.add(player);
                 }
             }
-        }
 
-        return returnList;
+            return returnList;
+        }
     }
 
-    public List<EntityPlayer> getPlayersCanTalk()
+    public List<ServerPlayerEntity> getPlayersCanTalk()
     {
         if (!canAllowedChat)
         {
@@ -85,17 +83,18 @@ public class GroupConfig
         return getPlayersForGroup();
     }
 
-    public List<EntityPlayer> getPlayersListening()
+    public List<ServerPlayerEntity> getPlayersListening()
     {
-        final List<EntityPlayer> returnList = new ArrayList<>();
-        for (final EntityPlayer player : getPlayersForGroup())
+        final List<ServerPlayerEntity> returnList = new ArrayList<>();
+        for (final ServerPlayerEntity player : getPlayersForGroup())
         {
-            final IGroupSettings groupSettings = player.getCapability(GroupProvider.GROUP_SETTINGS_CAP, null);
-
-            if (groupSettings != null && !groupSettings.getIgnoredGroups().contains(group))
+            player.getCapability(GroupProvider.GROUP_SETTINGS_CAP, null).ifPresent(groupSettings ->
             {
-                returnList.add(player);
-            }
+                if (!groupSettings.getIgnoredGroups().contains(group))
+                {
+                    returnList.add(player);
+                }
+            });
         }
         return returnList;
     }
