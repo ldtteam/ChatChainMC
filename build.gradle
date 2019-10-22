@@ -113,3 +113,15 @@ shadowJar {
 reobf {
     shadowJar {}
 }
+
+task setupDecompWorkspace {
+    afterEvaluate {
+        println "Setup"
+    }
+}
+
+task setupCIWorkspace {
+    afterEvaluate {
+        println "Setup"
+    }
+}
