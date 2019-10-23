@@ -133,10 +133,6 @@ public class ChatChainMC
         }
 
         connection = new ChatChainHubConnection(getMainConfig().getApiUrl(), accessToken);
-        connection.connect();
-
-        Log.getLogger().info("Connection Status: " + connection.getConnectionState());
-
         connection.onConnection(hub -> {
             hub.onGenericMessage(APIMessages::ReceiveGenericMessage, GenericMessage.class);
             hub.onClientEventMessage(APIMessages::ReceiveClientEvent, ClientEventMessage.class);
@@ -147,7 +143,10 @@ public class ChatChainMC
             hub.sendGetGroups();
             hub.sendGetClient();
             hub.sendClientEventMessage(new ClientEventMessage("START"));
+
+            Log.getLogger().info("Connection Status: " + hub.getConnectionState());
         });
+        connection.connect(false);
 
         EntryPoint.register(event.getCommandDispatcher());
     }
