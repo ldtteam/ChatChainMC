@@ -15,6 +15,19 @@ import java.util.concurrent.CompletableFuture;
 
 public class CommandUtils
 {
+    public static CompletableFuture<Suggestions> getAllGroupSuggestions(final CommandContext<CommandSource> context, final SuggestionsBuilder builder)
+    {
+        final List<String> suggestions = new ArrayList<>();
+
+        for (final String groupId : ChatChainMC.INSTANCE.getGroupsConfig().getGroupStorage().keySet())
+        {
+            final GroupConfig groupConfig = ChatChainMC.INSTANCE.getGroupsConfig().getGroupStorage().get(groupId);
+            suggestions.add(groupConfig.getCommandName());
+        }
+        suggestions.sort(null);
+        return ISuggestionProvider.suggest(suggestions, builder);
+    }
+
     public static CompletableFuture<Suggestions> getTalkingGroupSuggestions(final CommandContext<CommandSource> context, final SuggestionsBuilder builder)
     {
         final List<String> suggestions = new ArrayList<>();

@@ -18,7 +18,9 @@ public class EntryPoint extends AbstractCommand
                 .addNode(ReloadCommand.build())
                 .addNode(ReconnectCommand.build())
                 .addNode(TalkInGroupCommand.build())
-                .addNode(UUIDCommand.build());
+                .addNode(UUIDCommand.build())
+                .addNode(AddPlayerCommand.build())
+                .addNode(RemovePlayerCommand.build());
 
         dispatcher.register(chatChainRoot.build());
     }

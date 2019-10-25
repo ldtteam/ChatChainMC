@@ -25,6 +25,7 @@ public class UUIDCommand extends AbstractCommand
     protected static LiteralArgumentBuilder<CommandSource> build()
     {
         return newLiteral(NAME)
+                .requires(source -> source.hasPermissionLevel(2))
                 .then(newArgument(PLAYER, EntityArgument.player())
                         .executes(UUIDCommand::onExecute));
     }
