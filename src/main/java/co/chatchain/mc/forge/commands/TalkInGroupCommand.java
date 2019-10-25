@@ -56,7 +56,7 @@ public class TalkInGroupCommand extends AbstractCommand
     protected static LiteralArgumentBuilder<CommandSource> build()
     {
         return newLiteral(NAME)
-                .then(newArgument(GROUP_NAME, StringArgumentType.word()).suggests(CommandUtils::getGroupSuggestions)
+                .then(newArgument(GROUP_NAME, StringArgumentType.word()).suggests(CommandUtils::getTalkingGroupSuggestions)
                         .executes(TalkInGroupCommand::onExecute));
     }
 }
