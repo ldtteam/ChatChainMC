@@ -1,15 +1,15 @@
 package co.chatchain.mc.forge.configs.formatting.replacements;
 
-import co.chatchain.commons.messages.objects.User;
+import co.chatchain.commons.objects.ClientUser;
 import co.chatchain.mc.forge.util.ColourUtils;
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 
 public enum ClientUserReplacements
 {
-    NAME("client-user-name", User::getName),
-    UID("client-user-uid", User::getUniqueId),
-    NICKNAME("client-user-nickname", User::getNickName),
+    NAME("client-user-name", ClientUser::getName),
+    UID("client-user-uid", ClientUser::getUniqueId),
+    NICKNAME("client-user-nickname", ClientUser::getNickName),
     COLOUR("client-user-colour", user -> user.getColour() == null ? null : "§" + ColourUtils.getColourFromHexColour(user.getColour()).getColourCode());
 
     @Getter
@@ -25,7 +25,7 @@ public enum ClientUserReplacements
     }
 
     @Nullable
-    public String GetReplacementObject(final User user)
+    public String GetReplacementObject(final ClientUser user)
     {
         if (user == null)
             return null;
@@ -34,7 +34,7 @@ public enum ClientUserReplacements
     }
 
     @Nullable
-    public static String GetReplacementObject(final User user, final String replacementString)
+    public static String GetReplacementObject(final ClientUser user, final String replacementString)
     {
         final ClientUserReplacements userReplacement = GetFromReplacement(replacementString);
 
@@ -56,6 +56,6 @@ public enum ClientUserReplacements
 
     public interface UserReplacementAction
     {
-        String invoke(final User user);
+        String invoke(final ClientUser user);
     }
 }

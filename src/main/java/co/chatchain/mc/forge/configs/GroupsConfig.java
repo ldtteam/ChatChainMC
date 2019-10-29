@@ -1,13 +1,11 @@
 package co.chatchain.mc.forge.configs;
 
-import co.chatchain.commons.messages.objects.Group;
+import co.chatchain.commons.objects.Group;
 import lombok.Getter;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @ConfigSerializable
@@ -41,6 +39,6 @@ public class GroupsConfig extends AbstractConfig
             }
         }
 
-        return returnGroup != null ? returnGroup.getGroupId() : "";
+        return returnGroup != null ? returnGroup.getId() : "";
     }
 }

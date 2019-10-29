@@ -1,12 +1,12 @@
 package co.chatchain.mc.forge.configs.formatting;
 
-import co.chatchain.commons.messages.objects.Client;
-import co.chatchain.commons.messages.objects.ClientRank;
-import co.chatchain.commons.messages.objects.Group;
-import co.chatchain.commons.messages.objects.User;
-import co.chatchain.commons.messages.objects.messages.ClientEventMessage;
-import co.chatchain.commons.messages.objects.messages.GenericMessage;
-import co.chatchain.commons.messages.objects.messages.UserEventMessage;
+import co.chatchain.commons.objects.Client;
+import co.chatchain.commons.objects.ClientRank;
+import co.chatchain.commons.objects.ClientUser;
+import co.chatchain.commons.objects.Group;
+import co.chatchain.commons.objects.messages.ClientEventMessage;
+import co.chatchain.commons.objects.messages.GenericMessageMessage;
+import co.chatchain.commons.objects.messages.UserEventMessage;
 import co.chatchain.mc.forge.ChatChainMC;
 import co.chatchain.mc.forge.configs.formatting.formats.MessageFormats;
 import co.chatchain.mc.forge.configs.formatting.replacements.ClientRankReplacements;
@@ -15,7 +15,6 @@ import co.chatchain.mc.forge.configs.formatting.replacements.ClientUserReplaceme
 import co.chatchain.mc.forge.configs.formatting.replacements.GroupReplacements;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -27,15 +26,15 @@ public class ReplacementUtils
     private static final Pattern MOTHER_REPLACEMENT = Pattern.compile("\\{.*?}");
     private static final Pattern OR_REPLACEMENT = Pattern.compile("[^\\|\\|]*");
 
-    public static String getFormat(final GenericMessage message)
+    public static String getFormat(final GenericMessageMessage message)
     {
-        return getFormat(message.getGroup(), message.getSendingClient(), message.getUser(), MessageFormats::getGenericMessage)
+        return getFormat(message.getGroup(), message.getSendingClient(), message.getClientUser(), MessageFormats::getGenericMessage)
                 .replace("{message}", message.getMessage());
     }
 
-    public static String getFormat(final GenericMessage message, final Client client)
+    public static String getFormat(final GenericMessageMessage message, final Client client)
     {
-        return getFormat(message.getGroup(), client, message.getUser(), MessageFormats::getGenericMessage)
+        return getFormat(message.getGroup(), client, message.getClientUser(), MessageFormats::getGenericMessage)
                 .replace("{message}", message.getMessage());
     }
 
@@ -46,10 +45,10 @@ public class ReplacementUtils
 
     public static String getFormat(final UserEventMessage message)
     {
-        return getFormat(message.getGroup(), message.getSendingClient(), message.getUser(), formats -> formats.getUserEventMessages().get(message.getEvent().toUpperCase()));
+        return getFormat(message.getGroup(), message.getSendingClient(), message.getClientUser(), formats -> formats.getUserEventMessages().get(message.getEvent().toUpperCase()));
     }
 
-    private static String getFormat(final Group group, final Client client, final User user, final FormatAction action)
+    private static String getFormat(final Group group, final Client client, final ClientUser user, final FormatAction action)
     {
         final List<String> format = new ArrayList<>();
 
@@ -105,7 +104,7 @@ public class ReplacementUtils
         return outputStringBuilder.toString();
     }
 
-    private static String getReplacementForSection(final Group group, final Client client, final User user, final String formatsString)
+    private static String getReplacementForSection(final Group group, final Client client, final ClientUser user, final String formatsString)
     {
 
         final Matcher childMatcher = OR_REPLACEMENT.matcher(formatsString);

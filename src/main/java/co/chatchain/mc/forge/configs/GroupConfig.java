@@ -1,6 +1,6 @@
 package co.chatchain.mc.forge.configs;
 
-import co.chatchain.commons.messages.objects.Group;
+import co.chatchain.commons.objects.Group;
 import co.chatchain.mc.forge.ChatChainMC;
 import co.chatchain.mc.forge.capabilities.GroupProvider;
 import lombok.Getter;
@@ -37,7 +37,7 @@ public class GroupConfig
     {
         if (commandName == null || commandName.isEmpty())
         {
-            return group.getGroupName().replace(" ", "");
+            return group.getName().replace(" ", "");
         }
         return commandName;
     }

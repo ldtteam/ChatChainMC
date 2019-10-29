@@ -1,7 +1,7 @@
 package co.chatchain.mc.forge.message.handling;
 
-import co.chatchain.commons.messages.objects.Group;
-import co.chatchain.commons.messages.objects.messages.*;
+import co.chatchain.commons.objects.Group;
+import co.chatchain.commons.objects.messages.*;
 import co.chatchain.mc.forge.ChatChainMC;
 import co.chatchain.mc.forge.configs.GroupConfig;
 import co.chatchain.mc.forge.configs.GroupsConfig;
@@ -16,23 +16,23 @@ public class APIMessages
 
     private static void createGroupInConfig(final Group group)
     {
-        if (!ChatChainMC.INSTANCE.getGroupsConfig().getGroupStorage().containsKey(group.getGroupId()))
+        if (!ChatChainMC.INSTANCE.getGroupsConfig().getGroupStorage().containsKey(group.getId()))
         {
             GroupConfig config = new GroupConfig();
             config.setGroup(group);
 
-            ChatChainMC.INSTANCE.getGroupsConfig().getGroupStorage().put(group.getGroupId(), config);
+            ChatChainMC.INSTANCE.getGroupsConfig().getGroupStorage().put(group.getId(), config);
             ChatChainMC.INSTANCE.getGroupsConfig().save();
         }
     }
 
-    public static void ReceiveGenericMessage(final GenericMessage message)
+    public static void ReceiveGenericMessage(final GenericMessageMessage message)
     {
         createGroupInConfig(message.getGroup());
 
         final ITextComponent messageToSend = new StringTextComponent(ReplacementUtils.getFormat(message));
 
-        final GroupConfig groupConfig = ChatChainMC.INSTANCE.getGroupsConfig().getGroupStorage().get(message.getGroup().getGroupId());
+        final GroupConfig groupConfig = ChatChainMC.INSTANCE.getGroupsConfig().getGroupStorage().get(message.getGroup().getId());
 
         for (final ServerPlayerEntity player : groupConfig.getPlayersListening())
         {
@@ -48,7 +48,7 @@ public class APIMessages
 
         final ITextComponent messageToSend = new StringTextComponent(ReplacementUtils.getFormat(message));
 
-        final GroupConfig groupsConfig = ChatChainMC.INSTANCE.getGroupsConfig().getGroupStorage().get(message.getGroup().getGroupId());
+        final GroupConfig groupsConfig = ChatChainMC.INSTANCE.getGroupsConfig().getGroupStorage().get(message.getGroup().getId());
 
         for (final ServerPlayerEntity player : groupsConfig.getPlayersListening())
         {
@@ -64,7 +64,7 @@ public class APIMessages
 
         final ITextComponent messageToSend = new StringTextComponent(ReplacementUtils.getFormat(message));
 
-        final GroupConfig groupsConfig = ChatChainMC.INSTANCE.getGroupsConfig().getGroupStorage().get(message.getGroup().getGroupId());
+        final GroupConfig groupsConfig = ChatChainMC.INSTANCE.getGroupsConfig().getGroupStorage().get(message.getGroup().getId());
 
         for (final ServerPlayerEntity player : groupsConfig.getPlayersListening())
         {
@@ -74,23 +74,23 @@ public class APIMessages
         Log.getLogger().info("New User Event Message " + messageToSend.getFormattedText());
     }
 
-    public static void ReceiveGroups(final GetGroupsResponse message)
+    public static void ReceiveGroups(final GetGroupsMessage message)
     {
         final GroupsConfig groupsConfig = ChatChainMC.INSTANCE.getGroupsConfig();
 
         for (final Group group : message.getGroups())
         {
-            if (!groupsConfig.getGroupStorage().containsKey(group.getGroupId()))
+            if (!groupsConfig.getGroupStorage().containsKey(group.getId()))
             {
                 GroupConfig config = new GroupConfig();
                 config.setGroup(group);
-                groupsConfig.getGroupStorage().put(group.getGroupId(), config);
+                groupsConfig.getGroupStorage().put(group.getId(), config);
             }
         }
         groupsConfig.save();
     }
 
-    public static void ReceiveClient(final GetClientResponse message)
+    public static void ReceiveClient(final GetClientMessage message)
     {
         ChatChainMC.INSTANCE.setClient(message.getClient());
     }
