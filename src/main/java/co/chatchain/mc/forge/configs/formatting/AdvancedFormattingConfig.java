@@ -1,8 +1,8 @@
 package co.chatchain.mc.forge.configs.formatting;
 
-import co.chatchain.commons.messages.objects.Client;
-import co.chatchain.commons.messages.objects.Group;
-import co.chatchain.commons.messages.objects.User;
+import co.chatchain.commons.objects.Client;
+import co.chatchain.commons.objects.Group;
+import co.chatchain.commons.objects.ClientUser;
 import co.chatchain.mc.forge.configs.AbstractConfig;
 import co.chatchain.mc.forge.configs.formatting.formats.DefaultFormats;
 import co.chatchain.mc.forge.configs.formatting.formats.MessageFormats;
@@ -40,16 +40,16 @@ public class AdvancedFormattingConfig extends AbstractConfig
     private Map<String, GroupOverrides> groupOverrides = new HashMap<>();
 
     @NotNull
-    public List<String> getOverride(final Group group, final Client client, final User user, final FormatAction action)
+    public List<String> getOverride(final Group group, final Client client, final ClientUser clientUser, final FormatAction action)
     {
-        if (group != null && client != null && user != null)
-            return getOverride(group.getGroupId(), client.getClientId(), user.getUniqueId(), action);
+        if (group != null && client != null && clientUser != null)
+            return getOverride(group.getId(), client.getId(), clientUser.getUniqueId(), action);
 
         if (group != null && client != null)
-            return getOverride(group.getGroupId(), client.getClientId(), action);
+            return getOverride(group.getId(), client.getId(), action);
 
         if (group != null)
-            return getOverride(group.getGroupId(), action);
+            return getOverride(group.getId(), action);
 
         return action.invoke(formats);
     }

@@ -1,16 +1,16 @@
 package co.chatchain.mc.forge.configs.formatting.replacements;
 
-import co.chatchain.commons.messages.objects.User;
+import co.chatchain.commons.objects.ClientUser;
 import co.chatchain.mc.forge.util.ColourUtils;
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 
 public enum ClientUserReplacements
 {
-    NAME("client-user-name", User::getName),
-    UID("client-user-uid", User::getUniqueId),
-    NICKNAME("client-user-nickname", User::getNickName),
-    COLOUR("client-user-colour", user -> user.getColour() == null ? null : "§" + ColourUtils.getColourFromHexColour(user.getColour()).getColourCode());
+    NAME("client-user-name", ClientUser::getName),
+    UID("client-user-uid", ClientUser::getUniqueId),
+    NICKNAME("client-user-nickname", ClientUser::getNickName),
+    COLOUR("client-user-colour", clientUser -> clientUser.getColour() == null ? null : "§" + ColourUtils.getColourFromHexColour(clientUser.getColour()).getColourCode());
 
     @Getter
     final String replacement;
@@ -25,20 +25,20 @@ public enum ClientUserReplacements
     }
 
     @Nullable
-    public String GetReplacementObject(final User user)
+    public String GetReplacementObject(final ClientUser clientUser)
     {
-        if (user == null)
+        if (clientUser == null)
             return null;
 
-        return this.action.invoke(user);
+        return this.action.invoke(clientUser);
     }
 
     @Nullable
-    public static String GetReplacementObject(final User user, final String replacementString)
+    public static String GetReplacementObject(final ClientUser clientUser, final String replacementString)
     {
         final ClientUserReplacements userReplacement = GetFromReplacement(replacementString);
 
-        return userReplacement == null ? null : userReplacement.GetReplacementObject(user);
+        return userReplacement == null ? null : userReplacement.GetReplacementObject(clientUser);
     }
 
     @Nullable
@@ -56,6 +56,6 @@ public enum ClientUserReplacements
 
     public interface UserReplacementAction
     {
-        String invoke(final User user);
+        String invoke(final ClientUser clientUser);
     }
 }

@@ -1,6 +1,6 @@
 package co.chatchain.mc.forge.compatibility.sponge;
 
-import co.chatchain.commons.messages.objects.ClientRank;
+import co.chatchain.commons.objects.ClientRank;
 import co.chatchain.mc.forge.ChatChainMC;
 import co.chatchain.mc.forge.util.ColourUtils;
 import net.minecraft.entity.player.EntityPlayer;

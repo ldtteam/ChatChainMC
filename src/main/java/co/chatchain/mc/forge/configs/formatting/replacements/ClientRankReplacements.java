@@ -1,6 +1,6 @@
 package co.chatchain.mc.forge.configs.formatting.replacements;
 
-import co.chatchain.commons.messages.objects.ClientRank;
+import co.chatchain.commons.objects.ClientRank;
 import co.chatchain.mc.forge.util.ColourUtils;
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;

@@ -2,11 +2,14 @@ package co.chatchain.mc.forge;
 
 import co.chatchain.commons.AccessTokenResolver;
 import co.chatchain.commons.ChatChainHubConnection;
-import co.chatchain.commons.messages.objects.Client;
-import co.chatchain.commons.messages.objects.ClientRank;
-import co.chatchain.commons.messages.objects.Group;
-import co.chatchain.commons.messages.objects.User;
-import co.chatchain.commons.messages.objects.messages.*;
+import co.chatchain.commons.objects.Client;
+import co.chatchain.commons.objects.ClientRank;
+import co.chatchain.commons.objects.Group;
+import co.chatchain.commons.objects.ClientUser;
+import co.chatchain.commons.objects.messages.*;
+import co.chatchain.commons.objects.requests.ClientEventRequest;
+import co.chatchain.commons.objects.requests.GenericMessageRequest;
+import co.chatchain.commons.objects.requests.UserEventRequest;
 import co.chatchain.mc.forge.capabilities.GroupProvider;
 import co.chatchain.mc.forge.capabilities.IGroupSettings;
 import co.chatchain.mc.forge.commands.BaseCommand;
@@ -166,15 +169,16 @@ public class ChatChainMC
         logger.info("Connection Status: " + connection.getConnectionState());
 
         connection.onConnection(hub -> {
-            hub.onGenericMessage(APIMessages::ReceiveGenericMessage, GenericMessage.class);
-            hub.onClientEventMessage(APIMessages::ReceiveClientEvent, ClientEventMessage.class);
-            hub.onUserEventMessage(APIMessages::ReceiveUserEvent, UserEventMessage.class);
-            hub.onGetGroupsResponse(APIMessages::ReceiveGroups, GetGroupsResponse.class);
-            hub.onGetClientResponse(APIMessages::ReceiveClient, GetClientResponse.class);
+            hub.onGenericMessage(APIMessages::ReceiveGenericMessage);
+            hub.onClientEventMessage(APIMessages::ReceiveClientEvent);
+            hub.onUserEventMessage(APIMessages::ReceiveUserEvent);
+
+            //hub.onGetGroupsResponse(APIMessages::ReceiveGroups, GetGroupsResponse.class);
+            //hub.onGetClientResponse(APIMessages::ReceiveClient, GetClientResponse.class);
 
             hub.sendGetGroups();
             hub.sendGetClient();
-            hub.sendClientEventMessage(new ClientEventMessage("START"));
+            hub.sendClientEventMessage(new ClientEventRequest("START", null));
         });
 
         event.registerServerCommand(new BaseCommand());
@@ -201,9 +205,7 @@ public class ChatChainMC
                 userColour = ChatChainSpongePlugin.getPlayerColour(event.getPlayer());
             }
 
-            final User user = new User(event.getUsername(), event.getPlayer().getUniqueID().toString(), null, userColour, clientRanks);
-
-            final GenericMessage message = new GenericMessage(groupSettings.getTalkingGroup(), user, event.getMessage(), false);
+            final ClientUser user = new ClientUser(event.getUsername(), event.getPlayer().getUniqueID().toString(), null, userColour, clientRanks);
 
             if (groupSettings.getTalkingGroup() == null)
             {
@@ -230,7 +232,9 @@ public class ChatChainMC
                 }
             }
 
-            final GroupConfig groupConfig = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(groupSettings.getTalkingGroup().getGroupId());
+            final GenericMessageRequest request = new GenericMessageRequest(groupSettings.getTalkingGroup().getId(), user, event.getMessage());
+
+            final GroupConfig groupConfig = ChatChainMC.instance.getGroupsConfig().getGroupStorage().get(groupSettings.getTalkingGroup().getId());
 
             if (!groupConfig.getPlayersCanTalk().contains(event.getPlayer()))
             {
@@ -247,9 +251,10 @@ public class ChatChainMC
 
             if (ChatChainMC.instance.connection.getConnectionState() == HubConnectionState.CONNECTED)
             {
-                ChatChainMC.instance.connection.sendGenericMessage(message);
+                ChatChainMC.instance.connection.sendGenericMessage(request);
             }
 
+            final GenericMessageMessage message = new GenericMessageMessage(ChatChainMC.instance.getClient(), ChatChainMC.instance.getClient().getId(), groupSettings.getTalkingGroup(), user, event.getMessage());
             final ITextComponent messageToSend = new TextComponentString(ReplacementUtils.getFormat(message, ChatChainMC.instance.getClient()));
 
             event.setComponent(messageToSend);
@@ -272,9 +277,17 @@ public class ChatChainMC
     {
         if (event.player != null && !event.player.world.isRemote && ChatChainMC.instance.connection.getConnectionState() == HubConnectionState.CONNECTED)
         {
-            final User user = new User(event.player.getName(), event.player.getUniqueID().toString());
+            final List<ClientRank> clientRanks = new ArrayList<>();
+            String userColour = null;
+            if (ChatChainMC.instance.isSpongeIsPresent() && ChatChainMC.instance.getMainConfig().isUseSponge())
+            {
+                clientRanks.addAll(ChatChainSpongePlugin.getPlayerRanks(event.player));
+                userColour = ChatChainSpongePlugin.getPlayerColour(event.player);
+            }
 
-            ChatChainMC.instance.connection.sendUserEventMessage(new UserEventMessage("LOGIN", user));
+            final ClientUser user = new ClientUser(event.player.getName(), event.player.getUniqueID().toString(), null, userColour, clientRanks);
+
+            ChatChainMC.instance.connection.sendUserEventMessage(new UserEventRequest(user, "LOGIN", null));
         }
     }
 
@@ -283,9 +296,17 @@ public class ChatChainMC
     {
         if (event.player != null && !event.player.world.isRemote && ChatChainMC.instance.connection.getConnectionState() == HubConnectionState.CONNECTED)
         {
-            final User user = new User(event.player.getName(), event.player.getUniqueID().toString());
+            final List<ClientRank> clientRanks = new ArrayList<>();
+            String userColour = null;
+            if (ChatChainMC.instance.isSpongeIsPresent() && ChatChainMC.instance.getMainConfig().isUseSponge())
+            {
+                clientRanks.addAll(ChatChainSpongePlugin.getPlayerRanks(event.player));
+                userColour = ChatChainSpongePlugin.getPlayerColour(event.player);
+            }
 
-            ChatChainMC.instance.connection.sendUserEventMessage(new UserEventMessage("LOGOUT", user));
+            final ClientUser user = new ClientUser(event.player.getName(), event.player.getUniqueID().toString(), null, userColour, clientRanks);
+
+            ChatChainMC.instance.connection.sendUserEventMessage(new UserEventRequest(user, "LOGOUT", null));
         }
     }
 
@@ -295,10 +316,19 @@ public class ChatChainMC
         if (event.getEntity() instanceof EntityPlayer
                 && !event.getEntity().world.isRemote && ChatChainMC.instance.connection.getConnectionState() == HubConnectionState.CONNECTED)
         {
-            final User user = new User(event.getEntity().getName(), event.getEntity().getUniqueID().toString());
+            final EntityPlayer player = (EntityPlayer) event.getEntity();
 
+            final List<ClientRank> clientRanks = new ArrayList<>();
+            String userColour = null;
+            if (ChatChainMC.instance.isSpongeIsPresent() && ChatChainMC.instance.getMainConfig().isUseSponge())
+            {
+                clientRanks.addAll(ChatChainSpongePlugin.getPlayerRanks(player));
+                userColour = ChatChainSpongePlugin.getPlayerColour(player);
+            }
 
-            ChatChainMC.instance.connection.sendUserEventMessage(new UserEventMessage("DEATH", user));
+            final ClientUser user = new ClientUser(player.getName(), player.getUniqueID().toString(), null, userColour, clientRanks);
+
+            ChatChainMC.instance.connection.sendUserEventMessage(new UserEventRequest(user, "DEATH", null));
         }
     }
 

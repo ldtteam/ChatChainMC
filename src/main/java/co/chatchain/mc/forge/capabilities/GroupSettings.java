@@ -1,6 +1,6 @@
 package co.chatchain.mc.forge.capabilities;
 
-import co.chatchain.commons.messages.objects.Group;
+import co.chatchain.commons.objects.Group;
 import co.chatchain.mc.forge.ChatChainMC;
 
 import java.util.ArrayList;
@@ -15,13 +15,13 @@ public class GroupSettings implements IGroupSettings
     @Override
     public void addIgnoredGroup(Group group)
     {
-        this.ignoredGroups.add(group.getGroupId());
+        this.ignoredGroups.add(group.getId());
     }
 
     @Override
     public void removeIgnoredGroup(Group group)
     {
-        this.ignoredGroups.remove(group.getGroupId());
+        this.ignoredGroups.remove(group.getId());
     }
 
     @Override
@@ -43,7 +43,7 @@ public class GroupSettings implements IGroupSettings
     @Override
     public void setTalkingGroup(Group group)
     {
-        this.talkingGroup = group.getGroupId();
+        this.talkingGroup = group.getId();
     }
 
     @Override
