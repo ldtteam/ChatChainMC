@@ -173,11 +173,8 @@ public class ChatChainMC
             hub.onClientEventMessage(APIMessages::ReceiveClientEvent);
             hub.onUserEventMessage(APIMessages::ReceiveUserEvent);
 
-            //hub.onGetGroupsResponse(APIMessages::ReceiveGroups, GetGroupsResponse.class);
-            //hub.onGetClientResponse(APIMessages::ReceiveClient, GetClientResponse.class);
-
-            hub.sendGetGroups();
-            hub.sendGetClient();
+            APIMessages.ReceiveGroups(hub.sendGetGroups().blockingGet());
+            APIMessages.ReceiveClient(hub.sendGetClient().blockingGet());
             hub.sendClientEventMessage(new ClientEventRequest("START", null));
         });
 
