@@ -2,10 +2,13 @@ package co.chatchain.mc.forge;
 
 import co.chatchain.commons.AccessTokenResolver;
 import co.chatchain.commons.ChatChainHubConnection;
-import co.chatchain.commons.messages.objects.Client;
-import co.chatchain.commons.messages.objects.Group;
-import co.chatchain.commons.messages.objects.User;
-import co.chatchain.commons.messages.objects.messages.*;
+import co.chatchain.commons.objects.Client;
+import co.chatchain.commons.objects.ClientUser;
+import co.chatchain.commons.objects.Group;
+import co.chatchain.commons.objects.messages.*;
+import co.chatchain.commons.objects.requests.ClientEventRequest;
+import co.chatchain.commons.objects.requests.GenericMessageRequest;
+import co.chatchain.commons.objects.requests.UserEventRequest;
 import co.chatchain.mc.forge.capabilities.GroupProvider;
 import co.chatchain.mc.forge.capabilities.IGroupSettings;
 import co.chatchain.mc.forge.commands.EntryPoint;
@@ -52,6 +55,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 
 @Mod(ChatChainMC.MOD_ID)
 @Mod.EventBusSubscriber
@@ -134,15 +138,13 @@ public class ChatChainMC
 
         connection = new ChatChainHubConnection(getMainConfig().getApiUrl(), accessToken);
         connection.onConnection(hub -> {
-            hub.onGenericMessage(APIMessages::ReceiveGenericMessage, GenericMessage.class);
-            hub.onClientEventMessage(APIMessages::ReceiveClientEvent, ClientEventMessage.class);
-            hub.onUserEventMessage(APIMessages::ReceiveUserEvent, UserEventMessage.class);
-            hub.onGetGroupsResponse(APIMessages::ReceiveGroups, GetGroupsResponse.class);
-            hub.onGetClientResponse(APIMessages::ReceiveClient, GetClientResponse.class);
+            hub.onGenericMessage(APIMessages::ReceiveGenericMessage);
+            hub.onClientEventMessage(APIMessages::ReceiveClientEvent);
+            hub.onUserEventMessage(APIMessages::ReceiveUserEvent);
 
-            hub.sendGetGroups();
-            hub.sendGetClient();
-            hub.sendClientEventMessage(new ClientEventMessage("START"));
+            APIMessages.ReceiveGroups(hub.sendGetGroups().blockingGet());
+            APIMessages.ReceiveClient(hub.sendGetClient().blockingGet());
+            hub.sendClientEventMessage(new ClientEventRequest("START", null));
 
             Log.getLogger().info("Connection Status: " + hub.getConnectionState());
         });
@@ -167,9 +169,7 @@ public class ChatChainMC
 
     private void handleChatMessage(final IGroupSettings groupSettings, ServerChatEvent event)
     {
-        final User user = new User(event.getUsername(), event.getPlayer().getUniqueID().toString(), null);
-
-        final GenericMessage message = new GenericMessage(groupSettings.getTalkingGroup(), user, event.getMessage(), false);
+        final ClientUser user = new ClientUser(event.getUsername(), event.getPlayer().getUniqueID().toString(), null, null, new ArrayList<>());
 
         if (groupSettings.getTalkingGroup() == null)
         {
@@ -196,7 +196,9 @@ public class ChatChainMC
             }
         }
 
-        final GroupConfig groupConfig = getGroupsConfig().getGroupStorage().get(groupSettings.getTalkingGroup().getGroupId());
+        final GenericMessageRequest request = new GenericMessageRequest(groupSettings.getTalkingGroup().getId(), event.getMessage(), user);
+
+        final GroupConfig groupConfig = getGroupsConfig().getGroupStorage().get(groupSettings.getTalkingGroup().getId());
 
         if (!groupConfig.getPlayersCanTalk().contains(event.getPlayer()))
         {
@@ -213,8 +215,10 @@ public class ChatChainMC
 
         if (connection.getConnectionState() == HubConnectionState.CONNECTED)
         {
-            connection.sendGenericMessage(message);
+            connection.sendGenericMessage(request);
         }
+
+        final GenericMessageMessage message = new GenericMessageMessage(client, client.getId(), groupSettings.getTalkingGroup(), event.getMessage(), user);
 
         final ITextComponent messageToSend = new StringTextComponent(ReplacementUtils.getFormat(message, getClient()));
 
@@ -237,9 +241,9 @@ public class ChatChainMC
     {
         if (event.getPlayer() != null && !event.getPlayer().world.isRemote && connection.getConnectionState() == HubConnectionState.CONNECTED)
         {
-            final User user = new User(event.getPlayer().getName().getString(), event.getPlayer().getUniqueID().toString());
+            final ClientUser user = new ClientUser(event.getPlayer().getName().getString(), event.getPlayer().getUniqueID().toString(), null, null, new ArrayList<>());
 
-            connection.sendUserEventMessage(new UserEventMessage("LOGIN", user));
+            connection.sendUserEventMessage(new UserEventRequest(user, "LOGIN", null));
         }
     }
 
@@ -248,9 +252,9 @@ public class ChatChainMC
     {
         if (event.getPlayer() != null && !event.getPlayer().world.isRemote && connection.getConnectionState() == HubConnectionState.CONNECTED)
         {
-            final User user = new User(event.getPlayer().getName().getString(), event.getPlayer().getUniqueID().toString());
+            final ClientUser user = new ClientUser(event.getPlayer().getName().getString(), event.getPlayer().getUniqueID().toString(), null, null, new ArrayList<>());
 
-            connection.sendUserEventMessage(new UserEventMessage("LOGOUT", user));
+            connection.sendUserEventMessage(new UserEventRequest(user, "LOGOUT", null));
         }
     }
 
@@ -260,9 +264,9 @@ public class ChatChainMC
         if (event.getEntity() instanceof PlayerEntity
                 && !event.getEntity().world.isRemote && connection.getConnectionState() == HubConnectionState.CONNECTED)
         {
-            final User user = new User(event.getEntity().getName().getString(), event.getEntity().getUniqueID().toString());
+            final ClientUser user = new ClientUser(event.getEntity().getName().getString(), event.getEntity().getUniqueID().toString(), null, null, new ArrayList<>());
 
-            connection.sendUserEventMessage(new UserEventMessage("DEATH", user));
+            connection.sendUserEventMessage(new UserEventRequest(user, "DEATH", null));
         }
     }
 

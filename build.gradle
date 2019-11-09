@@ -60,7 +60,7 @@ dependencies {
     
     compile 'io.reactivex.rxjava2:rxjava:2.2.2'
 
-    shadow 'co.chatchain:commons:31904'
+    shadow 'co.chatchain:commons:32925'
 }
 
 minecraft {
