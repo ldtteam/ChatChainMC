@@ -1,6 +1,6 @@
 package co.chatchain.mc.forge.capabilities;
 
-import co.chatchain.commons.messages.objects.Group;
+import co.chatchain.commons.objects.Group;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
@@ -12,7 +12,7 @@ import java.util.concurrent.Callable;
 public interface IGroupSettings
 {
 
-    void addIgnoredGroup(final co.chatchain.commons.messages.objects.Group group);
+    void addIgnoredGroup(final co.chatchain.commons.objects.Group group);
 
     void removeIgnoredGroup(final Group group);
 
