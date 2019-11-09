@@ -196,7 +196,7 @@ public class ChatChainMC
             }
         }
 
-        final GenericMessageRequest request = new GenericMessageRequest(groupSettings.getTalkingGroup().getId(), user, event.getMessage());
+        final GenericMessageRequest request = new GenericMessageRequest(groupSettings.getTalkingGroup().getId(), event.getMessage(), user);
 
         final GroupConfig groupConfig = getGroupsConfig().getGroupStorage().get(groupSettings.getTalkingGroup().getId());
 
@@ -218,7 +218,7 @@ public class ChatChainMC
             connection.sendGenericMessage(request);
         }
 
-        final GenericMessageMessage message = new GenericMessageMessage(client, client.getId(), groupSettings.getTalkingGroup(), user, event.getMessage());
+        final GenericMessageMessage message = new GenericMessageMessage(client, client.getId(), groupSettings.getTalkingGroup(), event.getMessage(), user);
 
         final ITextComponent messageToSend = new StringTextComponent(ReplacementUtils.getFormat(message, getClient()));
 
