@@ -1,5 +1,6 @@
 package co.chatchain.mc.forge.configs;
 
+import co.chatchain.commons.configuration.AbstractConfig;
 import co.chatchain.commons.interfaces.IConnectionConfig;
 import co.chatchain.mc.forge.util.Log;
 import lombok.Getter;

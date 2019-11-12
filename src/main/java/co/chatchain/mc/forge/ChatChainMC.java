@@ -2,6 +2,7 @@ package co.chatchain.mc.forge;
 
 import co.chatchain.commons.ChatChainHubConnection;
 import co.chatchain.commons.HubModule;
+import co.chatchain.commons.configuration.AbstractConfig;
 import co.chatchain.commons.configuration.ConfigurationModule;
 import co.chatchain.commons.core.CoreModule;
 import co.chatchain.commons.core.entities.Client;
@@ -45,16 +46,11 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.ConfigurationOptions;
 import ninja.leaping.configurate.gson.GsonConfigurationLoader;
-import ninja.leaping.configurate.loader.ConfigurationLoader;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializers;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 
@@ -260,29 +256,6 @@ public class ChatChainMC
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private <M extends AbstractConfig> M getConfig(Path file, Class<M> clazz, ConfigurationLoader loader)
-    {
-        try
-        {
-            if (!file.toFile().exists())
-            {
-                Files.createFile(file);
-            }
-
-            @SuppressWarnings("UnstableApiUsage") TypeToken token = TypeToken.of(clazz);
-            ConfigurationNode node = loader.load(ConfigurationOptions.defaults());
-            M config = (M) node.getValue(token, clazz.newInstance());
-            config.init(loader, node, token);
-            config.save();
-            return config;
-        } catch (IOException | ObjectMappingException | IllegalAccessException | InstantiationException e)
-        {
-            Log.getLogger().warn("Getting the config failed", e);
-            return null;
-        }
-    }
-
     public void reloadConfigs()
     {
         if (!configDir.exists())
@@ -300,11 +273,11 @@ public class ChatChainMC
         TypeSerializers.getDefaultSerializers().registerType(TypeToken.of(Group.class), new GroupTypeSerializer());
 
         final Path mainConfigPath = configDir.toPath().resolve("main.json");
-        mainConfig = getConfig(mainConfigPath, MainConfig.class,
+        mainConfig = AbstractConfig.getConfig(mainConfigPath, MainConfig.class,
                 GsonConfigurationLoader.builder().setPath(mainConfigPath).build());
 
         final Path groupsConfigPath = configDir.toPath().resolve("groups.json");
-        groupsConfig = getConfig(groupsConfigPath, GroupsConfig.class,
+        groupsConfig = AbstractConfig.getConfig(groupsConfigPath, GroupsConfig.class,
                 GsonConfigurationLoader.builder().setPath(groupsConfigPath).build());
     }
 }
