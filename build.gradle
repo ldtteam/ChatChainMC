@@ -109,6 +109,7 @@ shadowJar {
     
     relocate('com.typesafe.config', 'co.chatchain.typesafe.config')
     relocate('com.google', 'co.chatchain.google')
+    relocate('javax.inject', 'co.chatchain.inject')
 }
 
 reobf {
