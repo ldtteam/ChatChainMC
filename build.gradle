@@ -107,7 +107,8 @@ shadowJar {
 
     exclude 'dummyThing'
     
-    relocate('com.typesafe.config', 'configurate.typesafe.config')
+    relocate('com.typesafe.config', 'co.chatchain.typesafe.config')
+    relocate('com.google', 'co.chatchain.google')
 }
 
 reobf {
