@@ -10,7 +10,7 @@ public enum CustomClientUserReplacements
     NAME("client-user-name", ClientUser::getName),
     UID("client-user-uid", ClientUser::getUniqueId),
     NICKNAME("client-user-nickname", ClientUser::getNickName),
-    COLOUR("client-user-colour", user -> ColourUtils.getColourFromHexColour(user.getColour()).getColourCode());
+    COLOUR("client-user-colour", user -> "§" + ColourUtils.getColourFromHexColour(user.getColour()).getColourCode());
 
     private final String replacement;
     private final UserReplacementAction action;

@@ -8,6 +8,7 @@ import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 import java.util.HashMap;
 import java.util.Map;
 
+@SuppressWarnings("CanBeFinal")
 @ConfigSerializable
 public class GroupsConfig extends AbstractConfig
 {

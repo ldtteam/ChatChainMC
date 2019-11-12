@@ -8,9 +8,6 @@ import com.mojang.brigadier.exceptions.CommandExceptionType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.command.CommandSource;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Interface for all commands
  */
@@ -21,13 +18,14 @@ public abstract class AbstractCommand
      *
      * @return new built command
      */
+    @SuppressWarnings("unused")
     protected static LiteralArgumentBuilder<CommandSource> build()
     {
         throw new RuntimeException("Missing command builder!");
     }
 
     /**
-     * Creates new subcommand, used for subcommands and type picking.
+     * Creates new sub command, used for sub commands and type picking.
      *
      * @param name subcommand name
      * @return new node builder
@@ -74,18 +72,13 @@ public abstract class AbstractCommand
     /**
      * Our dummy exception type
      */
-    public static class ChatChainMCCommandExceptionType implements CommandExceptionType
+    @SuppressWarnings("unused")
+    protected static class ChatChainMCCommandExceptionType implements CommandExceptionType
     {
-        /**
-         * Creates a dummy exception type
-         */
-        public ChatChainMCCommandExceptionType()
-        {
-        }
     }
 
     /**
-     * Class for building command trees efectively
+     * Class for building command trees effectively
      */
     protected static class CommandTree
     {
@@ -93,10 +86,6 @@ public abstract class AbstractCommand
          * Tree root node
          */
         private final LiteralArgumentBuilder<CommandSource> rootNode;
-        /**
-         * List of child trees, commands are directly baked into rootNode
-         */
-        private final List<CommandTree> childNodes;
 
         /**
          * Creates new command tree.
@@ -106,25 +95,12 @@ public abstract class AbstractCommand
         protected CommandTree(final String commandName)
         {
             rootNode = newLiteral(commandName);
-            childNodes = new ArrayList<>();
-        }
-
-        /**
-         * Adds new tree as leaf into this tree.
-         *
-         * @param tree new tree to add
-         * @return this
-         */
-        protected CommandTree addNode(final CommandTree tree)
-        {
-            childNodes.add(tree);
-            return this;
         }
 
         /**
          * Adds new command as leaf into this tree.
          *
-         * @param command new commnad to add
+         * @param command new command to add
          * @return this
          */
         protected CommandTree addNode(final LiteralArgumentBuilder<CommandSource> command)
@@ -140,10 +116,6 @@ public abstract class AbstractCommand
          */
         protected LiteralArgumentBuilder<CommandSource> build()
         {
-            for (final CommandTree ct : childNodes)
-            {
-                addNode(ct.build());
-            }
             return rootNode;
         }
     }

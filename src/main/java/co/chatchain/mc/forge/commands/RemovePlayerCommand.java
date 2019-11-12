@@ -14,7 +14,6 @@ import net.minecraft.util.text.StringTextComponent;
 
 public class RemovePlayerCommand extends AbstractCommand
 {
-
     private final static String NAME = "remove-player";
 
     private final static String GROUP_NAME = "groupName";

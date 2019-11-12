@@ -9,7 +9,7 @@ import java.util.List;
 public class GroupSettings implements IGroupSettings
 {
 
-    private List<String> ignoredGroups = new ArrayList<>();
+    private final List<String> ignoredGroups = new ArrayList<>();
     private String talkingGroup = ChatChainMC.INSTANCE.getGroupsConfig().getDefaultGroup();
 
     @Override

@@ -71,10 +71,10 @@ public class ColourUtils
 
     private static double colourDistance(final Color colour1, final Color colour2)
     {
-        final double redSqrd = Math.pow(colour1.getRed() -colour2.getRed(), 2);
-        final double greenSqrd = Math.pow(colour1.getGreen() - colour2.getGreen(), 2);
-        final double blueSqrd = Math.pow(colour1.getBlue() - colour2.getBlue(), 2);
-        return Math.sqrt(redSqrd + greenSqrd + blueSqrd);
+        final double redSqrt = Math.pow(colour1.getRed() -colour2.getRed(), 2);
+        final double greenSqrt = Math.pow(colour1.getGreen() - colour2.getGreen(), 2);
+        final double blueSqrt = Math.pow(colour1.getBlue() - colour2.getBlue(), 2);
+        return Math.sqrt(redSqrt + greenSqrt + blueSqrt);
     }
 
     public static Colour getColourFromHexColour(final String hexColour)

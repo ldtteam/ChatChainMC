@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@SuppressWarnings("CanBeFinal")
 @ConfigSerializable
 public class GroupConfig
 {
@@ -35,7 +36,7 @@ public class GroupConfig
 
     public String getCommandName()
     {
-        if (commandName == null || commandName.isEmpty())
+        if ((commandName == null || commandName.isEmpty()) && group.getName() != null)
         {
             return group.getName().replace(" ", "");
         }

@@ -9,6 +9,7 @@ import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+@SuppressWarnings("CanBeFinal")
 @ConfigSerializable
 public class MainConfig extends AbstractConfig implements IConnectionConfig
 {
