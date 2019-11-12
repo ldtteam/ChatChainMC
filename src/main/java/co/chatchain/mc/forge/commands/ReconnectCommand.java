@@ -4,6 +4,7 @@ import co.chatchain.mc.forge.ChatChainMC;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.command.CommandSource;
 
+@SuppressWarnings("SameReturnValue")
 public class ReconnectCommand extends AbstractCommand
 {
     private final static String NAME = "reconnect";

@@ -8,9 +8,9 @@ import net.minecraft.command.arguments.EntityArgument;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.text.StringTextComponent;
 
+@SuppressWarnings({"SameReturnValue", "unused"})
 public class UUIDCommand extends AbstractCommand
 {
-
     private final static String NAME = "uuid";
 
     private final static String PLAYER = "player";

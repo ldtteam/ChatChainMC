@@ -12,9 +12,9 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.text.StringTextComponent;
 
+@SuppressWarnings("ALL")
 public class TalkInGroupCommand extends AbstractCommand
 {
-
     private final static String NAME = "talk";
 
     private static final String GROUP_NAME = "groupName";

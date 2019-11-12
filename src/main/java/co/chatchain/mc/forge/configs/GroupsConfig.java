@@ -1,6 +1,7 @@
 package co.chatchain.mc.forge.configs;
 
-import co.chatchain.commons.objects.Group;
+import co.chatchain.commons.configuration.AbstractConfig;
+import co.chatchain.commons.core.entities.Group;
 import lombok.Getter;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
@@ -8,6 +9,7 @@ import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 import java.util.HashMap;
 import java.util.Map;
 
+@SuppressWarnings("CanBeFinal")
 @ConfigSerializable
 public class GroupsConfig extends AbstractConfig
 {

@@ -4,6 +4,7 @@ import co.chatchain.mc.forge.ChatChainMC;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.command.CommandSource;
 
+@SuppressWarnings("SameReturnValue")
 public class ReloadCommand extends AbstractCommand
 {
     private final static String NAME = "reload";

@@ -1,6 +1,6 @@
 package co.chatchain.mc.forge.configs;
 
-import co.chatchain.commons.objects.Group;
+import co.chatchain.commons.core.entities.Group;
 import co.chatchain.mc.forge.ChatChainMC;
 import co.chatchain.mc.forge.capabilities.GroupProvider;
 import lombok.Getter;
@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@SuppressWarnings("CanBeFinal")
 @ConfigSerializable
 public class GroupConfig
 {
@@ -35,7 +36,7 @@ public class GroupConfig
 
     public String getCommandName()
     {
-        if (commandName == null || commandName.isEmpty())
+        if ((commandName == null || commandName.isEmpty()) && group.getName() != null)
         {
             return group.getName().replace(" ", "");
         }

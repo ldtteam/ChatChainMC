@@ -1,6 +1,6 @@
 package co.chatchain.mc.forge.capabilities;
 
-import co.chatchain.commons.objects.Group;
+import co.chatchain.commons.core.entities.Group;
 import co.chatchain.mc.forge.ChatChainMC;
 
 import java.util.ArrayList;
@@ -9,7 +9,7 @@ import java.util.List;
 public class GroupSettings implements IGroupSettings
 {
 
-    private List<String> ignoredGroups = new ArrayList<>();
+    private final List<String> ignoredGroups = new ArrayList<>();
     private String talkingGroup = ChatChainMC.INSTANCE.getGroupsConfig().getDefaultGroup();
 
     @Override
