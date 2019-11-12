@@ -1,6 +1,6 @@
 package co.chatchain.mc.forge.configs;
 
-import co.chatchain.commons.objects.Group;
+import co.chatchain.commons.core.entities.Group;
 import co.chatchain.mc.forge.ChatChainMC;
 import co.chatchain.mc.forge.capabilities.GroupProvider;
 import lombok.Getter;

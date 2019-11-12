@@ -1,6 +1,6 @@
 package co.chatchain.mc.forge.configs;
 
-import co.chatchain.commons.objects.Group;
+import co.chatchain.commons.core.entities.Group;
 import lombok.Getter;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;

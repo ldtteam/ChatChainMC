@@ -1,6 +1,6 @@
 package co.chatchain.mc.forge.capabilities;
 
-import co.chatchain.commons.objects.Group;
+import co.chatchain.commons.core.entities.Group;
 import net.minecraft.nbt.INBT;
 import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
