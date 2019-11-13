@@ -38,7 +38,6 @@ sourceSets {
 }
 
 repositories {
-    mavenLocal()
     maven {
         name 'LDTTeam - Modding'
         url 'https://ldtteam.jfrog.io/ldtteam/modding/'
@@ -61,7 +60,7 @@ dependencies {
     
     compile 'io.reactivex.rxjava2:rxjava:2.2.2'
 
-    shadow 'co.chatchain:commons:33104'
+    shadow 'co.chatchain:commons:33128'
 }
 
 minecraft {
@@ -107,9 +106,7 @@ shadowJar {
 
     exclude 'dummyThing'
     
-    relocate('com.typesafe.config', 'co.chatchain.typesafe.config')
-    relocate('com.google', 'co.chatchain.google')
-    relocate('javax.inject', 'co.chatchain.inject')
+    relocate('com.typesafe.config', 'configurate.typesafe.config')
 }
 
 reobf {

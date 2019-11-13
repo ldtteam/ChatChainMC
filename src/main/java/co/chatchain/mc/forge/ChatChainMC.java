@@ -127,8 +127,6 @@ public class ChatChainMC
         connection = injector.getInstance(ChatChainHubConnection.class);
         connection.connect(false);
 
-        connection.sendClientEventMessage(new ClientEventRequest("START", null));
-
         EntryPoint.register(event.getCommandDispatcher());
     }
 

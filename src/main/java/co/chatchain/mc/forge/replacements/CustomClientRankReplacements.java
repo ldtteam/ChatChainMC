@@ -11,7 +11,7 @@ public enum CustomClientRankReplacements
     UID("client-rank-uid", ClientRank::getUniqueId),
     PRIORITY("client-rank-priority", rank -> String.valueOf(rank.getPriority())),
     DISPLAY("client-rank-display", ClientRank::getDisplay),
-    COLOUR("client-rank-colour", rank -> "§" + ColourUtils.getColourFromHexColour(rank.getColour()).getColourCode());
+    COLOUR("client-rank-colour", rank -> rank.getColour() == null ? null : "§" + ColourUtils.getColourFromHexColour(rank.getColour()).getColourCode());
 
     private final String replacement;
     private final ClientRankReplacementAction action;
