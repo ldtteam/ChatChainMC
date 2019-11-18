@@ -1,26 +1,28 @@
 package co.chatchain.mc.forge;
 
-import co.chatchain.commons.AccessTokenResolver;
 import co.chatchain.commons.ChatChainHubConnection;
-import co.chatchain.commons.objects.Client;
-import co.chatchain.commons.objects.ClientRank;
-import co.chatchain.commons.objects.Group;
-import co.chatchain.commons.objects.ClientUser;
-import co.chatchain.commons.objects.messages.*;
-import co.chatchain.commons.objects.requests.ClientEventRequest;
-import co.chatchain.commons.objects.requests.GenericMessageRequest;
-import co.chatchain.commons.objects.requests.UserEventRequest;
+import co.chatchain.commons.HubModule;
+import co.chatchain.commons.configuration.AbstractConfig;
+import co.chatchain.commons.configuration.ConfigurationModule;
+import co.chatchain.commons.core.CoreModule;
+import co.chatchain.commons.core.entities.Client;
+import co.chatchain.commons.core.entities.ClientRank;
+import co.chatchain.commons.core.entities.Group;
+import co.chatchain.commons.core.entities.ClientUser;
+import co.chatchain.commons.core.entities.messages.*;
+import co.chatchain.commons.core.entities.requests.GenericMessageRequest;
+import co.chatchain.commons.core.entities.requests.UserEventRequest;
+import co.chatchain.commons.core.interfaces.formatters.IGenericMessageFormatter;
+import co.chatchain.commons.infrastructure.formatters.GenericMessageFormatter;
 import co.chatchain.mc.forge.capabilities.GroupProvider;
 import co.chatchain.mc.forge.capabilities.IGroupSettings;
 import co.chatchain.mc.forge.commands.BaseCommand;
 import co.chatchain.mc.forge.compatibility.sponge.ChatChainSpongePlugin;
 import co.chatchain.mc.forge.configs.*;
-import co.chatchain.mc.forge.configs.formatting.AdvancedFormattingConfig;
-import co.chatchain.mc.forge.configs.formatting.ReplacementUtils;
-import co.chatchain.mc.forge.configs.formatting.FormattingConfig;
-import co.chatchain.mc.forge.message.handling.APIMessages;
 import co.chatchain.mc.forge.serializers.GroupTypeSerializer;
 import com.google.common.reflect.TypeToken;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import com.microsoft.signalr.HubConnectionState;
 import lombok.Getter;
 import lombok.NonNull;
@@ -40,17 +42,12 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.ConfigurationOptions;
 import ninja.leaping.configurate.gson.GsonConfigurationLoader;
-import ninja.leaping.configurate.loader.ConfigurationLoader;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializers;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -80,8 +77,6 @@ public class ChatChainMC
     @Getter
     private Logger logger = null;
 
-    private AccessTokenResolver accessToken = null;
-
     @Getter
     private ChatChainHubConnection connection = null;
 
@@ -92,14 +87,7 @@ public class ChatChainMC
     private GroupsConfig groupsConfig;
 
     @Getter
-    private FormattingConfig formattingConfig;
-
-    @Getter
-    private AdvancedFormattingConfig advancedFormattingConfig;
-
-    @Getter
-    @Setter
-    private Client client;
+    private Injector injector;
 
     @Getter
     @Setter
@@ -123,23 +111,17 @@ public class ChatChainMC
             }
         }
 
+        //noinspection UnstableApiUsage
         TypeSerializers.getDefaultSerializers().registerType(TypeToken.of(Group.class), new GroupTypeSerializer());
 
         final Path mainConfigPath = configDir.toPath().resolve("main.json");
-        mainConfig = getConfig(mainConfigPath, MainConfig.class,
+        mainConfig = AbstractConfig.getConfig(mainConfigPath, MainConfig.class,
                 GsonConfigurationLoader.builder().setPath(mainConfigPath).build());
 
         final Path groupsConfigPath = configDir.toPath().resolve("groups.json");
-        groupsConfig = getConfig(groupsConfigPath, GroupsConfig.class,
+        groupsConfig = AbstractConfig.getConfig(groupsConfigPath, GroupsConfig.class,
                 GsonConfigurationLoader.builder().setPath(groupsConfigPath).build());
 
-        final Path formattingConfigPath = configDir.toPath().resolve("formatting.json");
-        formattingConfig = getConfig(formattingConfigPath, FormattingConfig.class,
-                GsonConfigurationLoader.builder().setPath(formattingConfigPath).build());
-
-        final Path advancedFormattingConfigPath = configDir.toPath().resolve("advanced-formatting.json");
-        advancedFormattingConfig = getConfig(advancedFormattingConfigPath, AdvancedFormattingConfig.class,
-                GsonConfigurationLoader.builder().setPath(advancedFormattingConfigPath).build());
         CapabilityManager.INSTANCE.register(IGroupSettings.class, new IGroupSettings.Storage(), new IGroupSettings.Factory());
     }
 
@@ -155,28 +137,17 @@ public class ChatChainMC
     @Mod.EventHandler
     public synchronized void serverStart(FMLServerStartingEvent event)
     {
-        try
+
+        Path formattingConfigPath = configDir.toPath().resolve("formatting.json");
+        if (mainConfig.getAdvancedFormatting())
         {
-            accessToken = new AccessTokenResolver(mainConfig.getClientId(), mainConfig.getClientSecret(), mainConfig.getIdentityUrl());
-        } catch (IOException e)
-        {
-            logger.error("Exception while attempting to get ChatChain Access Token from IdentityServer", e);
+            formattingConfigPath = configDir.toPath().resolve("advanced-formatting.json");
         }
 
-        connection = new ChatChainHubConnection(mainConfig.getApiUrl(), accessToken);
-        connection.connect();
+        injector = Guice.createInjector(new HubModule(), new CoreModule(), new ConfigurationModule(formattingConfigPath, mainConfig.getAdvancedFormatting()), new ChatChainMCModule());
 
-        logger.info("Connection Status: " + connection.getConnectionState());
-
-        connection.onConnection(hub -> {
-            hub.onGenericMessage(APIMessages::ReceiveGenericMessage);
-            hub.onClientEventMessage(APIMessages::ReceiveClientEvent);
-            hub.onUserEventMessage(APIMessages::ReceiveUserEvent);
-
-            APIMessages.ReceiveGroups(hub.sendGetGroups().blockingGet());
-            APIMessages.ReceiveClient(hub.sendGetClient().blockingGet());
-            hub.sendClientEventMessage(new ClientEventRequest("START", null));
-        });
+        connection = injector.getInstance(ChatChainHubConnection.class);
+        connection.connect(false);
 
         event.registerServerCommand(new BaseCommand());
     }
@@ -251,8 +222,16 @@ public class ChatChainMC
                 ChatChainMC.instance.connection.sendGenericMessage(request);
             }
 
-            final GenericMessageMessage message = new GenericMessageMessage(ChatChainMC.instance.getClient(), ChatChainMC.instance.getClient().getId(), groupSettings.getTalkingGroup(), event.getMessage(), user);
-            final ITextComponent messageToSend = new TextComponentString(ReplacementUtils.getFormat(message, ChatChainMC.instance.getClient()));
+            Client client = ChatChainMC.instance.connection.getClient();
+            if (client == null)
+            {
+                client = new Client("client-id", "owner-id", ChatChainMC.instance.getMainConfig().getClientNameIfOffline(), null);
+            }
+
+            final GenericMessageMessage message = new GenericMessageMessage(client, client.getId(), groupSettings.getTalkingGroup(), event.getMessage(), user);
+
+            final IGenericMessageFormatter formatter = ChatChainMC.instance.injector.getInstance(GenericMessageFormatter.class);
+            final ITextComponent messageToSend = new TextComponentString(formatter.format(message));
 
             event.setComponent(messageToSend);
 
@@ -329,67 +308,14 @@ public class ChatChainMC
         }
     }
 
-    /*@SubscribeEvent TODO: Disabled until i can figure out a better way to do this, currently the names for advancements aren't always there (some have names, some dont.....)
-    public static void playerAdvancement(AdvancementEvent event)
-    {
-        if (event.getEntityPlayer() != null
-                && !event.getEntity().world.isRemote && ChatChainMC.instance.connection.getConnection().getConnectionState() == HubConnectionState.CONNECTED)
-        {
-            final User user = new User(event.getEntity().getName());
-
-            final Map<String, String> extraEventData = new HashMap<>();
-            if (event.getAdvancement().getDisplay() != null)
-            {
-                extraEventData.put("achievement-name", event.getAdvancement().getDisplayText().getUnformattedText());
-                ChatChainMC.instance.getLogger().info("achievement: " + event.getAdvancement().getDisplay().getTitle().getFormattedText());
-            }
-
-            final UserEventMessage messages = new UserEventMessage("ACHIEVEMENT", user, false, extraEventData);
-            //messages.getExtraEventData().put("ACHIEVEMENT_NAME", event.getAdvancement().getDisplayText().getUnformattedText());
-
-            ChatChainMC.instance.connection.sendUserEventMessage(messages);
-        }
-    }*/
-
-    @SuppressWarnings("unchecked")
-    private <M extends AbstractConfig> M getConfig(Path file, Class<M> clazz, ConfigurationLoader loader)
-    {
-        try
-        {
-            if (!file.toFile().exists())
-            {
-                Files.createFile(file);
-            }
-
-            @SuppressWarnings("UnstableApiUsage") TypeToken token = TypeToken.of(clazz);
-            ConfigurationNode node = loader.load(ConfigurationOptions.defaults());
-            M config = (M) node.getValue(token, clazz.newInstance());
-            config.init(loader, node, token);
-            config.save();
-            return config;
-        } catch (IOException | ObjectMappingException | IllegalAccessException | InstantiationException e)
-        {
-            logger.warn("Getting the config failed", e);
-            return null;
-        }
-    }
-
     public void reloadConfigs()
     {
         final Path mainConfigPath = configDir.toPath().resolve("main.json");
-        mainConfig = getConfig(mainConfigPath, MainConfig.class,
+        mainConfig = AbstractConfig.getConfig(mainConfigPath, MainConfig.class,
                 GsonConfigurationLoader.builder().setPath(mainConfigPath).build());
 
         final Path groupsConfigPath = configDir.toPath().resolve("groups.json");
-        groupsConfig = getConfig(groupsConfigPath, GroupsConfig.class,
+        groupsConfig = AbstractConfig.getConfig(groupsConfigPath, GroupsConfig.class,
                 GsonConfigurationLoader.builder().setPath(groupsConfigPath).build());
-
-        final Path formattingConfigPath = configDir.toPath().resolve("formatting.json");
-        formattingConfig = getConfig(formattingConfigPath, FormattingConfig.class,
-                GsonConfigurationLoader.builder().setPath(formattingConfigPath).build());
-
-        final Path advancedFormattingConfigPath = configDir.toPath().resolve("advanced-formatting.json");
-        advancedFormattingConfig = getConfig(advancedFormattingConfigPath, AdvancedFormattingConfig.class,
-                GsonConfigurationLoader.builder().setPath(advancedFormattingConfigPath).build());
     }
 }

@@ -64,15 +64,10 @@ dependencies {
     compile('org.projectlombok:lombok:1.16.18')
     apt('org.projectlombok:lombok:1.16.18')
 
-    compile('ninja.leaping.configurate:configurate-gson:3.3')
-
-    compile('org.java-websocket:Java-WebSocket:1.3.4')
-
     compileOnly('org.spongepowered:spongeapi:' + spongeApiVersion)
-    
-    compile 'io.reactivex.rxjava2:rxjava:2.2.2'
 
-    compile 'co.chatchain:commons:32925'
+    compile 'co.chatchain:commons:33128'
+    shadow 'co.chatchain:commons:33128'
 }
 
 processResources {
@@ -91,13 +86,15 @@ processResources {
 }
 
 shadowJar {
-    from sourceSets.api.output
-    from sourceSets.main.output
+    configurations = [project.configurations.shadow]
 
     exclude 'dummyThing'
 
     exclude 'META-INF'
-    relocate('com.typesafe.config', 'configurate.typesafe.config')
+    relocate('com.typesafe.config', 'co.chatchain.typesafe.config')
+    relocate('ninja.leaping.configurate', "co.chatchain.configurate")
+    relocate('com.google', 'co.chatchain.google')
+    relocate('javax.inject', 'co.chatchain.inject')
 }
 
 reobf {
