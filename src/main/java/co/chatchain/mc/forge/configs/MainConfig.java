@@ -1,12 +1,22 @@
 package co.chatchain.mc.forge.configs;
 
+import co.chatchain.commons.configuration.AbstractConfig;
+import co.chatchain.commons.interfaces.IConnectionConfig;
+import co.chatchain.mc.forge.ChatChainMC;
 import lombok.Getter;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 @ConfigSerializable
-public class MainConfig extends AbstractConfig
+public class MainConfig extends AbstractConfig implements IConnectionConfig
 {
+
+    @Getter
+    @Setting(value = "client-name-if-offline")
+    private String clientNameIfOffline = "MC";
 
     @Getter
     @Setting(value = "clickable-group-mute-or-talk")
@@ -17,6 +27,7 @@ public class MainConfig extends AbstractConfig
     @Setting(value = "client-id", comment = "ChatChainIdentity User ID for this client")
     private String clientId = "ClientId";
 
+    @Override
     public String getClientId()
     {
         return getSystemValueOrConfigValue("CHATCHAIN_CLIENT_ID", clientId);
@@ -27,6 +38,7 @@ public class MainConfig extends AbstractConfig
     @Setting(value = "client-secret", comment = "ChatChainIdentity User password for this client")
     private String clientSecret = "ClientSecret";
 
+    @Override
     public String getClientSecret()
     {
         return getSystemValueOrConfigValue("CHATCHAIN_CLIENT_SECRET", clientSecret);
@@ -37,9 +49,18 @@ public class MainConfig extends AbstractConfig
     @Setting(value = "api-url", comment = "API URL Your client is connecting to")
     private String apiUrl = "https://api.chatchain.co/hubs/chatchain";
 
-    public String getApiUrl()
+    @Override
+    public URL getHubUrl()
     {
-        return getSystemValueOrConfigValue("CHATCHAIN_API_URL", apiUrl);
+        try
+        {
+            return new URL(getSystemValueOrConfigValue("CHATCHAIN_API_URL", apiUrl));
+        }
+        catch (MalformedURLException e)
+        {
+            ChatChainMC.instance.getLogger().error("ChatChain Hub URL is malformed!", e);
+        }
+        return null;
     }
 
     //####### Identity URL #######\\
@@ -47,9 +68,18 @@ public class MainConfig extends AbstractConfig
     @Setting(value = "identity-url", comment = "Identity URL Your client is authenticating against")
     private String identityUrl = "https://identity.chatchain.co/connect/token";
 
-    public String getIdentityUrl()
+    @Override
+    public URL getIdentityUrl()
     {
-        return getSystemValueOrConfigValue("CHATCHAIN_IDENTITY_URL", identityUrl);
+        try
+        {
+            return new URL(getSystemValueOrConfigValue("CHATCHAIN_IDENTITY_URL", identityUrl));
+        }
+        catch (MalformedURLException e)
+        {
+            ChatChainMC.instance.getLogger().error("ChatChain Identity URL is malformed!", e);
+        }
+        return null;
     }
 
     //####### Use Advanced Formatting #######\\
