@@ -66,8 +66,8 @@ dependencies {
 
     compileOnly('org.spongepowered:spongeapi:' + spongeApiVersion)
 
-    compile 'co.chatchain:commons:33128'
-    shadow 'co.chatchain:commons:33128'
+    compile 'co.chatchain:commons:33267'
+    shadow 'co.chatchain:commons:33267'
 }
 
 processResources {
