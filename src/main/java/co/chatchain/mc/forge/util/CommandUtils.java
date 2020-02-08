@@ -10,6 +10,7 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.command.ISuggestionProvider;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -74,5 +75,10 @@ public class CommandUtils
         }
         suggestions.sort(null);
         return ISuggestionProvider.suggest(suggestions, builder);
+    }
+
+    public static CompletableFuture<Suggestions> getStatsSections(final CommandContext<CommandSource> context, final SuggestionsBuilder builder)
+    {
+        return ISuggestionProvider.suggest(Arrays.asList("online-users", "performance"), builder);
     }
 }

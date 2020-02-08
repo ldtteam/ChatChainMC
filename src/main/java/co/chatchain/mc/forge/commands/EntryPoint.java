@@ -20,7 +20,8 @@ public class EntryPoint extends AbstractCommand
                 .addNode(TalkInGroupCommand.build())
                 .addNode(UUIDCommand.build())
                 .addNode(AddPlayerCommand.build())
-                .addNode(RemovePlayerCommand.build());
+                .addNode(RemovePlayerCommand.build())
+                .addNode(StatsCommand.build());
 
         final CommandTree chatChainRootAlias1 = new CommandTree("chatchain")
                 .addNode(IgnoreGroupCommand.build())
@@ -29,7 +30,8 @@ public class EntryPoint extends AbstractCommand
                 .addNode(TalkInGroupCommand.build())
                 .addNode(UUIDCommand.build())
                 .addNode(AddPlayerCommand.build())
-                .addNode(RemovePlayerCommand.build());
+                .addNode(RemovePlayerCommand.build())
+                .addNode(StatsCommand.build());
 
         final CommandTree chatChainRootAlias2 = new CommandTree("chat")
                 .addNode(IgnoreGroupCommand.build())
@@ -38,7 +40,8 @@ public class EntryPoint extends AbstractCommand
                 .addNode(TalkInGroupCommand.build())
                 .addNode(UUIDCommand.build())
                 .addNode(AddPlayerCommand.build())
-                .addNode(RemovePlayerCommand.build());
+                .addNode(RemovePlayerCommand.build())
+                .addNode(StatsCommand.build());
 
         final CommandTree chatChainRootAlias3 = new CommandTree("ccmc")
                 .addNode(IgnoreGroupCommand.build())
@@ -47,7 +50,8 @@ public class EntryPoint extends AbstractCommand
                 .addNode(TalkInGroupCommand.build())
                 .addNode(UUIDCommand.build())
                 .addNode(AddPlayerCommand.build())
-                .addNode(RemovePlayerCommand.build());
+                .addNode(RemovePlayerCommand.build())
+                .addNode(StatsCommand.build());
 
         dispatcher.register(chatChainRoot.build());
         dispatcher.register(chatChainRootAlias1.build());
