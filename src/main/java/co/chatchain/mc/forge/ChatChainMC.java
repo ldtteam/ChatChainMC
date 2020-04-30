@@ -9,7 +9,6 @@ import co.chatchain.commons.core.entities.Client;
 import co.chatchain.commons.core.entities.ClientUser;
 import co.chatchain.commons.core.entities.Group;
 import co.chatchain.commons.core.entities.messages.GenericMessageMessage;
-import co.chatchain.commons.core.entities.requests.ClientEventRequest;
 import co.chatchain.commons.core.entities.requests.GenericMessageRequest;
 import co.chatchain.commons.core.entities.requests.UserEventRequest;
 import co.chatchain.commons.core.interfaces.formatters.IGenericMessageFormatter;

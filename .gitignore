@@ -18,6 +18,8 @@
 .project
 .settings/
 /bin/
+/runClient/
+/runServer/
 
 # intellij files
 /.idea/
