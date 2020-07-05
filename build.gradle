@@ -55,7 +55,7 @@ dependencies {
     compile('org.projectlombok:lombok:1.16.18')
     apt('org.projectlombok:lombok:1.16.18')
 
-    shadow 'co.chatchain:commons:feature-stats#12'
+    shadow 'co.chatchain:commons:42978'
 }
 
 minecraft {
