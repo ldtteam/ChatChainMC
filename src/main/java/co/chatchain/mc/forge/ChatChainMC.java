@@ -2,7 +2,6 @@ package co.chatchain.mc.forge;
 
 import co.chatchain.commons.ChatChainHubConnection;
 import co.chatchain.commons.HubModule;
-import co.chatchain.commons.configuration.AbstractConfig;
 import co.chatchain.commons.configuration.ConfigurationModule;
 import co.chatchain.commons.core.CoreModule;
 import co.chatchain.commons.core.entities.Client;
@@ -10,7 +9,7 @@ import co.chatchain.commons.core.entities.ClientUser;
 import co.chatchain.commons.core.entities.Group;
 import co.chatchain.commons.core.entities.messages.GenericMessageMessage;
 import co.chatchain.commons.core.entities.requests.GenericMessageRequest;
-import co.chatchain.commons.core.entities.requests.UserEventRequest;
+import co.chatchain.commons.core.entities.requests.events.UserEventRequest;
 import co.chatchain.commons.core.interfaces.formatters.IGenericMessageFormatter;
 import co.chatchain.commons.infrastructure.formatters.GenericMessageFormatter;
 import co.chatchain.mc.forge.capabilities.GroupProvider;
@@ -19,6 +18,9 @@ import co.chatchain.mc.forge.commands.EntryPoint;
 import co.chatchain.mc.forge.configs.*;
 import co.chatchain.mc.forge.serializers.GroupTypeSerializer;
 import co.chatchain.mc.forge.util.Log;
+import co.chatchain.mc.forge.util.UserUtils;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -52,6 +54,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Mod(ChatChainMC.MOD_ID)
 @Mod.EventBusSubscriber
@@ -82,6 +86,14 @@ public class ChatChainMC
     private Injector injector;
 
     private File configDir;
+
+    /**
+     * KV map of RequestIDs to Player UUIDs
+     */
+    @Getter
+    private final Cache<String, UUID> statsRequestsCache = CacheBuilder.newBuilder()
+            .expireAfterWrite(10, TimeUnit.MINUTES)
+            .build();
 
     public ChatChainMC()
     {
@@ -121,7 +133,7 @@ public class ChatChainMC
             formattingConfigPath = configDir.toPath().resolve("advanced-formatting.json");
         }
 
-        injector = Guice.createInjector(new HubModule(), new CoreModule(), new ConfigurationModule(formattingConfigPath, mainConfig.getAdvancedFormatting()), new ChatChainMCModule());
+        injector = Guice.createInjector(new HubModule(), new CoreModule(), new ConfigurationModule(formattingConfigPath.toFile(), mainConfig.getAdvancedFormatting()), new ChatChainMCModule());
 
         connection = injector.getInstance(ChatChainHubConnection.class);
         connection.connect(false);
@@ -145,8 +157,7 @@ public class ChatChainMC
 
     private void handleChatMessage(final IGroupSettings groupSettings, ServerChatEvent event)
     {
-        final ClientUser user = new ClientUser(event.getUsername(), event.getPlayer().getUniqueID().toString(), null, null, new ArrayList<>());
-
+        final ClientUser user = UserUtils.getClientUserFromPlayer(event.getPlayer());
         if (groupSettings.getTalkingGroup() == null)
         {
             final String defaultGroupString = getGroupsConfig().getDefaultGroup();

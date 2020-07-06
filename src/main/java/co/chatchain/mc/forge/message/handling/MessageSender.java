@@ -9,6 +9,8 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 
+import java.util.UUID;
+
 public class MessageSender implements IMessageSender
 {
     private static void createGroupInConfig(final Group group)
@@ -38,6 +40,21 @@ public class MessageSender implements IMessageSender
         }
 
         Log.getLogger().info("New Message: " + messageToSend.getFormattedText());
+        return true;
+    }
+
+    @Override
+    public boolean sendStatsMessage(String message, String responseLocation)
+    {
+        final ITextComponent messageToSend = new StringTextComponent(message);
+
+        ServerPlayerEntity playerEntity = ChatChainMC.MINECRAFT_SERVER.getPlayerList().getPlayerByUUID(UUID.fromString(responseLocation));
+
+        if (playerEntity != null)
+        {
+            playerEntity.sendMessage(messageToSend);
+        }
+
         return true;
     }
 }
