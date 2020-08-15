@@ -32,12 +32,15 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Util;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -127,6 +130,11 @@ public class ChatChainMC
     {
         MINECRAFT_SERVER = event.getServer();
 
+        for (ServerWorld dim : MINECRAFT_SERVER.getWorlds())
+        {
+            System.out.println("DIMENSION: " + dim.func_234923_W_().func_240901_a_());
+        }
+
         Path formattingConfigPath = configDir.toPath().resolve("formatting.json");
         if (mainConfig.getAdvancedFormatting())
         {
@@ -137,8 +145,12 @@ public class ChatChainMC
 
         connection = injector.getInstance(ChatChainHubConnection.class);
         connection.connect(false);
+    }
 
-        EntryPoint.register(event.getCommandDispatcher());
+    @SubscribeEvent
+    public void registerCommands(RegisterCommandsEvent event)
+    {
+        EntryPoint.register(event.getDispatcher());
     }
 
     @SubscribeEvent
@@ -170,14 +182,14 @@ public class ChatChainMC
                 }
                 else
                 {
-                    event.getPlayer().sendMessage(new StringTextComponent("§cYou do not have perms for default group in the config!"));
+                    event.getPlayer().sendMessage(new StringTextComponent("§cYou do not have perms for default group in the config!"), Util.DUMMY_UUID);
                     event.setCanceled(true);
                     return;
                 }
             }
             else
             {
-                event.getPlayer().sendMessage(new StringTextComponent("§cPlease set a default group for chat in the config!"));
+                event.getPlayer().sendMessage(new StringTextComponent("§cPlease set a default group for chat in the config!"), Util.DUMMY_UUID);
                 event.setCanceled(true);
                 return;
             }
@@ -189,7 +201,7 @@ public class ChatChainMC
 
         if (!groupConfig.getPlayersCanTalk().contains(event.getPlayer()))
         {
-            event.getPlayer().sendMessage(new StringTextComponent("§cYou do not have perms for your talking group!"));
+            event.getPlayer().sendMessage(new StringTextComponent("§cYou do not have perms for your talking group!"), Util.DUMMY_UUID);
             event.setCanceled(true);
             return;
         }
@@ -197,7 +209,7 @@ public class ChatChainMC
         if (groupSettings.getIgnoredGroups().contains(groupSettings.getTalkingGroup()))
         {
             groupSettings.removeIgnoredGroup(groupSettings.getTalkingGroup());
-            event.getPlayer().sendMessage(new StringTextComponent("Group unmuted"));
+            event.getPlayer().sendMessage(new StringTextComponent("Group unmuted"), Util.DUMMY_UUID);
         }
 
         if (connection.getConnectionState() == HubConnectionState.CONNECTED)
@@ -225,7 +237,7 @@ public class ChatChainMC
 
             for (final ServerPlayerEntity player: groupConfig.getPlayersListening())
             {
-                player.sendMessage(messageToSend);
+                player.sendMessage(messageToSend, Util.DUMMY_UUID);
             }
         }
     }

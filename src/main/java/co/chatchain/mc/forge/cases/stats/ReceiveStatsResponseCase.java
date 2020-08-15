@@ -5,6 +5,7 @@ import co.chatchain.commons.core.entities.messages.stats.StatsResponseMessage;
 import co.chatchain.commons.core.interfaces.cases.stats.IReceiveStatsResponseCase;
 import co.chatchain.mc.forge.ChatChainMC;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.util.Util;
 import net.minecraft.util.text.StringTextComponent;
 
 import java.util.Arrays;
@@ -26,13 +27,13 @@ public class ReceiveStatsResponseCase implements IReceiveStatsResponseCase
 
             if (message.getStatsObject().getOnlineUsers() != null)
             {
-                textComponent.appendText("\n§f[§cStats§f]§r §f[§eOnline Users§f]:§r " + Arrays.toString(message.getStatsObject().getOnlineUsers().stream().map(ClientUser::getName).toArray()));
+                textComponent.appendString("\n§f[§cStats§f]§r §f[§eOnline Users§f]:§r " + Arrays.toString(message.getStatsObject().getOnlineUsers().stream().map(ClientUser::getName).toArray()));
                 allNull = false;
             }
 
             if (message.getStatsObject().getPerformance() != null)
             {
-                textComponent.appendText("\n§f[§cStats§f]§r §f[§ePerformance§f]:§r " + message.getStatsObject().getPerformance() + " " + message.getStatsObject().getPerformanceName());
+                textComponent.appendString("\n§f[§cStats§f]§r §f[§ePerformance§f]:§r " + message.getStatsObject().getPerformance() + " " + message.getStatsObject().getPerformanceName());
                 allNull = false;
             }
 
@@ -43,7 +44,7 @@ public class ReceiveStatsResponseCase implements IReceiveStatsResponseCase
 
             if (playerEntity != null)
             {
-                playerEntity.sendMessage(textComponent);
+                playerEntity.sendMessage(textComponent, Util.DUMMY_UUID);
             }
             return false;
         }

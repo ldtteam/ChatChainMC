@@ -8,7 +8,8 @@ import co.chatchain.commons.core.interfaces.cases.stats.IReceiveStatsRequestCase
 import co.chatchain.commons.interfaces.IChatChainHubConnection;
 import co.chatchain.mc.forge.ChatChainMC;
 import co.chatchain.mc.forge.util.UserUtils;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.server.ServerWorld;
 
 import javax.inject.Inject;
 import java.text.DecimalFormat;
@@ -41,7 +42,12 @@ public class ReceiveStatsRequestCase implements IReceiveStatsRequestCase
 
         if (message.getStatsSection() == null || message.getStatsSection().equals("performance"))
         {
-            long[] times = ChatChainMC.MINECRAFT_SERVER.getTickTime(DimensionType.OVERWORLD);
+            long[] times = null;
+            for (ServerWorld dim : ChatChainMC.MINECRAFT_SERVER.getWorlds())
+            {
+                if (dim.func_234923_W_().func_240901_a_().equals(new ResourceLocation("minecraft:overworld")))
+                    times = ChatChainMC.MINECRAFT_SERVER.getTickTime(dim.func_234923_W_());
+            }
 
             if (times != null)
             {

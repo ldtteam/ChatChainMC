@@ -6,6 +6,7 @@ import co.chatchain.mc.forge.ChatChainMC;
 import co.chatchain.mc.forge.configs.GroupConfig;
 import co.chatchain.mc.forge.util.Log;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.util.Util;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 
@@ -36,10 +37,10 @@ public class MessageSender implements IMessageSender
 
         for (final ServerPlayerEntity player : groupConfig.getPlayersListening())
         {
-            player.sendMessage(messageToSend);
+            player.sendMessage(messageToSend, Util.DUMMY_UUID);
         }
 
-        Log.getLogger().info("New Message: " + messageToSend.getFormattedText());
+        Log.getLogger().info("New Message: " + messageToSend.getUnformattedComponentText());
         return true;
     }
 
@@ -52,7 +53,7 @@ public class MessageSender implements IMessageSender
 
         if (playerEntity != null)
         {
-            playerEntity.sendMessage(messageToSend);
+            playerEntity.sendMessage(messageToSend, Util.DUMMY_UUID);
         }
 
         return true;
