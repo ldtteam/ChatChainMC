@@ -48,7 +48,7 @@ repositories {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.16.1-32.0.108'
+    minecraft 'net.minecraftforge:forge:1.16.2-33.0.42'
 
     compile('org.jetbrains:annotations:15.0')
 
