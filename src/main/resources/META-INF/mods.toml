@@ -1,6 +1,7 @@
 modLoader="javafml"
 loaderVersion="[31,)"
 issueTrackerURL="https://github.com/ldtteam/ChatChainMC/issues/new"
+license="GNU GPL v3"
 [[mods]]
 modId="chatchainmc"
 version="${file.jarVersion}"
