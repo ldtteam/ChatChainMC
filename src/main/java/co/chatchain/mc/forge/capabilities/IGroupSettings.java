@@ -40,7 +40,6 @@ public interface IGroupSettings
 
     class Factory implements Callable<IGroupSettings>
     {
-
         @Nullable
         @Override
         public IGroupSettings call()

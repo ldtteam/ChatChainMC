@@ -162,7 +162,7 @@ public class ChatChainMC
     @SubscribeEvent
     public void mcChatMessage(ServerChatEvent event)
     {
-        final LazyOptional<IGroupSettings> optionalGroupSettings = event.getPlayer().getCapability(GroupProvider.GROUP_SETTINGS_CAP, null);
+        final LazyOptional<IGroupSettings> optionalGroupSettings = event.getPlayer().getCapability(GroupProvider.GROUP_SETTINGS_CAP);
 
         optionalGroupSettings.ifPresent(settings -> this.handleChatMessage(settings, event));
     }

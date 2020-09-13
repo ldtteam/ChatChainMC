@@ -5,10 +5,11 @@ import co.chatchain.mc.forge.ChatChainMC;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class GroupSettings implements IGroupSettings
 {
-
+    public final UUID uuid = UUID.randomUUID();
     private final List<String> ignoredGroups = new ArrayList<>();
     private String talkingGroup = ChatChainMC.INSTANCE.getGroupsConfig().getDefaultGroup();
 

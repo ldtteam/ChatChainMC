@@ -89,7 +89,7 @@ public class GroupConfig
         final List<ServerPlayerEntity> returnList = new ArrayList<>();
         for (final ServerPlayerEntity player : getPlayersForGroup())
         {
-            player.getCapability(GroupProvider.GROUP_SETTINGS_CAP, null).ifPresent(groupSettings ->
+            player.getCapability(GroupProvider.GROUP_SETTINGS_CAP).ifPresent(groupSettings ->
             {
                 if (!groupSettings.getIgnoredGroups().contains(group))
                 {

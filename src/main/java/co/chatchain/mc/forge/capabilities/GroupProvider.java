@@ -12,13 +12,14 @@ import javax.annotation.Nullable;
 public class GroupProvider implements ICapabilityProvider
 {
     @CapabilityInject(IGroupSettings.class)
-    public static Capability<IGroupSettings> GROUP_SETTINGS_CAP;
-    private static final LazyOptional<IGroupSettings> holder = LazyOptional.of(GroupSettings::new);
+    public static Capability<IGroupSettings> GROUP_SETTINGS_CAP = null;
+
+    private final LazyOptional<IGroupSettings> instance = LazyOptional.of(GroupSettings::new);
 
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull final Capability<T> capability, @Nullable final Direction side)
     {
-        return capability == GROUP_SETTINGS_CAP ? holder.cast() : LazyOptional.empty();
+        return GROUP_SETTINGS_CAP.orEmpty(capability, instance);
     }
 }

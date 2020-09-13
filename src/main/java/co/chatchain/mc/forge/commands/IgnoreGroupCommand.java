@@ -51,7 +51,7 @@ public class IgnoreGroupCommand extends AbstractCommand
 
         final GroupConfig finalGroupConfig = groupConfig;
 
-        player.getCapability(GroupProvider.GROUP_SETTINGS_CAP, null).ifPresent(settings -> {
+        player.getCapability(GroupProvider.GROUP_SETTINGS_CAP).ifPresent(settings -> {
             if (settings.getIgnoredGroups().contains(finalGroupConfig.getGroup()))
             {
                 settings.removeIgnoredGroup(finalGroupConfig.getGroup());

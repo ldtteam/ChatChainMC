@@ -55,6 +55,9 @@ dependencies {
     compile('org.projectlombok:lombok:1.16.18')
     apt('org.projectlombok:lombok:1.16.18')
 
+    //compile('ninja.leaping.configurate:configurate-core:3.3')
+
+    compile 'co.chatchain:commons:42978'
     shadow 'co.chatchain:commons:42978'
 }
 
@@ -87,6 +90,8 @@ minecraft {
             // Recommended logging level for the console
             property 'forge.logging.console.level', 'info'
 
+            args 'nogui'
+
             mods {
                 structurize {
                     source sourceSets.main
@@ -101,7 +106,7 @@ shadowJar {
 
     exclude 'dummyThing'
 
-    relocate('com.typesafe.config', 'co.chatchain.typesafe.config')
+    //relocate('com.typesafe.config', 'co.chatchain.typesafe.config')
     relocate('com.google', 'co.chatchain.google')
     relocate('javax.inject', 'co.chatchain.inject')
 }

@@ -45,7 +45,7 @@ public class TalkInGroupCommand extends AbstractCommand
 
         final GroupConfig finalGroupConfig = groupConfig;
 
-        player.getCapability(GroupProvider.GROUP_SETTINGS_CAP, null).ifPresent(settings -> {
+        player.getCapability(GroupProvider.GROUP_SETTINGS_CAP).ifPresent(settings -> {
             settings.setTalkingGroup(finalGroupConfig.getGroup());
             context.getSource().sendFeedback(new StringTextComponent("Talking group set to: " + groupName), true);
         });
