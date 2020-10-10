@@ -9,7 +9,6 @@ import java.util.UUID;
 
 public class GroupSettings implements IGroupSettings
 {
-    public final UUID uuid = UUID.randomUUID();
     private final List<String> ignoredGroups = new ArrayList<>();
     private String talkingGroup = ChatChainMC.INSTANCE.getGroupsConfig().getDefaultGroup();
 
@@ -45,6 +44,12 @@ public class GroupSettings implements IGroupSettings
     public void setTalkingGroup(Group group)
     {
         this.talkingGroup = group.getId();
+    }
+
+    @Override
+    public void setTalkingGroup(String group)
+    {
+        this.talkingGroup = group;
     }
 
     @Override
