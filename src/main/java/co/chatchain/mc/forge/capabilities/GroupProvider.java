@@ -5,9 +5,8 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class GroupProvider implements ICapabilityProvider
 {
@@ -16,9 +15,9 @@ public class GroupProvider implements ICapabilityProvider
 
     private final LazyOptional<IGroupSettings> instance = LazyOptional.of(GroupSettings::new);
 
-    @Nonnull
+    @NotNull
     @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull final Capability<T> capability, @Nullable final Direction side)
+    public <T> LazyOptional<T> getCapability(@NotNull final Capability<T> capability, @Nullable final Direction side)
     {
         return GROUP_SETTINGS_CAP.orEmpty(capability, instance);
     }
