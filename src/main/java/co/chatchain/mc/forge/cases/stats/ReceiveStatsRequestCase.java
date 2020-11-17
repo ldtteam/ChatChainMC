@@ -45,8 +45,8 @@ public class ReceiveStatsRequestCase implements IReceiveStatsRequestCase
             long[] times = null;
             for (ServerWorld dim : ChatChainMC.MINECRAFT_SERVER.getWorlds())
             {
-                if (dim.func_234923_W_().func_240901_a_().equals(new ResourceLocation("minecraft:overworld")))
-                    times = ChatChainMC.MINECRAFT_SERVER.getTickTime(dim.func_234923_W_());
+                if (dim.getDimensionKey().getLocation().equals(new ResourceLocation("minecraft:overworld")))
+                    times = ChatChainMC.MINECRAFT_SERVER.getTickTime(dim.getDimensionKey());
             }
 
             if (times != null)

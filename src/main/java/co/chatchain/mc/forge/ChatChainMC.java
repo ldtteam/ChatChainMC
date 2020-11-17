@@ -132,7 +132,7 @@ public class ChatChainMC
 
         for (ServerWorld dim : MINECRAFT_SERVER.getWorlds())
         {
-            System.out.println("DIMENSION: " + dim.func_234923_W_().func_240901_a_());
+            System.out.println("DIMENSION: " + dim.getDimensionKey().getLocation());
         }
 
         Path formattingConfigPath = configDir.toPath().resolve("formatting.json");
