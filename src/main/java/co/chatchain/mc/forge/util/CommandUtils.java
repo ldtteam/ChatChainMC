@@ -6,8 +6,8 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.ISuggestionProvider;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.SharedSuggestionProvider;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,7 +16,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class CommandUtils
 {
-    public static CompletableFuture<Suggestions> getAllGroupSuggestions(final CommandContext<CommandSource> context, final SuggestionsBuilder builder)
+    public static CompletableFuture<Suggestions> getAllGroupSuggestions(final CommandContext<CommandSourceStack> context, final SuggestionsBuilder builder)
     {
         final List<String> suggestions = new ArrayList<>();
 
@@ -26,20 +26,20 @@ public class CommandUtils
             suggestions.add(groupConfig.getCommandName());
         }
         suggestions.sort(null);
-        return ISuggestionProvider.suggest(suggestions, builder);
+        return SharedSuggestionProvider.suggest(suggestions, builder);
     }
 
-    public static CompletableFuture<Suggestions> getTalkingGroupSuggestions(final CommandContext<CommandSource> context, final SuggestionsBuilder builder)
+    public static CompletableFuture<Suggestions> getTalkingGroupSuggestions(final CommandContext<CommandSourceStack> context, final SuggestionsBuilder builder)
     {
         final List<String> suggestions = new ArrayList<>();
-        final CommandSource source = context.getSource();
+        final CommandSourceStack source = context.getSource();
 
         for (final String groupId : ChatChainMC.INSTANCE.getGroupsConfig().getGroupStorage().keySet())
         {
             final GroupConfig groupConfig = ChatChainMC.INSTANCE.getGroupsConfig().getGroupStorage().get(groupId);
             try
             {
-                if (groupConfig.isCanAllowedChat() && groupConfig.getPlayersForGroup().contains(source.asPlayer()))
+                if (groupConfig.isCanAllowedChat() && groupConfig.getPlayersForGroup().contains(source.getPlayerOrException()))
                 {
                     suggestions.add(groupConfig.getCommandName());
                 }
@@ -50,20 +50,20 @@ public class CommandUtils
             }
         }
         suggestions.sort(null);
-        return ISuggestionProvider.suggest(suggestions, builder);
+        return SharedSuggestionProvider.suggest(suggestions, builder);
     }
 
-    public static CompletableFuture<Suggestions> getIgnorableGroupSuggestions(final CommandContext<CommandSource> context, final SuggestionsBuilder builder)
+    public static CompletableFuture<Suggestions> getIgnorableGroupSuggestions(final CommandContext<CommandSourceStack> context, final SuggestionsBuilder builder)
     {
         final List<String> suggestions = new ArrayList<>();
-        final CommandSource source = context.getSource();
+        final CommandSourceStack source = context.getSource();
 
         for (final String groupId : ChatChainMC.INSTANCE.getGroupsConfig().getGroupStorage().keySet())
         {
             final GroupConfig groupConfig = ChatChainMC.INSTANCE.getGroupsConfig().getGroupStorage().get(groupId);
             try
             {
-                if (groupConfig.getPlayersForGroup().contains(source.asPlayer()))
+                if (groupConfig.getPlayersForGroup().contains(source.getPlayerOrException()))
                 {
                     suggestions.add(groupConfig.getCommandName());
                 }
@@ -74,11 +74,11 @@ public class CommandUtils
             }
         }
         suggestions.sort(null);
-        return ISuggestionProvider.suggest(suggestions, builder);
+        return SharedSuggestionProvider.suggest(suggestions, builder);
     }
 
-    public static CompletableFuture<Suggestions> getStatsSections(final CommandContext<CommandSource> context, final SuggestionsBuilder builder)
+    public static CompletableFuture<Suggestions> getStatsSections(final CommandContext<CommandSourceStack> context, final SuggestionsBuilder builder)
     {
-        return ISuggestionProvider.suggest(Arrays.asList("online-users", "performance"), builder);
+        return SharedSuggestionProvider.suggest(Arrays.asList("online-users", "performance"), builder);
     }
 }

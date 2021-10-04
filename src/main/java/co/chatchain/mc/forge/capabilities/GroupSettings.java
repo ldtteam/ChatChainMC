@@ -2,12 +2,13 @@ package co.chatchain.mc.forge.capabilities;
 
 import co.chatchain.commons.core.entities.Group;
 import co.chatchain.mc.forge.ChatChainMC;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.saveddata.SavedData;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
-public class GroupSettings implements IGroupSettings
+public class GroupSettings extends SavedData implements IGroupSettings
 {
     private final List<String> ignoredGroups = new ArrayList<>();
     private String talkingGroup = ChatChainMC.INSTANCE.getGroupsConfig().getDefaultGroup();
@@ -59,6 +60,12 @@ public class GroupSettings implements IGroupSettings
         {
             return ChatChainMC.INSTANCE.getGroupsConfig().getGroupStorage().get(talkingGroup).getGroup();
         }
+        return null;
+    }
+
+    @Override
+    public CompoundTag save(final CompoundTag p_77763_)
+    {
         return null;
     }
 }

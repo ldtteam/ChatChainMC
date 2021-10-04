@@ -8,9 +8,9 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.minecraft.command.CommandSource;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.level.ServerPlayer;
 
 public class IgnoreGroupCommand extends AbstractCommand
 {
@@ -19,9 +19,9 @@ public class IgnoreGroupCommand extends AbstractCommand
 
     private static final String GROUP_NAME = "groupName";
 
-    private static int onExecute(final CommandContext<CommandSource> context) throws CommandSyntaxException
+    private static int onExecute(final CommandContext<CommandSourceStack> context) throws CommandSyntaxException
     {
-        ServerPlayerEntity player = context.getSource().asPlayer();
+        ServerPlayer player = context.getSource().getPlayerOrException();
         final String groupName = context.getArgument(GROUP_NAME, String.class);
 
         GroupConfig groupConfig = null;
@@ -39,13 +39,13 @@ public class IgnoreGroupCommand extends AbstractCommand
 
         if (groupConfig == null || !groupConfig.getPlayersForGroup().contains(player))
         {
-            context.getSource().sendErrorMessage(new StringTextComponent("This group is invalid!"));
+            context.getSource().sendFailure(new TextComponent("This group is invalid!"));
             return 0;
         }
 
         if (!groupConfig.isGroupIgnorable())
         {
-            context.getSource().sendErrorMessage(new StringTextComponent("This group is not ignorable!"));
+            context.getSource().sendFailure(new TextComponent("This group is not ignorable!"));
             return 0;
         }
 
@@ -55,19 +55,19 @@ public class IgnoreGroupCommand extends AbstractCommand
             if (settings.getIgnoredGroups().contains(finalGroupConfig.getGroup()))
             {
                 settings.removeIgnoredGroup(finalGroupConfig.getGroup());
-                context.getSource().sendFeedback(new StringTextComponent("Group un-ignored"), true);
+                context.getSource().sendSuccess(new TextComponent("Group un-ignored"), true);
             }
             else
             {
                 settings.addIgnoredGroup(finalGroupConfig.getGroup());
-                context.getSource().sendFeedback(new StringTextComponent("Group ignored"), true);
+                context.getSource().sendSuccess(new TextComponent("Group ignored"), true);
             }
         });
 
         return 1;
     }
 
-    protected static LiteralArgumentBuilder<CommandSource> build()
+    protected static LiteralArgumentBuilder<CommandSourceStack> build()
     {
         return newLiteral(NAME)
                 .then(newArgument(GROUP_NAME, StringArgumentType.word()).suggests(CommandUtils::getIgnorableGroupSuggestions)

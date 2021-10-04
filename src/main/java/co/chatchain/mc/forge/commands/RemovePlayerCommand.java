@@ -7,10 +7,10 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.arguments.EntityArgument;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.level.ServerPlayer;
 
 public class RemovePlayerCommand extends AbstractCommand
 {
@@ -20,15 +20,15 @@ public class RemovePlayerCommand extends AbstractCommand
 
     private final static String PLAYER = "player";
 
-    private static int onExecute(final CommandContext<CommandSource> context) throws CommandSyntaxException
+    private static int onExecute(final CommandContext<CommandSourceStack> context) throws CommandSyntaxException
     {
-        if (!context.getSource().hasPermissionLevel(2))
+        if (!context.getSource().hasPermission(2))
         {
-            context.getSource().sendErrorMessage(new StringTextComponent("You must be OP level 2"));
+            context.getSource().sendFailure(new TextComponent("You must be OP level 2"));
             return 0;
         }
 
-        final ServerPlayerEntity player = EntityArgument.getPlayer(context, PLAYER);
+        final ServerPlayer player = EntityArgument.getPlayer(context, PLAYER);
         final String groupName = context.getArgument(GROUP_NAME, String.class);
 
         GroupConfig groupConfig = null;
@@ -46,13 +46,13 @@ public class RemovePlayerCommand extends AbstractCommand
 
         if (groupConfig == null)
         {
-            context.getSource().sendErrorMessage(new StringTextComponent("This group is invalid!"));
+            context.getSource().sendFailure(new TextComponent("This group is invalid!"));
             return 0;
         }
 
-        if (groupConfig.contains(player.getUniqueID()))
+        if (groupConfig.contains(player.getUUID()))
         {
-            groupConfig.remove(player.getUniqueID());
+            groupConfig.remove(player.getUUID());
         }
 
         ChatChainMC.INSTANCE.getGroupsConfig().save();
@@ -60,10 +60,10 @@ public class RemovePlayerCommand extends AbstractCommand
         return 1;
     }
 
-    protected static LiteralArgumentBuilder<CommandSource> build()
+    protected static LiteralArgumentBuilder<CommandSourceStack> build()
     {
         return newLiteral(NAME)
-                .requires(source -> source.hasPermissionLevel(2))
+                .requires(source -> source.hasPermission(2))
                 .then(newArgument(GROUP_NAME, StringArgumentType.word()).suggests(CommandUtils::getAllGroupSuggestions)
                         .then(newArgument(PLAYER, EntityArgument.player())
                                 .executes(RemovePlayerCommand::onExecute)));

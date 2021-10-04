@@ -6,7 +6,7 @@ import co.chatchain.mc.forge.capabilities.GroupProvider;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Delegate;
-import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
@@ -52,7 +52,7 @@ public class GroupConfig
     @Setting("allowed-players")
     private List<UUID> allowedPlayers = new ArrayList<>();
 
-    public List<ServerPlayerEntity> getPlayersForGroup()
+    public List<ServerPlayer> getPlayersForGroup()
     {
         if (allowAllPlayers)
         {
@@ -60,10 +60,10 @@ public class GroupConfig
         }
         else
         {
-            final List<ServerPlayerEntity> returnList = new ArrayList<>();
+            final List<ServerPlayer> returnList = new ArrayList<>();
             for (final UUID uuid : allowedPlayers)
             {
-                final ServerPlayerEntity player = ChatChainMC.MINECRAFT_SERVER.getPlayerList().getPlayerByUUID(uuid);
+                final ServerPlayer player = ChatChainMC.MINECRAFT_SERVER.getPlayerList().getPlayer(uuid);
                 if (ChatChainMC.MINECRAFT_SERVER.getPlayerList().getPlayers().contains(player))
                 {
                     returnList.add(player);
@@ -74,7 +74,7 @@ public class GroupConfig
         }
     }
 
-    public List<ServerPlayerEntity> getPlayersCanTalk()
+    public List<ServerPlayer> getPlayersCanTalk()
     {
         if (!canAllowedChat)
         {
@@ -84,10 +84,10 @@ public class GroupConfig
         return getPlayersForGroup();
     }
 
-    public List<ServerPlayerEntity> getPlayersListening()
+    public List<ServerPlayer> getPlayersListening()
     {
-        final List<ServerPlayerEntity> returnList = new ArrayList<>();
-        for (final ServerPlayerEntity player : getPlayersForGroup())
+        final List<ServerPlayer> returnList = new ArrayList<>();
+        for (final ServerPlayer player : getPlayersForGroup())
         {
             player.getCapability(GroupProvider.GROUP_SETTINGS_CAP).ifPresent(groupSettings ->
             {

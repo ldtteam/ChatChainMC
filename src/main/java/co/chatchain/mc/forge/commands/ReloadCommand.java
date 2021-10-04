@@ -2,7 +2,7 @@ package co.chatchain.mc.forge.commands;
 
 import co.chatchain.mc.forge.ChatChainMC;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import net.minecraft.command.CommandSource;
+import net.minecraft.commands.CommandSourceStack;
 
 @SuppressWarnings("SameReturnValue")
 public class ReloadCommand extends AbstractCommand
@@ -15,7 +15,7 @@ public class ReloadCommand extends AbstractCommand
         return 1;
     }
 
-    protected static LiteralArgumentBuilder<CommandSource> build()
+    protected static LiteralArgumentBuilder<CommandSourceStack> build()
     {
         return newLiteral(NAME)
                 .executes(context -> ReloadCommand.onExecute());

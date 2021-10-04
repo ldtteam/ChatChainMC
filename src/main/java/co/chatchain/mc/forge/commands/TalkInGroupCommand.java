@@ -8,9 +8,9 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.minecraft.command.CommandSource;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.level.ServerPlayer;
 
 @SuppressWarnings("ALL")
 public class TalkInGroupCommand extends AbstractCommand
@@ -19,9 +19,9 @@ public class TalkInGroupCommand extends AbstractCommand
 
     private static final String GROUP_NAME = "groupName";
 
-    private static int onExecute(final CommandContext<CommandSource> context) throws CommandSyntaxException
+    private static int onExecute(final CommandContext<CommandSourceStack> context) throws CommandSyntaxException
     {
-        ServerPlayerEntity player = context.getSource().asPlayer();
+        ServerPlayer player = context.getSource().getPlayerOrException();
         final String groupName = context.getArgument(GROUP_NAME, String.class);
 
         GroupConfig groupConfig = null;
@@ -39,7 +39,7 @@ public class TalkInGroupCommand extends AbstractCommand
 
         if (groupConfig == null || !groupConfig.getPlayersCanTalk().contains(player))
         {
-            context.getSource().sendErrorMessage(new StringTextComponent("This group is invalid!"));
+            context.getSource().sendFailure(new TextComponent("This group is invalid!"));
             return 0;
         }
 
@@ -47,13 +47,13 @@ public class TalkInGroupCommand extends AbstractCommand
 
         player.getCapability(GroupProvider.GROUP_SETTINGS_CAP).ifPresent(settings -> {
             settings.setTalkingGroup(finalGroupConfig.getGroup());
-            context.getSource().sendFeedback(new StringTextComponent("Talking group set to: " + groupName), true);
+            context.getSource().sendSuccess(new TextComponent("Talking group set to: " + groupName), true);
         });
 
         return 1;
     }
 
-    protected static LiteralArgumentBuilder<CommandSource> build()
+    protected static LiteralArgumentBuilder<CommandSourceStack> build()
     {
         return newLiteral(NAME)
                 .then(newArgument(GROUP_NAME, StringArgumentType.word()).suggests(CommandUtils::getTalkingGroupSuggestions)

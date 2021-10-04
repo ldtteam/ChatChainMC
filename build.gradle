@@ -1,30 +1,27 @@
 buildscript {
     repositories {
-        jcenter()
+        maven { url = 'https://maven.minecraftforge.net' }
+        mavenCentral()
         maven {
-            url = 'https://files.minecraftforge.net/maven'
+            url "https://plugins.gradle.org/m2/"
         }
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
+        classpath "io.freefair.gradle:lombok-plugin:6.2.0"
+        classpath "gradle.plugin.com.github.jengelman.gradle.plugins:shadow:7.0.0"
     }
 }
 
-plugins {
-    id 'io.franzbecker.gradle-lombok' version '1.12'
-    id 'net.ltgt.apt' version '0.10'
-    id 'com.github.johnrengelman.shadow' version '2.0.4'
-}
-
-apply plugin: 'java'
-apply plugin: 'idea'
-apply plugin: 'application'
 apply plugin: "net.minecraftforge.gradle"
+apply plugin: "io.freefair.lombok"
+apply plugin: "com.github.johnrengelman.shadow"
 
 group = modGroup
 archivesBaseName = modBaseName
 version = System.getenv()['BUILD_NUMBER'] != null ? System.getenv()['BUILD_NUMBER'] : System.getenv()['TRAVIS_BUILD_NUMBER']
-mainClassName = 'co.chatchain.mc.forge.ChatChainMC'
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(16)
 
 sourceSets {
     main {
@@ -48,21 +45,21 @@ repositories {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.16.4-35.0.1'
+    minecraft 'net.minecraftforge:forge:1.17.1-37.0.75'
 
-    compile('org.jetbrains:annotations:15.0')
+    compileOnly('org.jetbrains:annotations:15.0')
 
-    compile('org.projectlombok:lombok:1.16.18')
-    apt('org.projectlombok:lombok:1.16.18')
+    compileOnly 'org.projectlombok:lombok:1.18.20'
+    annotationProcessor 'org.projectlombok:lombok:1.18.20'
 
     //compile('ninja.leaping.configurate:configurate-core:3.3')
 
-    compile 'co.chatchain:commons:42978'
+    compileOnly 'co.chatchain:commons:42978'
     shadow 'co.chatchain:commons:42978'
 }
 
 minecraft {
-    mappings channel: 'snapshot', version: '20200916-1.16.2'
+    mappings channel: 'official', version: '1.17.1'
 
     runs {
         client {

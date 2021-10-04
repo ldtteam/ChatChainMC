@@ -6,7 +6,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandExceptionType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.minecraft.command.CommandSource;
+import net.minecraft.commands.CommandSourceStack;
 
 /**
  * Interface for all commands
@@ -19,7 +19,7 @@ public abstract class AbstractCommand
      * @return new built command
      */
     @SuppressWarnings("unused")
-    protected static LiteralArgumentBuilder<CommandSource> build()
+    protected static LiteralArgumentBuilder<CommandSourceStack> build()
     {
         throw new RuntimeException("Missing command builder!");
     }
@@ -30,7 +30,7 @@ public abstract class AbstractCommand
      * @param name subcommand name
      * @return new node builder
      */
-    protected static LiteralArgumentBuilder<CommandSource> newLiteral(final String name)
+    protected static LiteralArgumentBuilder<CommandSourceStack> newLiteral(final String name)
     {
         return LiteralArgumentBuilder.literal(name);
     }
@@ -43,7 +43,7 @@ public abstract class AbstractCommand
      * @param type argument type, see net.minecraft.command.arguments
      * @return new node builder
      */
-    protected static <T> RequiredArgumentBuilder<CommandSource, T> newArgument(final String name, final ArgumentType<T> type)
+    protected static <T> RequiredArgumentBuilder<CommandSourceStack, T> newArgument(final String name, final ArgumentType<T> type)
     {
         return RequiredArgumentBuilder.argument(name, type);
     }
@@ -85,7 +85,7 @@ public abstract class AbstractCommand
         /**
          * Tree root node
          */
-        private final LiteralArgumentBuilder<CommandSource> rootNode;
+        private final LiteralArgumentBuilder<CommandSourceStack> rootNode;
 
         /**
          * Creates new command tree.
@@ -103,7 +103,7 @@ public abstract class AbstractCommand
          * @param command new command to add
          * @return this
          */
-        protected CommandTree addNode(final LiteralArgumentBuilder<CommandSource> command)
+        protected CommandTree addNode(final LiteralArgumentBuilder<CommandSourceStack> command)
         {
             rootNode.then(command.build());
             return this;
@@ -114,7 +114,7 @@ public abstract class AbstractCommand
          *
          * @return tree as command node
          */
-        protected LiteralArgumentBuilder<CommandSource> build()
+        protected LiteralArgumentBuilder<CommandSourceStack> build()
         {
             return rootNode;
         }

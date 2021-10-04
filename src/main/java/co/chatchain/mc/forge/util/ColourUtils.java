@@ -1,30 +1,29 @@
 package co.chatchain.mc.forge.util;
 
 import lombok.Getter;
-import net.minecraft.util.text.TextFormatting;
-
+import net.minecraft.ChatFormatting;
 
 public class ColourUtils
 {
 
     public enum Colour
     {
-        DARK_RED(new RGBColour(170, 0, 0), "#AA0000", "4", TextFormatting.DARK_RED),
-        RED(new RGBColour(255, 85, 85), "#FF5555", "c", TextFormatting.RED),
-        GOLD(new RGBColour(255, 170, 0), "#FFAA00", "6", TextFormatting.GOLD),
-        YELLOW(new RGBColour(255, 255, 85), "#FFFF55", "e", TextFormatting.YELLOW),
-        DARK_GREEN(new RGBColour(0, 170, 0), "#00AA00", "2", TextFormatting.DARK_GREEN),
-        GREEN(new RGBColour(85, 255, 85), "#55FF55", "a", TextFormatting.GREEN),
-        AQUA(new RGBColour(85, 255, 255), "#55FFFF", "b", TextFormatting.AQUA),
-        DARK_AQUA(new RGBColour(0, 170, 170), "#00AAAA", "3", TextFormatting.DARK_AQUA),
-        DARK_BLUE(new RGBColour(0, 0, 170), "#0000AA", "1", TextFormatting.DARK_BLUE),
-        BLUE(new RGBColour(85, 85, 255), "#5555FF", "9", TextFormatting.BLUE),
-        LIGHT_PURPLE(new RGBColour(255, 85, 255), "#FF55FF", "d", TextFormatting.LIGHT_PURPLE),
-        DARK_PURPLE(new RGBColour(170, 0, 170), "#AA00AA", "5", TextFormatting.DARK_PURPLE),
-        WHITE(new RGBColour(255, 255, 255), "#FFFFFF", "f", TextFormatting.WHITE),
-        GRAY(new RGBColour(170, 170, 170), "#AAAAAA", "7", TextFormatting.GRAY),
-        DARK_GRAY(new RGBColour(85, 85, 85), "#555555", "8", TextFormatting.DARK_GRAY),
-        BLACK(new RGBColour(0, 0, 0), "#000000", "0", TextFormatting.BLACK);
+        DARK_RED(new RGBColour(170, 0, 0), "#AA0000", "4", ChatFormatting.DARK_RED),
+        RED(new RGBColour(255, 85, 85), "#FF5555", "c", ChatFormatting.RED),
+        GOLD(new RGBColour(255, 170, 0), "#FFAA00", "6", ChatFormatting.GOLD),
+        YELLOW(new RGBColour(255, 255, 85), "#FFFF55", "e", ChatFormatting.YELLOW),
+        DARK_GREEN(new RGBColour(0, 170, 0), "#00AA00", "2", ChatFormatting.DARK_GREEN),
+        GREEN(new RGBColour(85, 255, 85), "#55FF55", "a", ChatFormatting.GREEN),
+        AQUA(new RGBColour(85, 255, 255), "#55FFFF", "b", ChatFormatting.AQUA),
+        DARK_AQUA(new RGBColour(0, 170, 170), "#00AAAA", "3", ChatFormatting.DARK_AQUA),
+        DARK_BLUE(new RGBColour(0, 0, 170), "#0000AA", "1", ChatFormatting.DARK_BLUE),
+        BLUE(new RGBColour(85, 85, 255), "#5555FF", "9", ChatFormatting.BLUE),
+        LIGHT_PURPLE(new RGBColour(255, 85, 255), "#FF55FF", "d", ChatFormatting.LIGHT_PURPLE),
+        DARK_PURPLE(new RGBColour(170, 0, 170), "#AA00AA", "5", ChatFormatting.DARK_PURPLE),
+        WHITE(new RGBColour(255, 255, 255), "#FFFFFF", "f", ChatFormatting.WHITE),
+        GRAY(new RGBColour(170, 170, 170), "#AAAAAA", "7", ChatFormatting.GRAY),
+        DARK_GRAY(new RGBColour(85, 85, 85), "#555555", "8", ChatFormatting.DARK_GRAY),
+        BLACK(new RGBColour(0, 0, 0), "#000000", "0", ChatFormatting.BLACK);
 
         @Getter
         private final RGBColour colour;
@@ -36,14 +35,14 @@ public class ColourUtils
         private final String colourCode;
 
         @Getter
-        private final TextFormatting textFormatting;
+        private final ChatFormatting chatFormatting;
 
-        Colour(final RGBColour colour, final String hexCode, final String colourCode, final TextFormatting textFormatting)
+        Colour(final RGBColour colour, final String hexCode, final String colourCode, final ChatFormatting chatFormatting)
         {
             this.colour = colour;
             this.hexCode = hexCode;
             this.colourCode = colourCode;
-            this.textFormatting = textFormatting;
+            this.chatFormatting = chatFormatting;
         }
 
         public static Colour getFromColourCode(final String colourCode)

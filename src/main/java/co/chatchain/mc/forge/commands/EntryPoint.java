@@ -2,7 +2,7 @@ package co.chatchain.mc.forge.commands;
 
 import co.chatchain.mc.forge.ChatChainMC;
 import com.mojang.brigadier.CommandDispatcher;
-import net.minecraft.command.CommandSource;
+import net.minecraft.commands.CommandSourceStack;
 
 public class EntryPoint extends AbstractCommand
 {
@@ -11,7 +11,7 @@ public class EntryPoint extends AbstractCommand
      *
      * @param dispatcher main server command dispatcher
      */
-    public static void register(final CommandDispatcher<CommandSource> dispatcher)
+    public static void register(final CommandDispatcher<CommandSourceStack> dispatcher)
     {
         final CommandTree chatChainRoot = new CommandTree(ChatChainMC.MOD_ID)
                 .addNode(IgnoreGroupCommand.build())

@@ -8,8 +8,8 @@ import co.chatchain.commons.core.interfaces.cases.stats.IReceiveStatsRequestCase
 import co.chatchain.commons.interfaces.IChatChainHubConnection;
 import co.chatchain.mc.forge.ChatChainMC;
 import co.chatchain.mc.forge.util.UserUtils;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 
 import javax.inject.Inject;
 import java.text.DecimalFormat;
@@ -18,8 +18,8 @@ import java.util.List;
 
 public class ReceiveStatsRequestCase implements IReceiveStatsRequestCase
 {
-    private static final DecimalFormat TIME_FORMATTER = new DecimalFormat("########0.000");
-    private IChatChainHubConnection chatChainHubConnection;
+    private static final DecimalFormat           TIME_FORMATTER = new DecimalFormat("########0.000");
+    private final        IChatChainHubConnection chatChainHubConnection;
 
     @Inject
     public ReceiveStatsRequestCase(final IChatChainHubConnection chatChainHubConnection)
@@ -43,10 +43,10 @@ public class ReceiveStatsRequestCase implements IReceiveStatsRequestCase
         if (message.getStatsSection() == null || message.getStatsSection().equals("performance"))
         {
             long[] times = null;
-            for (ServerWorld dim : ChatChainMC.MINECRAFT_SERVER.getWorlds())
+            for (ServerLevel dim : ChatChainMC.MINECRAFT_SERVER.getAllLevels())
             {
-                if (dim.getDimensionKey().getLocation().equals(new ResourceLocation("minecraft:overworld")))
-                    times = ChatChainMC.MINECRAFT_SERVER.getTickTime(dim.getDimensionKey());
+                if (dim.dimension().location().equals(new ResourceLocation("minecraft:overworld")))
+                    times = ChatChainMC.MINECRAFT_SERVER.getTickTime(dim.dimension());
             }
 
             if (times != null)

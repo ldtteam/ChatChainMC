@@ -27,15 +27,14 @@ import com.google.inject.Injector;
 import com.microsoft.signalr.HubConnectionState;
 import lombok.Getter;
 import lombok.NonNull;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.Util;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Util;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.util.LazyOptional;
@@ -47,9 +46,9 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
-import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fmlserverevents.FMLServerStartingEvent;
+import net.minecraftforge.fmlserverevents.FMLServerStoppingEvent;
 import ninja.leaping.configurate.gson.GsonConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializers;
 
@@ -112,14 +111,12 @@ public class ChatChainMC
         configDir = new File("config/ChatChainMC/");
 
         reloadConfigs();
-
-        CapabilityManager.INSTANCE.register(IGroupSettings.class, new IGroupSettings.Storage(), new IGroupSettings.Factory());
     }
 
     @SubscribeEvent
     public void onAttachCapabilities(AttachCapabilitiesEvent<Entity> event)
     {
-        if (event.getObject() instanceof PlayerEntity)
+        if (event.getObject() instanceof Player)
         {
             event.addCapability(new ResourceLocation(MOD_ID, "groupsettings"), new GroupProvider());
         }
@@ -130,9 +127,9 @@ public class ChatChainMC
     {
         MINECRAFT_SERVER = event.getServer();
 
-        for (ServerWorld dim : MINECRAFT_SERVER.getWorlds())
+        for (ServerLevel dim : MINECRAFT_SERVER.getAllLevels())
         {
-            System.out.println("DIMENSION: " + dim.getDimensionKey().getLocation());
+            System.out.println("DIMENSION: " + dim.dimension().location());
         }
 
         Path formattingConfigPath = configDir.toPath().resolve("formatting.json");
@@ -182,14 +179,14 @@ public class ChatChainMC
                 }
                 else
                 {
-                    event.getPlayer().sendMessage(new StringTextComponent("§cYou do not have perms for default group in the config!"), Util.DUMMY_UUID);
+                    event.getPlayer().sendMessage(new TextComponent("§cYou do not have perms for default group in the config!"), Util.NIL_UUID);
                     event.setCanceled(true);
                     return;
                 }
             }
             else
             {
-                event.getPlayer().sendMessage(new StringTextComponent("§cPlease set a default group for chat in the config!"), Util.DUMMY_UUID);
+                event.getPlayer().sendMessage(new TextComponent("§cPlease set a default group for chat in the config!"), Util.NIL_UUID);
                 event.setCanceled(true);
                 return;
             }
@@ -201,7 +198,7 @@ public class ChatChainMC
 
         if (!groupConfig.getPlayersCanTalk().contains(event.getPlayer()))
         {
-            event.getPlayer().sendMessage(new StringTextComponent("§cYou do not have perms for your talking group!"), Util.DUMMY_UUID);
+            event.getPlayer().sendMessage(new TextComponent("§cYou do not have perms for your talking group!"), Util.NIL_UUID);
             event.setCanceled(true);
             return;
         }
@@ -209,7 +206,7 @@ public class ChatChainMC
         if (groupSettings.getIgnoredGroups().contains(groupSettings.getTalkingGroup()))
         {
             groupSettings.removeIgnoredGroup(groupSettings.getTalkingGroup());
-            event.getPlayer().sendMessage(new StringTextComponent("Group unmuted"), Util.DUMMY_UUID);
+            event.getPlayer().sendMessage(new TextComponent("Group unmuted"), Util.NIL_UUID);
         }
 
         if (connection.getConnectionState() == HubConnectionState.CONNECTED)
@@ -226,7 +223,7 @@ public class ChatChainMC
         final GenericMessageMessage message = new GenericMessageMessage(client, client.getId(), groupSettings.getTalkingGroup(), event.getMessage(), user);
 
         final IGenericMessageFormatter formatter = injector.getInstance(GenericMessageFormatter.class);
-        final ITextComponent messageToSend = new StringTextComponent(formatter.format(message));
+        final TextComponent messageToSend = new TextComponent(formatter.format(message));
 
         event.setComponent(messageToSend);
 
@@ -235,9 +232,9 @@ public class ChatChainMC
             Log.getLogger().info("New Generic Message " + messageToSend.toString());
             event.setCanceled(true);
 
-            for (final ServerPlayerEntity player: groupConfig.getPlayersListening())
+            for (final ServerPlayer player : groupConfig.getPlayersListening())
             {
-                player.sendMessage(messageToSend, Util.DUMMY_UUID);
+                player.sendMessage(messageToSend, Util.NIL_UUID);
             }
         }
     }
@@ -245,9 +242,9 @@ public class ChatChainMC
     @SubscribeEvent
     public void playerLoggedIn(PlayerEvent.PlayerLoggedInEvent event)
     {
-        if (event.getPlayer() != null && !event.getPlayer().world.isRemote && connection.getConnectionState() == HubConnectionState.CONNECTED)
+        if (event.getPlayer() != null && !event.getPlayer().level.isClientSide && connection.getConnectionState() == HubConnectionState.CONNECTED)
         {
-            final ClientUser user = new ClientUser(event.getPlayer().getName().getString(), event.getPlayer().getUniqueID().toString(), null, null, new ArrayList<>());
+            final ClientUser user = new ClientUser(event.getPlayer().getName().getString(), event.getPlayer().getUUID().toString(), null, null, new ArrayList<>());
 
             connection.sendUserEventMessage(new UserEventRequest(user, "LOGIN", null));
         }
@@ -256,9 +253,9 @@ public class ChatChainMC
     @SubscribeEvent
     public void playerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event)
     {
-        if (event.getPlayer() != null && !event.getPlayer().world.isRemote && connection.getConnectionState() == HubConnectionState.CONNECTED)
+        if (event.getPlayer() != null && !event.getPlayer().level.isClientSide && connection.getConnectionState() == HubConnectionState.CONNECTED)
         {
-            final ClientUser user = new ClientUser(event.getPlayer().getName().getString(), event.getPlayer().getUniqueID().toString(), null, null, new ArrayList<>());
+            final ClientUser user = new ClientUser(event.getPlayer().getName().getString(), event.getPlayer().getUUID().toString(), null, null, new ArrayList<>());
 
             connection.sendUserEventMessage(new UserEventRequest(user, "LOGOUT", null));
         }
@@ -267,10 +264,10 @@ public class ChatChainMC
     @SubscribeEvent
     public void playerDied(LivingDeathEvent event)
     {
-        if (event.getEntity() instanceof PlayerEntity
-                && !event.getEntity().world.isRemote && connection.getConnectionState() == HubConnectionState.CONNECTED)
+        if (event.getEntity() instanceof Player
+                && !event.getEntity().level.isClientSide && connection.getConnectionState() == HubConnectionState.CONNECTED)
         {
-            final ClientUser user = new ClientUser(event.getEntity().getName().getString(), event.getEntity().getUniqueID().toString(), null, null, new ArrayList<>());
+            final ClientUser user = new ClientUser(event.getEntity().getName().getString(), event.getEntity().getUUID().toString(), null, null, new ArrayList<>());
 
             connection.sendUserEventMessage(new UserEventRequest(user, "DEATH", null));
         }
