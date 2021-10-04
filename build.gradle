@@ -23,6 +23,10 @@ version = System.getenv()['BUILD_NUMBER'] != null ? System.getenv()['BUILD_NUMBE
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(16)
 
+processResources {
+    duplicatesStrategy = 'include'
+}
+
 sourceSets {
     main {
         java {
